@@ -2,17 +2,10 @@
   <div class="media-manager" @click="handleContainerClick">
     <!-- Top Bar: Hierarchical Tabs -->
     <div class="top-bar-container">
-      <!-- Top Level (Persistent) -->
       <div class="top-bar">
         <div class="tabs-container">
           <span class="view-label">VIEW:</span>
-          <button 
-            class="tab-btn" 
-            :class="{ active: isAllSelected }"
-            @click="selectAll"
-          >
-            ALL
-          </button>
+          <button class="tab-btn" :class="{ active: isAllSelected }" @click="selectAll">ALL</button>
           <button 
             v-for="folder in rootLevelFolders" 
             :key="folder.id"
@@ -23,20 +16,14 @@
             {{ folder.name.toUpperCase() }}
           </button>
         </div>
-        
         <button class="select-all-btn" @click.stop="toggleSelectAll">
           {{ selectedItems.size > 0 ? 'DESELECT ALL' : 'SELECT ALL' }}
         </button>
       </div>
 
-      <!-- Sub-folder levels -->
-      <div 
-        v-for="(levelFolders, index) in subFolderLevels" 
-        :key="index"
-        class="top-bar sub-bar"
-      >
+      <div v-for="(levelFolders, index) in subFolderLevels" :key="index" class="top-bar sub-bar">
         <div class="tabs-container">
-          <span class="view-label"></span> <!-- Spacer -->
+          <span class="view-label"></span>
           <button 
             v-for="folder in levelFolders" 
             :key="folder.id"
@@ -50,20 +37,11 @@
       </div>
     </div>
 
-    <div v-if="loading" class="loading">
-      Loading...
-    </div>
-
-    <div v-else-if="error" class="error">
-      {{ error }}
-    </div>
+    <div v-if="loading" class="loading">Loading...</div>
+    <div v-else-if="error" class="error">{{ error }}</div>
 
     <div v-else class="content-area">
-      <div 
-        class="media-grid" 
-        ref="gridRef"
-        @mousedown="startSelection"
-      >
+      <div class="media-grid" ref="gridRef" @mousedown="startSelection">
         <MediaCard
           v-for="(item, index) in filteredMediaList"
           :key="item.id"
@@ -73,36 +51,61 @@
           :data-id="item.id"
           @click.stop="handleSelection(item, index, $event)"
         />
-        
-        <div v-if="filteredMediaList.length === 0" class="empty-state">
-          No media found.
-        </div>
-
-        <!-- Selection Frame -->
-        <div 
-          v-if="isSelecting" 
-          class="selection-frame"
-          :style="selectionFrameStyle"
-        ></div>
+        <div v-if="filteredMediaList.length === 0" class="empty-state">No media found.</div>
+        <div v-if="isSelecting" class="selection-frame" :style="selectionFrameStyle"></div>
       </div>
     </div>
 
     <!-- Bottom Bar: Controls -->
-    <div class="bottom-bar">
+    <div class="bottom-bar" @click.stop>
       <div class="controls-left">
+        <!-- Mapping Drop-up -->
+        <div class="dropup control-item" ref="mappingRef">
+          <span class="view-label">MAPPING:</span>
+          <div class="dropup-container">
+            <button class="dropup-btn" @click="toggleMappingMenu">
+              {{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}
+              <span class="arrow">▲</span>
+            </button>
+            <ul v-if="isMappingMenuOpen" class="dropup-menu">
+              <li 
+                v-for="m in mappings" 
+                :key="m.uid" 
+                @click="selectMapping(m)"
+                :class="{ active: selectedMapping?.uid === m.uid }"
+              >
+                {{ m.name }}
+              </li>
+              <li v-if="mappings.length === 0" class="disabled">No mappings found</li>
+            </ul>
+          </div>
+        </div>
+
         <label class="control-item">
           <input type="checkbox" v-model="options.splitSection"> Split Section
         </label>
         <div class="control-item">
           Overlap: <input type="number" v-model="options.overlap" class="input-number"> s
         </div>
-        <label class="control-item">
-          <input type="checkbox" v-model="options.addCueTag"> Add Cue Tag
-        </label>
+        <div class="control-group">
+          <label class="control-item">
+            <input type="checkbox" v-model="options.addCueTag"> Add Cue Tag
+          </label>
+          <input 
+            v-if="options.addCueTag" 
+            type="text" 
+            v-model="options.cueValue" 
+            class="input-text" 
+            placeholder="e.g. 1.2.3"
+            :class="{ invalid: !isCueValid && options.cueValue !== '' }"
+          >
+        </div>
       </div>
       <div class="controls-right">
         <span class="selection-count">{{ selectedItems.size }} selected</span>
-        <button class="create-btn" @click="handleCreateLayers">CREATE LAYERS</button>
+        <button class="create-btn" :disabled="!isCreateLayersEnabled" @click="handleCreateLayers">
+          CREATE LAYERS
+        </button>
       </div>
     </div>
   </div>
@@ -110,34 +113,36 @@
 
 <script setup>
 import { ref, onMounted, reactive, computed, onUnmounted, watch } from 'vue';
-import { getMediaList } from '../services/disguiseService';
+import { getMediaList, getMappingList } from '../services/disguiseService';
 import MediaCard from './MediaCard.vue';
 
 const props = defineProps({
-  directorEndpoint: {
-    type: String,
-    required: true
-  }
+  directorEndpoint: { type: String, required: true }
 });
 
 const loading = ref(true);
 const error = ref(null);
 const fullHierarchy = ref([]);
+const mappings = ref([]);
+const selectedMapping = ref(null);
+const isMappingMenuOpen = ref(false);
 const selectedItems = reactive(new Set());
 
 // Navigation state
-const navigationPath = ref([]); // Array of folder objects
+const navigationPath = ref([]);
 const isAllSelected = ref(true);
 
 // Options state
 const options = reactive({
   splitSection: false,
   overlap: 0,
-  addCueTag: false
+  addCueTag: false,
+  cueValue: ''
 });
 
 // Drag Selection State
 const gridRef = ref(null);
+const mappingRef = ref(null);
 const isSelecting = ref(false);
 const wasDragging = ref(false);
 const selectionStart = reactive({ x: 0, y: 0 });
@@ -147,65 +152,55 @@ let lastSelectedIndex = -1;
 
 // --- Computed Properties ---
 
-// Computed: Top level folders (All, Root, FolderA...)
-const rootLevelFolders = computed(() => {
-  return fullHierarchy.value.filter(item => item.type === 'folder');
-});
+const rootLevelFolders = computed(() => fullHierarchy.value.filter(item => item.type === 'folder'));
 
-// Computed: Calculate subfolder levels to render
 const subFolderLevels = computed(() => {
   if (isAllSelected.value || navigationPath.value.length === 0) return [];
-  
   const levels = [];
   let currentLevelFolders = navigationPath.value[0].children?.filter(i => i.type === 'folder') || [];
-  
   for (let i = 0; i < navigationPath.value.length; i++) {
-    if (currentLevelFolders.length > 0) {
-      levels.push(currentLevelFolders);
-    }
-    // Prep next level
+    if (currentLevelFolders.length > 0) levels.push(currentLevelFolders);
     const nextInPath = navigationPath.value[i + 1];
-    if (nextInPath) {
-      currentLevelFolders = nextInPath.children?.filter(i => i.type === 'folder') || [];
-    } else {
-      break;
-    }
+    if (nextInPath) currentLevelFolders = nextInPath.children?.filter(i => i.type === 'folder') || [];
+    else break;
   }
   return levels;
 });
 
-// Computed: Flatten all files from the hierarchy for 'ALL' view
 const allFiles = computed(() => {
   const files = [];
   const traverse = (items) => {
     items.forEach(item => {
-      if (item.type === 'file') {
-        files.push(item);
-      } else if (item.type === 'folder' && item.children) {
-        traverse(item.children);
-      }
+      if (item.type === 'file') files.push(item);
+      else if (item.children) traverse(item.children);
     });
   };
   traverse(fullHierarchy.value);
-  
-  // Sort alphabetically
   return files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
 });
 
-// Computed: Get files based on active tab
 const filteredMediaList = computed(() => {
-  if (isAllSelected.value) {
-    return allFiles.value;
-  }
-  
+  if (isAllSelected.value) return allFiles.value;
   if (navigationPath.value.length === 0) return [];
-  
-  // Return files in the last folder of the navigation path
   const currentFolder = navigationPath.value[navigationPath.value.length - 1];
   return currentFolder.children?.filter(item => item.type === 'file') || [];
 });
 
-// --- Navigation Helpers ---
+const isCueValid = computed(() => {
+  if (!options.addCueTag) return true;
+  const segment = '([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])';
+  const regex = new RegExp(`^${segment}(\\.${segment}){0,2}$`);
+  return regex.test(options.cueValue);
+});
+
+const isCreateLayersEnabled = computed(() => {
+  const hasSelection = selectedItems.size > 0;
+  const hasMapping = !!selectedMapping.value;
+  const validCue = isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true);
+  return hasSelection && hasMapping && validCue;
+});
+
+// --- Helpers ---
 
 const selectAll = () => {
   isAllSelected.value = true;
@@ -214,13 +209,22 @@ const selectAll = () => {
 
 const selectFolderAtLevel = (folder, level) => {
   isAllSelected.value = false;
-  // Truncate path to current level and add new selection
   navigationPath.value = navigationPath.value.slice(0, level);
   navigationPath.value.push(folder);
 };
 
-const isFolderInPath = (folder, level) => {
-  return navigationPath.value[level]?.id === folder.id;
+const isFolderInPath = (folder, level) => navigationPath.value[level]?.id === folder.id;
+
+const toggleMappingMenu = () => isMappingMenuOpen.value = !isMappingMenuOpen.value;
+const selectMapping = (m) => {
+  selectedMapping.value = m;
+  isMappingMenuOpen.value = false;
+};
+
+const handleClickOutside = (e) => {
+  if (mappingRef.value && !mappingRef.value.contains(e.target)) {
+    isMappingMenuOpen.value = false;
+  }
 };
 
 // --- Watchers & Lifecycle ---
@@ -233,59 +237,35 @@ watch([isAllSelected, navigationPath], () => {
 onMounted(async () => {
   try {
     loading.value = true;
-    const media = await getMediaList(props.directorEndpoint);
-    if (Array.isArray(media)) {
-      fullHierarchy.value = media;
-    }
+    const [media, mps] = await Promise.all([
+      getMediaList(props.directorEndpoint),
+      getMappingList(props.directorEndpoint)
+    ]);
+    if (Array.isArray(media)) fullHierarchy.value = media;
+    if (Array.isArray(mps)) mappings.value = mps;
   } catch (err) {
-    error.value = `Failed to load media: ${err.message}`;
+    error.value = `Failed to load data: ${err.message}`;
     console.error(err);
-    generateMockData();
   } finally {
     loading.value = false;
   }
   window.addEventListener('mouseup', endSelection);
   window.addEventListener('mousemove', updateSelection);
+  window.addEventListener('mousedown', handleClickOutside);
 });
 
 onUnmounted(() => {
   window.removeEventListener('mouseup', endSelection);
   window.removeEventListener('mousemove', updateSelection);
+  window.removeEventListener('mousedown', handleClickOutside);
 });
 
-// --- Methods ---
-
-function generateMockData() {
-    const mockFolders = ['content', 'sample', 'test'].map(name => ({
-        id: name,
-        name: name,
-        type: 'folder',
-        children: [
-          ...Array.from({ length: 3 }, (_, i) => ({
-              id: `${name}_file_${i}`,
-              name: `${name}_image_${i + 1}.mov`,
-              type: 'file',
-              path: `/mock/${name}/image_${i}.mov`
-          })),
-          {
-            id: `${name}_sub`,
-            name: `sub_${name}`,
-            type: 'folder',
-            children: [{
-              id: `${name}_sub_file`,
-              name: `nested_${name}.mov`,
-              type: 'file',
-              path: `/mock/${name}/sub/file.mov`
-            }]
-          }
-        ]
-    }));
-    fullHierarchy.value = [{id: 'Root', name: 'Root', type: 'folder', children: []}, ...mockFolders];
-}
+// --- UI Logic ---
 
 function handleCreateLayers() {
   console.log('Create Layers clicked', {
     selected: Array.from(selectedItems),
+    mapping: selectedMapping.value,
     options
   });
 }
@@ -388,7 +368,7 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #1e1e1e; /* Dark theme background */
+  background-color: #1e1e1e;
   color: #e0e0e0;
 }
 
@@ -496,12 +476,91 @@ const selectionFrameStyle = computed(() => {
   gap: 20px;
 }
 
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .control-item {
   display: flex;
   align-items: center;
   gap: 8px;
   color: #ccc;
   cursor: pointer;
+}
+
+.dropup {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.dropup-container {
+  position: relative;
+}
+
+.dropup-btn {
+  background-color: #333;
+  border: 1px solid #444;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-width: 150px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropup-btn:hover {
+  background-color: #444;
+}
+
+.dropup-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #252526;
+  border: 1px solid #444;
+  border-radius: 3px;
+  margin-bottom: 5px;
+  padding: 5px 0;
+  list-style: none;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+}
+
+.dropup-menu li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.dropup-menu li:hover {
+  background-color: #007acc;
+  color: white;
+}
+
+.dropup-menu li.active {
+  background-color: #37373d;
+  color: #007acc;
+  font-weight: bold;
+}
+
+.dropup-menu li.disabled {
+  color: #666;
+  cursor: default;
+}
+
+.arrow {
+  font-size: 0.6rem;
+  margin-left: 10px;
 }
 
 .input-number {
@@ -512,6 +571,20 @@ const selectionFrameStyle = computed(() => {
   border-radius: 3px;
   width: 40px;
   text-align: center;
+}
+
+.input-text {
+  background-color: #333;
+  border: 1px solid #444;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 3px;
+  width: 100px;
+  font-size: 0.8rem;
+}
+
+.input-text.invalid {
+  border-color: #f44336;
 }
 
 .selection-count {
@@ -531,8 +604,14 @@ const selectionFrameStyle = computed(() => {
   font-size: 0.85rem;
 }
 
-.create-btn:hover {
+.create-btn:hover:not(:disabled) {
   background-color: #1177bb;
+}
+
+.create-btn:disabled {
+  background-color: #3a3d41;
+  color: #757575;
+  cursor: not-allowed;
 }
 
 .loading, .error {
