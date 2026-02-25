@@ -1,0 +1,587 @@
+{
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "result": [
+    {
+      "hostname": "Designer-Carlos",
+      "lastProject": "Eventify_RAV\\eventify_rav.d3",
+      "projects": [
+        {
+          "path": "D:\\d3\\Eventify_RAV\\eventify_rav.d3",
+          "lastModified": "24 feb 2026 18:38:20.000",
+          "version": {
+            "major": 32,
+            "minor": 3,
+            "hotfix": 1,
+            "revision": 238768
+          }
+        },
+        {
+          "path": "D:\\d3\\OUATID_d3_project\\ouatid.d3",
+          "lastModified": "6 feb 2026 09:14:45.000",
+          "version": {
+            "major": 32,
+            "minor": 2,
+            "hotfix": 5,
+            "revision": 237380
+          }
+        },
+        {
+          "path": "D:\\d3\\QAT_ABQ_entrance\\qat_abq_opening.d3",
+          "lastModified": "3 feb 2026 01:50:12.000",
+          "version": {
+            "major": 32,
+            "minor": 2,
+            "hotfix": 5,
+            "revision": 237380
+          }
+        },
+        {
+          "path": "D:\\d3\\start\\start.d3",
+          "lastModified": "14 feb 2026 14:18:32.000",
+          "version": {
+            "major": 32,
+            "minor": 3,
+            "hotfix": 1,
+            "revision": 238768
+          }
+        },
+        {
+          "path": "D:\\d3\\test\\test.d3",
+          "lastModified": "10 dec 2025 12:47:49.000",
+          "version": {
+            "major": 31,
+            "minor": 3,
+            "hotfix": 4,
+            "revision": 228566
+          }
+        }
+      ]
+    },
+    {
+      "hostname": "Laptop-MPD3AA",
+      "lastProject": "Abu-Dhabi_fort\\abu-dhabi_fort.d3",
+      "projects": [
+        {
+          "path": "D:\\d3 Projects\\AAND_2025\\aand_2025.d3",
+          "lastModified": "2 dec 2025 14:53:38.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 2,
+            "revision": 232426
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\AAND_2025_v2 - Copy\\aand_2025_v2.d3",
+          "lastModified": "25 nov 2025 12:34:42.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 2,
+            "revision": 232426
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\AAND_2025_v2\\aand_2025_v2.d3",
+          "lastModified": "29 nov 2025 20:34:42.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 2,
+            "revision": 232426
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\ADG_2024\\adg_2024.d3",
+          "lastModified": "12 dec 2024 04:06:39.000",
+          "version": {
+            "major": 27,
+            "minor": 7,
+            "hotfix": 2,
+            "revision": 190369
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\ADG_2025\\adg_2025.d3",
+          "lastModified": "17 oct 2025 12:13:16.000",
+          "version": {
+            "major": 31,
+            "minor": 3,
+            "hotfix": 3,
+            "revision": 228168
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Abu-Dhabi_fort\\abu-dhabi_fort.d3",
+          "lastModified": "23 feb 2026 16:32:58.000",
+          "version": {
+            "major": 32,
+            "minor": 3,
+            "hotfix": 0,
+            "revision": 238105
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Burj_OLC_25\\burj_olc_001.d3",
+          "lastModified": "3 jan 2026 17:02:01.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 1,
+            "revision": 231784
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\EXEED_2025\\exeed_2025.d3",
+          "lastModified": "14 jan 2026 14:45:17.000",
+          "version": {
+            "major": 31,
+            "minor": 3,
+            "hotfix": 4,
+            "revision": 228566
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Egyptian SuperCup_2025\\egyptian supercup_2025.d3",
+          "lastModified": "3 nov 2025 16:19:09.000",
+          "version": {
+            "major": 32,
+            "minor": 0,
+            "hotfix": 3,
+            "revision": 229654
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Emaar_NY_2025\\Emaar_NY_2025.d3",
+          "lastModified": "16 dec 2025 18:36:25.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 1,
+            "revision": 231784
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\F1_Jedda\\f1_jedda.d3",
+          "lastModified": "20 apr 2025 15:45:16.000",
+          "version": {
+            "major": 30,
+            "minor": 7,
+            "hotfix": 0,
+            "revision": 213337
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MERAAS_2026\\meraas_2026.d3",
+          "lastModified": "20 jan 2026 23:21:35.000",
+          "version": {
+            "major": 32,
+            "minor": 2,
+            "hotfix": 0,
+            "revision": 234682
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MEYDAN_test\\MEYDAN_test.d3",
+          "lastModified": "24 oct 2025 09:08:52.000",
+          "version": {
+            "major": 31,
+            "minor": 3,
+            "hotfix": 3,
+            "revision": 228168
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Meydan_2025\\Meydan_2025.d3",
+          "lastModified": "31 oct 2025 21:24:45.000",
+          "version": {
+            "major": 32,
+            "minor": 0,
+            "hotfix": 3,
+            "revision": 229654
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\NOMADA NAS GALA DINNER\\nomada nas gala dinner.d3",
+          "lastModified": "2 feb 2026 06:57:32.000",
+          "version": {
+            "major": 32,
+            "minor": 2,
+            "hotfix": 3,
+            "revision": 236414
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Persp\\persp.d3",
+          "lastModified": "10 jan 2025 14:23:10.000",
+          "version": {
+            "major": 30,
+            "minor": 2,
+            "hotfix": 1,
+            "revision": 205166
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Purple Chair\\purple chair.d3",
+          "lastModified": "27 jan 2026 21:46:35.000",
+          "version": {
+            "major": 32,
+            "minor": 2,
+            "hotfix": 3,
+            "revision": 236414
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Sync Sammit 2024\\sync sammit 2024.d3",
+          "lastModified": "23 may 2024 15:09:50.000",
+          "version": {
+            "major": 27,
+            "minor": 1,
+            "hotfix": 4,
+            "revision": 181698
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Test\\test.d3",
+          "lastModified": "24 nov 2025 08:02:20.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 2,
+            "revision": 232426
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\Test_ADG\\test_adg.d3",
+          "lastModified": "16 sep 2025 09:30:30.000",
+          "version": {
+            "major": 30,
+            "minor": 8,
+            "hotfix": 5,
+            "revision": 220322
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\UAE_SuperCup_2023\\uae_supercup_2023.d3",
+          "lastModified": "29 dec 2023 16:11:02.000",
+          "version": {
+            "major": 26,
+            "minor": 1,
+            "hotfix": 1,
+            "revision": 172420
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\UAE_SuperCup_2023_test\\UAE_SuperCup_2023 - 1.d3",
+          "lastModified": "21 dec 2023 10:18:01.000",
+          "version": {
+            "major": 26,
+            "minor": 1,
+            "hotfix": 1,
+            "revision": 172420
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\UAE_SuperCup_2023_test\\UAE_SuperCup_2023.d3",
+          "lastModified": "15 dec 2023 06:39:20.000",
+          "version": {
+            "major": 26,
+            "minor": 3,
+            "hotfix": 1,
+            "revision": 175636
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\adg_2025_test\\adg_2025_test.d3",
+          "lastModified": "9 oct 2025 11:49:16.000",
+          "version": {
+            "major": 31,
+            "minor": 3,
+            "hotfix": 3,
+            "revision": 228168
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\gfd\\gfd.d3",
+          "lastModified": "1 dec 2023 11:27:06.000",
+          "version": {
+            "major": 25,
+            "minor": 3,
+            "hotfix": 1,
+            "revision": 168878
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\hatta_fest\\hatta_fest.d3",
+          "lastModified": "16 nov 2024 09:31:22.000",
+          "version": {
+            "major": 29,
+            "minor": 1,
+            "hotfix": 2,
+            "revision": 198643
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\orad_test\\orad_test.d3",
+          "lastModified": "23 dec 2024 08:53:38.000",
+          "version": {
+            "major": 30,
+            "minor": 2,
+            "hotfix": 1,
+            "revision": 205166
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\plugin\\plugin.d3",
+          "lastModified": "23 jun 2025 13:29:10.000",
+          "version": {
+            "major": 30,
+            "minor": 8,
+            "hotfix": 2,
+            "revision": 217911
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\september 2025\\september 2025.d3",
+          "lastModified": "31 may 2025 06:37:19.000",
+          "version": {
+            "major": 30,
+            "minor": 8,
+            "hotfix": 0,
+            "revision": 216685
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\sp\\sp.d3",
+          "lastModified": "1 oct 2024 10:23:50.000",
+          "version": {
+            "major": 27,
+            "minor": 7,
+            "hotfix": 2,
+            "revision": 190369
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\start\\start.d3",
+          "lastModified": "18 feb 2026 14:34:10.000",
+          "version": {
+            "major": 32,
+            "minor": 3,
+            "hotfix": 0,
+            "revision": 238105
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\tafa\\tafa.d3",
+          "lastModified": "5 oct 2024 11:43:49.000",
+          "version": {
+            "major": 27,
+            "minor": 7,
+            "hotfix": 2,
+            "revision": 190369
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\tanweer festival v2\\tanweer festival v2.d3",
+          "lastModified": "14 oct 2025 00:31:43.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 0,
+            "revision": 231132
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\test aldar\\test aldar.d3",
+          "lastModified": "7 feb 2025 20:53:12.000",
+          "version": {
+            "major": 30,
+            "minor": 3,
+            "hotfix": 1,
+            "revision": 207286
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\test alpha feed\\test alpha feed.d3",
+          "lastModified": "24 jan 2026 12:09:29.000",
+          "version": {
+            "major": 32,
+            "minor": 2,
+            "hotfix": 3,
+            "revision": 236414
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\test_file\\test_file.d3",
+          "lastModified": "1 oct 2025 11:41:25.000",
+          "version": {
+            "major": 31,
+            "minor": 3,
+            "hotfix": 3,
+            "revision": 228168
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\test_fort\\test_fort.d3",
+          "lastModified": "21 feb 2026 15:38:05.000",
+          "version": {
+            "major": 32,
+            "minor": 3,
+            "hotfix": 0,
+            "revision": 238105
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\test_leo\\test_leo.d3",
+          "lastModified": "24 nov 2025 08:03:02.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 2,
+            "revision": 232426
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\test_mount\\test_mount.d3",
+          "lastModified": "13 nov 2025 09:55:34.000",
+          "version": {
+            "major": 32,
+            "minor": 0,
+            "hotfix": 3,
+            "revision": 229654
+          }
+        }
+      ]
+    },
+    {
+      "hostname": "d3-designer",
+      "lastProject": "plugin test\\plugin test.d3",
+      "projects": [
+        {
+          "path": "D:\\d3 Projects\\JLO_Azizi_CCA\\jlo_azizi_cca.d3",
+          "lastModified": "18 feb 2025 17:13:55.000",
+          "version": {
+            "major": 30,
+            "minor": 3,
+            "hotfix": 1,
+            "revision": 207286
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\KSA_Sela_ANB_Arena\\ksa_sela_anb_arena.d3",
+          "lastModified": "25 sep 2025 20:43:42.000",
+          "version": {
+            "major": 31,
+            "minor": 3,
+            "hotfix": 2,
+            "revision": 227560
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MDL_DownBeast_2023\\mdl_downbeast_2023 with her.d3",
+          "lastModified": "8 dec 2024 15:23:55.000",
+          "version": {
+            "major": 30,
+            "minor": 1,
+            "hotfix": 1,
+            "revision": 203629
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MDL_DownBeast_2023\\mdl_downbeast_2023.d3",
+          "lastModified": "31 oct 2024 04:05:20.000",
+          "version": {
+            "major": 26,
+            "minor": 2,
+            "hotfix": 2,
+            "revision": 174130
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MDL_DownBeast_2024\\MDL_DownBeast_2024_old.d3",
+          "lastModified": "4 dec 2024 18:45:25.000",
+          "version": {
+            "major": 30,
+            "minor": 0,
+            "hotfix": 1,
+            "revision": 201424
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MDL_DownBeast_2024\\mdl_downbeast_2024 - Copy.d3",
+          "lastModified": "12 dec 2025 17:53:24.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 3,
+            "revision": 233619
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MDL_DownBeast_2024\\mdl_downbeast_2024.d3",
+          "lastModified": "10 dec 2024 22:04:20.000",
+          "version": {
+            "major": 30,
+            "minor": 1,
+            "hotfix": 1,
+            "revision": 203629
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MDL_ParkStage_2025\\mdl_parkstage_2025 - Copy.d3",
+          "lastModified": "13 jan 2026 18:22:23.000",
+          "version": {
+            "major": 32,
+            "minor": 2,
+            "hotfix": 1,
+            "revision": 235248
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\MDL_ParkStage_2025\\mdl_parkstage_2025.d3",
+          "lastModified": "7 dec 2025 16:51:58.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 3,
+            "revision": 233619
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\plugin test\\plugin test.d3",
+          "lastModified": "25 feb 2026 06:06:14.000",
+          "version": {
+            "major": 32,
+            "minor": 3,
+            "hotfix": 0,
+            "revision": 238105
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\start\\start.d3",
+          "lastModified": "24 feb 2026 05:45:37.000",
+          "version": {
+            "major": 32,
+            "minor": 3,
+            "hotfix": 0,
+            "revision": 238105
+          }
+        },
+        {
+          "path": "D:\\d3 Projects\\test\\test.d3",
+          "lastModified": "2 dec 2025 13:17:12.000",
+          "version": {
+            "major": 32,
+            "minor": 1,
+            "hotfix": 3,
+            "revision": 233619
+          }
+        }
+      ]
+    }
+  ]
+}

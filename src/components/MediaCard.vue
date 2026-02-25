@@ -5,15 +5,24 @@
     @click.stop="$emit('toggle-selection', $event)"
   >
     <div class="thumbnail-area">
-      <!-- Placeholder for actual thumbnail image -->
-      <span class="placeholder-text">IMG</span>
+      <img 
+        v-if="item.thumbnail" 
+        :src="item.thumbnail" 
+        class="thumbnail-image" 
+        @error="handleImageError"
+        alt="thumbnail"
+      />
+      <!-- Placeholder shown if no thumbnail or error -->
+      <span v-if="!imageLoaded" class="placeholder-text">IMG</span>
     </div>
     <div class="media-name" :title="item.name">{{ item.name }}</div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { ref, watch } from 'vue';
+
+const props = defineProps({
   item: {
     type: Object,
     required: true
@@ -25,6 +34,18 @@ defineProps({
 });
 
 defineEmits(['toggle-selection']);
+
+const imageLoaded = ref(true);
+
+// Reset image loaded state when item changes
+watch(() => props.item.thumbnail, (newVal) => {
+    imageLoaded.value = !!newVal;
+}, { immediate: true });
+
+function handleImageError(e) {
+  imageLoaded.value = false;
+  e.target.style.display = 'none'; // Hide broken image
+}
 </script>
 
 <style scoped>
@@ -60,12 +81,21 @@ defineEmits(['toggle-selection']);
   justify-content: center;
   margin: 5px;
   border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* or cover depending on preference */
 }
 
 .placeholder-text {
   color: #444;
   font-weight: bold;
   font-size: 1.2rem;
+  position: absolute;
 }
 
 .media-name {

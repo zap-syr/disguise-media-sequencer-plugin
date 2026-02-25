@@ -1,0 +1,10 @@
+{
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "d3Log": "Python script took 3.411ms\n",
+  "pythonLog": "",
+  "returnValue": "[{\"path\": \"internal/directprojection/videointexture/videoin_2.mov (direct).apx\", \"_type\": \"DirectProjection\", \"uid\": \"0x907baa5a49ad4b70\"}, {\"path\": \"internal/directprojection/videointexture/videoin_3.mov (direct).apx\", \"_type\": \"DirectProjection\", \"uid\": \"0x2c1f12da94cfd79c\"}, {\"path\": \"internal/directprojection/videointexture/videoin_4.mov (direct).apx\", \"_type\": \"DirectProjection\", \"uid\": \"0xcc926811723ebaae\"}, {\"path\": \"internal/directprojection/videointexture/videoin_1.mov (direct).apx\", \"_type\": \"DirectProjection\", \"uid\": \"0x2af82f6597d063e6\"}, {\"path\": \"objects/directprojection/surface 1 (direct).apx\", \"_type\": \"DirectProjection\", \"uid\": \"0x124981208216eb52\"}, {\"path\": \"objects/feedprojection/feed 1 (feed).apx\", \"_type\": \"FeedProjection\", \"uid\": \"0xb8767ce8fc21b276\"}]"
+}

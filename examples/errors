@@ -1,0 +1,8 @@
+MediaManager.vue:17 [Vue warn]: Property "rootLevelFolders" was accessed during render but is not defined on instance. 
+  at <MediaManager directorEndpoint="localhost:80" > 
+  at <App>
+
+
+[Vue warn]: Property "subFolderLevels" was accessed during render but is not defined on instance. 
+  at <MediaManager directorEndpoint="localhost:80" > 
+  at <App>
