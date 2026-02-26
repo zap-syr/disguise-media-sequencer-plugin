@@ -6,7 +6,6 @@
     <div v-else class="main-layout">
       <!-- Left Panel: Navigation & Media -->
       <div class="left-panel">
-        <!-- Top Bar moved inside Left Panel -->
         <div class="top-bar-container">
           <div class="top-bar">
             <div class="tabs-container">
@@ -55,7 +54,6 @@
           </div>
         </div>
 
-        <!-- Media Grid Area -->
         <div class="content-area">
           <div class="media-grid" ref="gridRef" @mousedown="startSelection">
             <MediaCard
@@ -75,111 +73,111 @@
         </div>
       </div>
 
-      <!-- Settings Sidebar (Full Height) -->
+      <!-- Settings Sidebar -->
       <div class="settings-sidebar" @click.stop>
         <div class="sidebar-title">SETTINGS</div>
         
-        <div class="sidebar-group">
-          <label class="sidebar-label">MAPPING</label>
-          <div class="dropdown-wrapper" ref="mappingRef">
-            <button class="dropdown-btn" @click="toggleMappingMenu">
-              {{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}
-              <span class="arrow">▼</span>
-            </button>
-            <ul v-if="isMappingMenuOpen" class="dropdown-menu">
-              <li 
-                v-for="m in mappings" 
-                :key="m.uid" 
-                @click="selectMapping(m)"
-                :class="{ active: selectedMapping?.uid === m.uid }"
-              >
-                {{ m.name }}
-              </li>
-              <li v-if="mappings.length === 0" class="disabled">No mappings found</li>
-            </ul>
+        <div class="sidebar-content">
+          <div class="sidebar-group">
+            <label class="sidebar-label">MAPPING</label>
+            <div class="dropdown-wrapper" ref="mappingRef">
+              <button class="dropdown-btn" @click="toggleMappingMenu">
+                {{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}
+                <span class="arrow">▼</span>
+              </button>
+              <ul v-if="isMappingMenuOpen" class="dropdown-menu">
+                <li 
+                  v-for="m in mappings" 
+                  :key="m.uid" 
+                  @click="selectMapping(m)"
+                  :class="{ active: selectedMapping?.uid === m.uid }"
+                >
+                  {{ m.name }}
+                </li>
+                <li v-if="mappings.length === 0" class="disabled">No mappings found</li>
+              </ul>
+            </div>
           </div>
-        </div>
 
-        <div class="sidebar-group">
-          <label class="sidebar-label">MODE</label>
-          <select v-model="options.mode" class="sidebar-select">
-            <option value="Normal">Normal</option>
-            <option value="Locked">Locked</option>
-          </select>
-        </div>
+          <div class="sidebar-group">
+            <label class="sidebar-label">MODE</label>
+            <select v-model="options.mode" class="sidebar-select">
+              <option value="Normal">Normal</option>
+              <option value="Locked">Locked</option>
+            </select>
+          </div>
 
-        <div class="sidebar-group">
-          <label class="sidebar-label">AT END POINT</label>
-          <select v-model="options.atEndPoint" class="sidebar-select">
-            <option value="Loop">Loop</option>
-            <option value="Ping-Pong">Ping-Pong</option>
-            <option value="Pause">Pause</option>
-          </select>
-        </div>
+          <div class="sidebar-group">
+            <label class="sidebar-label">AT END POINT</label>
+            <select v-model="options.atEndPoint" class="sidebar-select">
+              <option value="Loop">Loop</option>
+              <option value="Ping-Pong">Ping-Pong</option>
+              <option value="Pause">Pause</option>
+            </select>
+          </div>
 
-        <div class="sidebar-group">
-          <label class="sidebar-label">STILL IMG DURATION (s)</label>
-          <input 
-            type="number" 
-            v-model.number="options.stillDuration" 
-            class="sidebar-input-number"
-            min="0"
-            step="1"
-          >
-        </div>
-
-        <div class="sidebar-group">
-          <label class="sidebar-label">MOVIE DURATION</label>
-          <div class="duration-row">
-            <label class="control-item">
-              <input type="checkbox" v-model="options.fitToContent"> Fit To Contents
-            </label>
+          <div class="sidebar-group">
+            <label class="sidebar-label">STILL IMG DURATION (s)</label>
             <input 
-              v-if="!options.fitToContent"
               type="number" 
-              v-model.number="options.movieDuration" 
-              class="sidebar-input-number mini"
+              v-model.number="options.stillDuration" 
+              class="sidebar-input-number"
               min="0"
               step="1"
             >
-            <span v-if="!options.fitToContent" class="unit">s</span>
+          </div>
+
+          <div class="sidebar-group">
+            <label class="sidebar-label">MOVIE DURATION</label>
+            <div class="duration-row">
+              <label class="control-item">
+                <input type="checkbox" v-model="options.fitToContent"> Fit To Contents
+              </label>
+              <input 
+                v-if="!options.fitToContent"
+                type="number" 
+                v-model.number="options.movieDuration" 
+                class="sidebar-input-number mini"
+                min="0"
+                step="1"
+              >
+              <span v-if="!options.fitToContent" class="unit">s</span>
+            </div>
+          </div>
+
+          <div class="sidebar-group">
+            <label class="sidebar-label">OVERLAP (s)</label>
+            <input 
+              type="number" 
+              v-model.number="options.overlap" 
+              class="sidebar-input-number"
+              min="0"
+              step="0.5"
+            >
+          </div>
+
+          <div class="sidebar-group divider"></div>
+
+          <div class="sidebar-group row">
+            <input type="checkbox" id="splitSection" v-model="options.splitSection">
+            <label for="splitSection">Split Section</label>
+          </div>
+
+          <div class="sidebar-group row">
+            <input type="checkbox" id="addCueTag" v-model="options.addCueTag">
+            <label for="addCueTag">Add Cue Tag</label>
+          </div>
+
+          <div v-if="options.addCueTag" class="sidebar-group">
+            <input 
+              type="text" 
+              v-model="options.cueValue" 
+              class="sidebar-input-text" 
+              placeholder="e.g. 1.2.3"
+              :class="{ invalid: !isCueValid && options.cueValue !== '' }"
+            >
           </div>
         </div>
-
-        <div class="sidebar-group">
-          <label class="sidebar-label">OVERLAP (s)</label>
-          <input 
-            type="number" 
-            v-model.number="options.overlap" 
-            class="sidebar-input-number"
-            min="0"
-            step="0.5"
-          >
-        </div>
-
-        <div class="sidebar-group divider"></div>
-
-        <div class="sidebar-group row">
-          <input type="checkbox" id="splitSection" v-model="options.splitSection">
-          <label for="splitSection">Split Section</label>
-        </div>
-
-        <div class="sidebar-group row">
-          <input type="checkbox" id="addCueTag" v-model="options.addCueTag">
-          <label for="addCueTag">Add Cue Tag</label>
-        </div>
-
-        <div v-if="options.addCueTag" class="sidebar-group">
-          <input 
-            type="text" 
-            v-model="options.cueValue" 
-            class="sidebar-input-text" 
-            placeholder="e.g. 1.2.3"
-            :class="{ invalid: !isCueValid && options.cueValue !== '' }"
-          >
-        </div>
-
-        <div class="sidebar-spacer"></div>
 
         <div class="sidebar-footer">
           <div class="selection-info">{{ selectedItems.size }} item(s) selected</div>
@@ -375,21 +373,14 @@ async function handleCreateLayers() {
 
   try {
     isCreating.value = true;
-    
-    // Find all selected file objects to get their full paths
     const selectedFiles = allFiles.value.filter(file => selectedItems.has(file.id));
     const selectedPaths = selectedFiles.map(file => file.path);
-
-    // Prepare options with mapping path
     const requestOptions = {
       ...options,
       mappingPath: selectedMapping.value.path
     };
-
     const result = await createLayers(props.directorEndpoint, requestOptions, selectedPaths);
-    
     if (result && (result.status === 'success' || result.code === 0)) {
-      // Success feedback
       selectedItems.clear();
       lastSelectedIndex = -1;
       alert(`Successfully created ${result.count || selectedPaths.length} layers.`);
@@ -518,6 +509,7 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0; /* Important for responsive shrinking */
 }
 
 .top-bar-container {
@@ -526,6 +518,7 @@ const selectionFrameStyle = computed(() => {
   background-color: #252526;
   border-bottom: 1px solid #333;
   z-index: 10;
+  flex-shrink: 0;
 }
 
 .top-bar {
@@ -533,6 +526,7 @@ const selectionFrameStyle = computed(() => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
+  gap: 20px;
 }
 
 .sub-bar {
@@ -545,6 +539,18 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+  overflow-x: auto; /* Enable horizontal scrolling for tabs */
+  padding-bottom: 5px; /* Space for scrollbar */
+  scrollbar-width: thin;
+}
+
+.tabs-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tabs-container::-webkit-scrollbar-thumb {
+  background: #444;
+  border-radius: 2px;
 }
 
 .view-label {
@@ -553,6 +559,7 @@ const selectionFrameStyle = computed(() => {
   font-weight: bold;
   margin-right: 5px;
   min-width: 40px;
+  flex-shrink: 0;
 }
 
 .tab-btn {
@@ -564,12 +571,10 @@ const selectionFrameStyle = computed(() => {
   cursor: pointer;
   font-size: 0.8rem;
   transition: all 0.2s;
+  white-space: nowrap; /* Prevent tab text wrapping */
 }
 
-.tab-btn:hover {
-  background-color: #333;
-}
-
+.tab-btn:hover { background-color: #333; }
 .tab-btn.active {
   border-color: #007acc;
   color: #007acc;
@@ -580,6 +585,7 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   align-items: center;
   gap: 15px;
+  flex-shrink: 0; /* Prevent search/buttons from disappearing */
 }
 
 .search-input {
@@ -589,7 +595,7 @@ const selectionFrameStyle = computed(() => {
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.85rem;
-  width: 220px;
+  width: 180px;
 }
 
 .select-all-btn {
@@ -626,18 +632,22 @@ const selectionFrameStyle = computed(() => {
   border-left: 1px solid #333;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  box-sizing: border-box;
   height: 100%;
+  flex-shrink: 0;
 }
 
 .sidebar-title {
   font-size: 0.9rem;
   font-weight: bold;
   color: #888;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
+  padding: 15px;
   border-bottom: 1px solid #333;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto; /* Make settings scrollable */
+  padding: 20px;
 }
 
 .sidebar-group {
@@ -681,19 +691,9 @@ const selectionFrameStyle = computed(() => {
   font-size: 0.85rem;
 }
 
-.sidebar-input-number {
-  width: 100px;
-}
-
-.sidebar-input-number.mini {
-  width: 60px;
-  padding: 4px 8px;
-}
-
-.unit {
-  font-size: 0.8rem;
-  color: #888;
-}
+.sidebar-input-number { width: 100px; }
+.sidebar-input-number.mini { width: 60px; padding: 4px 8px; }
+.unit { font-size: 0.8rem; color: #888; }
 
 .dropdown-wrapper { position: relative; }
 .dropdown-btn {
@@ -725,20 +725,19 @@ const selectionFrameStyle = computed(() => {
   padding: 5px 0;
 }
 
-.dropdown-menu li {
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
+.dropdown-menu li { padding: 8px 12px; cursor: pointer; font-size: 0.85rem; }
 .dropdown-menu li:hover { background-color: #007acc; color: white; }
 
-.sidebar-spacer { flex: 1; }
-
 .sidebar-footer {
-  margin-top: 20px;
-  padding-top: 20px;
+  padding: 20px;
   border-top: 1px solid #333;
+  background-color: #252526;
+}
+
+.selection-info {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 15px;
 }
 
 .create-btn-sidebar {
