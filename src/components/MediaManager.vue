@@ -118,6 +118,17 @@
         </div>
 
         <div class="sidebar-group">
+          <label class="sidebar-label">STILL IMG DURATION (s)</label>
+          <input 
+            type="number" 
+            v-model.number="options.stillDuration" 
+            class="sidebar-input-number"
+            min="0"
+            step="1"
+          >
+        </div>
+
+        <div class="sidebar-group">
           <label class="sidebar-label">MOVIE DURATION</label>
           <div class="duration-row">
             <label class="control-item">
@@ -136,20 +147,7 @@
         </div>
 
         <div class="sidebar-group">
-          <label class="sidebar-label">STILL IMG DURATION (s)</label>
-          <input 
-            type="number" 
-            v-model.number="options.stillDuration" 
-            class="sidebar-input-number"
-            min="0"
-            step="1"
-          >
-        </div>
-
-        <div class="sidebar-group divider"></div>
-
-        <div class="sidebar-group">
-          <label class="sidebar-label">LAYERS OVERLAP (s)</label>
+          <label class="sidebar-label">OVERLAP (s)</label>
           <input 
             type="number" 
             v-model.number="options.overlap" 
@@ -158,6 +156,8 @@
             step="0.5"
           >
         </div>
+
+        <div class="sidebar-group divider"></div>
 
         <div class="sidebar-group row">
           <input type="checkbox" id="splitSection" v-model="options.splitSection">
@@ -185,10 +185,10 @@
           <div class="selection-info">{{ selectedItems.size }} item(s) selected</div>
           <button 
             class="create-btn-sidebar" 
-            :disabled="!isCreateLayersEnabled" 
+            :disabled="!isCreateLayersEnabled || isCreating" 
             @click="handleCreateLayers"
           >
-            CREATE LAYERS
+            {{ isCreating ? 'CREATING...' : 'CREATE LAYERS' }}
           </button>
         </div>
       </div>
@@ -198,7 +198,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, computed, onUnmounted, watch } from 'vue';
-import { getMediaList, getMappingList } from '../services/disguiseService';
+import { getMediaList, getMappingList, createLayers } from '../services/disguiseService';
 import MediaCard from './MediaCard.vue';
 
 const props = defineProps({
@@ -206,6 +206,7 @@ const props = defineProps({
 });
 
 const loading = ref(true);
+const isCreating = ref(false);
 const error = ref(null);
 const fullHierarchy = ref([]);
 const mappings = ref([]);
@@ -369,12 +370,38 @@ onUnmounted(() => {
 
 // --- UI Logic ---
 
-function handleCreateLayers() {
-  console.log('Create Layers clicked', {
-    selected: Array.from(selectedItems),
-    mapping: selectedMapping.value,
-    options
-  });
+async function handleCreateLayers() {
+  if (!isCreateLayersEnabled.value || isCreating.value) return;
+
+  try {
+    isCreating.value = true;
+    
+    // Find all selected file objects to get their full paths
+    const selectedFiles = allFiles.value.filter(file => selectedItems.has(file.id));
+    const selectedPaths = selectedFiles.map(file => file.path);
+
+    // Prepare options with mapping path
+    const requestOptions = {
+      ...options,
+      mappingPath: selectedMapping.value.path
+    };
+
+    const result = await createLayers(props.directorEndpoint, requestOptions, selectedPaths);
+    
+    if (result && (result.status === 'success' || result.code === 0)) {
+      // Success feedback
+      selectedItems.clear();
+      lastSelectedIndex = -1;
+      alert(`Successfully created ${result.count || selectedPaths.length} layers.`);
+    } else {
+      throw new Error(result.message || 'Unknown error during layer creation.');
+    }
+  } catch (err) {
+    alert(`Failed to create layers: ${err.message}`);
+    console.error(err);
+  } finally {
+    isCreating.value = false;
+  }
 }
 
 function handleSelection(item, index, event) {
@@ -655,11 +682,11 @@ const selectionFrameStyle = computed(() => {
 }
 
 .sidebar-input-number {
-  width: 150px;
+  width: 100px;
 }
 
 .sidebar-input-number.mini {
-  width: 100px;
+  width: 60px;
   padding: 4px 8px;
 }
 

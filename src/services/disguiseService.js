@@ -146,3 +146,130 @@ function buildFileHierarchy(files) {
   sortItems(root, true);
   return root;
 }
+
+/**
+ * Creates layers in Disguise by executing a Python script.
+ * @param {string} directorIp - The IP address and port.
+ * @param {Object} options - User settings from the sidebar.
+ * @param {Array<string>} selectedPaths - Array of full paths to selected media.
+ */
+export async function createLayers(directorIp, options, selectedPaths) {
+  // Map UI labels to Python values
+  const modeMap = { 'Locked': 0, 'Normal': 1 };
+  const endPointMap = { 'Loop': 0, 'Ping-Pong': 1, 'Pause': 2 };
+
+  const modeVal = modeMap[options.mode] ?? 1;
+  const endPointVal = endPointMap[options.atEndPoint] ?? 0;
+  const pathsList = JSON.stringify(selectedPaths);
+
+  const script = `
+def run():
+    current_track = guisystem.track
+    current_playhead_beats = guisystem.player.tCurrent
+
+    MODE = ${modeVal}
+    AT_END_POINT = ${endPointVal}
+    FIT_TO_CONTENTS = ${options.fitToContent ? 'True' : 'False'}
+    SPLIT_SECTION = ${options.splitSection ? 'True' : 'False'}
+    ADD_CUE_TAG = ${options.addCueTag ? 'True' : 'False'}
+
+    mapping_path = r'${options.mappingPath}'
+    cue_tag = '${options.cueValue}'
+
+    still_duration_seconds = ${options.stillDuration}
+    movie_duration_seconds = ${options.movieDuration}
+    overlap_seconds = ${options.overlap}
+
+    overlap_beats = current_track.timeToBeat(current_track.beatToTime(current_playhead_beats) + overlap_seconds) - current_playhead_beats
+
+    created_layers_info = []
+    current_start_beats = current_playhead_beats
+    
+    media_paths = ${pathsList}
+
+    for i, clip_path in enumerate(media_paths):
+        clip = resourceManager.loadOrCreate(clip_path, VideoClip)
+        if not clip:
+            continue
+
+        if clip.file and clip.file.nFrames > 1 and clip.fileFps > 1:
+            if FIT_TO_CONTENTS:
+                clip_duration_seconds = float(clip.file.nFrames) / clip.fileFps
+            else:
+                clip_duration_seconds = movie_duration_seconds
+        else:
+            clip_duration_seconds = still_duration_seconds
+
+        clip_end_time_in_seconds = current_track.beatToTime(current_start_beats) + clip_duration_seconds
+        clip_length_beats = current_track.timeToBeat(clip_end_time_in_seconds) - current_start_beats
+
+        layer_name = "Video Layer - {}".format(clip.description)
+        new_layer = current_track.addNewLayer(VariableVideoModule, current_start_beats, clip_length_beats, layer_name)
+
+        if new_layer:
+            # Mapping
+            mapping_fseq = new_layer.findSequence("mapping")
+            if mapping_fseq:
+                markDirty(mapping_fseq)
+                mapping_fseq.disableSequencing = True
+                mapping_resource = resourceManager.loadOrCreate(mapping_path, Projection)
+                mapping_fseq.sequence.setResource(current_start_beats, mapping_resource)
+                mapping_fseq.saveOnDelete()
+
+            # Video Clip
+            video_fseq = new_layer.findSequence("video")
+            if video_fseq:
+                markDirty(video_fseq)
+                video_fseq.disableSequencing = True
+                video_fseq.sequence.setResource(current_start_beats, clip)
+                video_fseq.saveOnDelete()
+
+            # Mode
+            mode_fseq = new_layer.findSequence("mode")
+            if mode_fseq:
+                markDirty(mode_fseq)
+                mode_fseq.disableSequencing = True
+                mode_fseq.sequence.setFloat(current_start_beats, MODE)
+                mode_fseq.saveOnDelete()
+
+            # End Behavior
+            end_fseq = new_layer.findSequence("At end point")
+            if end_fseq:
+                markDirty(end_fseq)
+                end_fseq.disableSequencing = True
+                end_fseq.sequence.setFloat(current_start_beats, AT_END_POINT)
+                end_fseq.saveOnDelete()
+
+            created_layers_info.append({
+                "name": new_layer.name,
+                "uid": new_layer.uid
+            })
+
+            if ADD_CUE_TAG:
+                # Handle incrementing cue tag if it's numeric
+                tag_text = cue_tag
+                try:
+                    # Attempt to handle simple numeric increment for . format
+                    parts = cue_tag.split('.')
+                    last_num = int(parts[-1])
+                    parts[-1] = str(last_num + i)
+                    tag_text = '.'.join(parts)
+                except:
+                    pass
+                
+                tag = Tag(1, tag_text)
+                current_track.setTagAtBeat(current_start_beats, tag)
+            
+            # Next iteration calculations
+            current_start_beats = current_start_beats + clip_length_beats - overlap_beats
+
+            if SPLIT_SECTION:
+                current_track.splitSectionAtBeat(current_start_beats)
+
+    return {"status": "success", "count": len(created_layers_info)}
+
+return run()
+`;
+
+  return await executePython(directorIp, script);
+}

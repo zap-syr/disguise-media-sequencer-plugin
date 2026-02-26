@@ -33,7 +33,9 @@ def createLayers():
       created_layers_info = []
       current_start_beats = current_playhead_beats
 
-      for i, clip in enumerate():
+      for i, clip_path in enumerate():
+            clip = resourceManager.loadOrCreate(clip_path, VideoClip)
+
             # define if clip still image or video and get duration
             if clip.file and clip.file.nFrames > 1 and clip.fileFps > 1:
                   if FIT_TO_CONTENTS:
@@ -74,8 +76,7 @@ def createLayers():
 
                         markDirty(video_fseq)
                         video_fseq.disableSequencing = True
-                        clip_resource = resourceManager.loadOrCreate(clip, VideoClip)
-                        video_fseq.sequence.setResource(current_insert_beat, clip_resource)
+                        video_fseq.sequence.setResource(current_insert_beat, clip)
                         video_fseq.saveOnDelete()
                   else:
                         print("Failed to find video sequence in the new layer.")
