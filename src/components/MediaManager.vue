@@ -1,78 +1,81 @@
 <template>
   <div class="media-manager" @click="handleContainerClick">
-    <!-- Top Bar: Hierarchical Tabs & Search -->
-    <div class="top-bar-container">
-      <div class="top-bar">
-        <div class="tabs-container">
-          <span class="view-label">VIEW:</span>
-          <button class="tab-btn" :class="{ active: isAllSelected }" @click="selectAll">ALL</button>
-          <button 
-            v-for="folder in rootLevelFolders" 
-            :key="folder.id"
-            class="tab-btn" 
-            :class="{ active: isFolderInPath(folder, 0) }"
-            @click="selectFolderAtLevel(folder, 0)"
-          >
-            {{ folder.name.toUpperCase() }}
-          </button>
-        </div>
-
-        <div class="top-bar-right">
-          <div class="search-container">
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              placeholder="Search files..." 
-              class="search-input"
-              @click.stop
-            >
-          </div>
-          <button class="select-all-btn" @click.stop="toggleSelectAll">
-            {{ selectedItems.size > 0 ? 'DESELECT ALL' : 'SELECT ALL' }}
-          </button>
-        </div>
-      </div>
-
-      <div v-for="(levelFolders, index) in subFolderLevels" :key="index" class="top-bar sub-bar">
-        <div class="tabs-container">
-          <span class="view-label"></span>
-          <button 
-            v-for="folder in levelFolders" 
-            :key="folder.id"
-            class="tab-btn" 
-            :class="{ active: isFolderInPath(folder, index + 1) }"
-            @click="selectFolderAtLevel(folder, index + 1)"
-          >
-            {{ folder.name.toUpperCase() }}
-          </button>
-        </div>
-      </div>
-    </div>
-
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
 
     <div v-else class="main-layout">
-      <!-- Media Grid Area -->
-      <div class="content-area">
-        <div class="media-grid" ref="gridRef" @mousedown="startSelection">
-          <MediaCard
-            v-for="(item, index) in filteredMediaList"
-            :key="item.id"
-            :item="item"
-            :selected="selectedItems.has(item.id)"
-            class="media-card-item"
-            :data-id="item.id"
-            @click.stop="handleSelection(item, index, $event)"
-          />
-          <div v-if="filteredMediaList.length === 0" class="empty-state">
-            {{ searchQuery ? 'No files match your search.' : 'No media found.' }}
+      <!-- Left Panel: Navigation & Media -->
+      <div class="left-panel">
+        <!-- Top Bar moved inside Left Panel -->
+        <div class="top-bar-container">
+          <div class="top-bar">
+            <div class="tabs-container">
+              <span class="view-label">VIEW:</span>
+              <button class="tab-btn" :class="{ active: isAllSelected }" @click="selectAll">ALL</button>
+              <button 
+                v-for="folder in rootLevelFolders" 
+                :key="folder.id"
+                class="tab-btn" 
+                :class="{ active: isFolderInPath(folder, 0) }"
+                @click="selectFolderAtLevel(folder, 0)"
+              >
+                {{ folder.name.toUpperCase() }}
+              </button>
+            </div>
+
+            <div class="top-bar-right">
+              <div class="search-container">
+                <input 
+                  type="text" 
+                  v-model="searchQuery" 
+                  placeholder="Search files..." 
+                  class="search-input"
+                  @click.stop
+                >
+              </div>
+              <button class="select-all-btn" @click.stop="toggleSelectAll">
+                {{ selectedItems.size > 0 ? 'DESELECT ALL' : 'SELECT ALL' }}
+              </button>
+            </div>
           </div>
-          <div v-if="isSelecting" class="selection-frame" :style="selectionFrameStyle"></div>
+
+          <div v-for="(levelFolders, index) in subFolderLevels" :key="index" class="top-bar sub-bar">
+            <div class="tabs-container">
+              <span class="view-label"></span>
+              <button 
+                v-for="folder in levelFolders" 
+                :key="folder.id"
+                class="tab-btn" 
+                :class="{ active: isFolderInPath(folder, index + 1) }"
+                @click="selectFolderAtLevel(folder, index + 1)"
+              >
+                {{ folder.name.toUpperCase() }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Media Grid Area -->
+        <div class="content-area">
+          <div class="media-grid" ref="gridRef" @mousedown="startSelection">
+            <MediaCard
+              v-for="(item, index) in filteredMediaList"
+              :key="item.id"
+              :item="item"
+              :selected="selectedItems.has(item.id)"
+              class="media-card-item"
+              :data-id="item.id"
+              @click.stop="handleSelection(item, index, $event)"
+            />
+            <div v-if="filteredMediaList.length === 0" class="empty-state">
+              {{ searchQuery ? 'No files match your search.' : 'No media found.' }}
+            </div>
+            <div v-if="isSelecting" class="selection-frame" :style="selectionFrameStyle"></div>
+          </div>
         </div>
       </div>
 
-      <!-- Settings Sidebar -->
+      <!-- Settings Sidebar (Full Height) -->
       <div class="settings-sidebar" @click.stop>
         <div class="sidebar-title">SETTINGS</div>
         
@@ -115,7 +118,38 @@
         </div>
 
         <div class="sidebar-group">
-          <label class="sidebar-label">OVERLAP (s)</label>
+          <label class="sidebar-label">MOVIE DURATION</label>
+          <div class="duration-row">
+            <label class="control-item">
+              <input type="checkbox" v-model="options.fitToContent"> Fit To Contents
+            </label>
+            <input 
+              v-if="!options.fitToContent"
+              type="number" 
+              v-model.number="options.movieDuration" 
+              class="sidebar-input-number mini"
+              min="0"
+              step="1"
+            >
+            <span v-if="!options.fitToContent" class="unit">s</span>
+          </div>
+        </div>
+
+        <div class="sidebar-group">
+          <label class="sidebar-label">STILL IMG DURATION (s)</label>
+          <input 
+            type="number" 
+            v-model.number="options.stillDuration" 
+            class="sidebar-input-number"
+            min="0"
+            step="1"
+          >
+        </div>
+
+        <div class="sidebar-group divider"></div>
+
+        <div class="sidebar-group">
+          <label class="sidebar-label">LAYERS OVERLAP (s)</label>
           <input 
             type="number" 
             v-model.number="options.overlap" 
@@ -124,8 +158,6 @@
             step="0.5"
           >
         </div>
-
-        <div class="sidebar-group divider"></div>
 
         <div class="sidebar-group row">
           <input type="checkbox" id="splitSection" v-model="options.splitSection">
@@ -182,19 +214,22 @@ const isMappingMenuOpen = ref(false);
 const selectedItems = reactive(new Set());
 const searchQuery = ref('');
 
-// Navigation state
-const navigationPath = ref([]);
-const isAllSelected = ref(true);
-
 // Options state
 const options = reactive({
   mode: 'Normal',
   atEndPoint: 'Loop',
+  stillDuration: 5,
+  fitToContent: true,
+  movieDuration: 30,
   overlap: 0,
   splitSection: false,
   addCueTag: false,
   cueValue: ''
 });
+
+// Navigation state
+const navigationPath = ref([]);
+const isAllSelected = ref(true);
 
 // Drag Selection State
 const gridRef = ref(null);
@@ -301,10 +336,10 @@ watch([isAllSelected, navigationPath], () => {
   lastSelectedIndex = -1;
 }, { deep: true });
 
-// Ensure overlap is never negative
-watch(() => options.overlap, (newVal) => {
-  if (newVal < 0) options.overlap = 0;
-});
+// Input Validations
+watch(() => options.overlap, (newVal) => { if (newVal < 0) options.overlap = 0; });
+watch(() => options.stillDuration, (newVal) => { if (newVal < 0) options.stillDuration = 0; });
+watch(() => options.movieDuration, (newVal) => { if (newVal < 0) options.movieDuration = 0; });
 
 onMounted(async () => {
   try {
@@ -439,9 +474,23 @@ const selectionFrameStyle = computed(() => {
 .media-manager {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
   background-color: #1e1e1e;
   color: #e0e0e0;
+  overflow: hidden;
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.left-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .top-bar-container {
@@ -457,12 +506,6 @@ const selectionFrameStyle = computed(() => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-}
-
-.top-bar-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
 }
 
 .sub-bar {
@@ -506,9 +549,10 @@ const selectionFrameStyle = computed(() => {
   background-color: rgba(0, 122, 204, 0.1);
 }
 
-.search-container {
+.top-bar-right {
   display: flex;
   align-items: center;
+  gap: 15px;
 }
 
 .search-input {
@@ -519,12 +563,6 @@ const selectionFrameStyle = computed(() => {
   border-radius: 4px;
   font-size: 0.85rem;
   width: 220px;
-  transition: border-color 0.2s;
-}
-
-.search-input:focus {
-  border-color: #007acc;
-  outline: none;
 }
 
 .select-all-btn {
@@ -538,34 +576,20 @@ const selectionFrameStyle = computed(() => {
   white-space: nowrap;
 }
 
-.select-all-btn:hover {
-  background-color: #333;
-  color: white;
-}
-
-.main-layout {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
 .content-area {
   flex: 1;
-  overflow: hidden;
   position: relative;
-  display: flex;
-  flex-direction: column;
+  overflow: hidden;
 }
 
 .media-grid {
-  flex: 1;
+  height: 100%;
   overflow-y: auto;
   padding: 20px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 15px;
   align-content: start;
-  position: relative;
 }
 
 /* Settings Sidebar */
@@ -577,6 +601,7 @@ const selectionFrameStyle = computed(() => {
   flex-direction: column;
   padding: 20px;
   box-sizing: border-box;
+  height: 100%;
 }
 
 .sidebar-title {
@@ -600,7 +625,12 @@ const selectionFrameStyle = computed(() => {
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
-  cursor: pointer;
+}
+
+.duration-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .sidebar-group.divider {
@@ -625,17 +655,20 @@ const selectionFrameStyle = computed(() => {
 }
 
 .sidebar-input-number {
+  width: 150px;
+}
+
+.sidebar-input-number.mini {
   width: 100px;
+  padding: 4px 8px;
 }
 
-.sidebar-input-text.invalid {
-  border-color: #f44336;
+.unit {
+  font-size: 0.8rem;
+  color: #888;
 }
 
-.dropdown-wrapper {
-  position: relative;
-}
-
+.dropdown-wrapper { position: relative; }
 .dropdown-btn {
   width: 100%;
   background-color: #333;
@@ -645,7 +678,6 @@ const selectionFrameStyle = computed(() => {
   border-radius: 4px;
   font-size: 0.85rem;
   cursor: pointer;
-  text-align: left;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -658,13 +690,11 @@ const selectionFrameStyle = computed(() => {
   width: 100%;
   background-color: #252526;
   border: 1px solid #444;
-  border-top: none;
   border-radius: 0 0 4px 4px;
   list-style: none;
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   padding: 5px 0;
 }
 
@@ -674,35 +704,14 @@ const selectionFrameStyle = computed(() => {
   font-size: 0.85rem;
 }
 
-.dropdown-menu li:hover {
-  background-color: #007acc;
-  color: white;
-}
+.dropdown-menu li:hover { background-color: #007acc; color: white; }
 
-.dropdown-menu li.active {
-  background-color: #37373d;
-  color: #007acc;
-}
-
-.dropdown-menu li.disabled {
-  color: #666;
-  cursor: default;
-}
-
-.sidebar-spacer {
-  flex: 1;
-}
+.sidebar-spacer { flex: 1; }
 
 .sidebar-footer {
   margin-top: 20px;
   padding-top: 20px;
   border-top: 1px solid #333;
-}
-
-.selection-info {
-  font-size: 0.8rem;
-  color: #888;
-  margin-bottom: 15px;
 }
 
 .create-btn-sidebar {
@@ -716,11 +725,6 @@ const selectionFrameStyle = computed(() => {
   cursor: pointer;
   text-transform: uppercase;
   font-size: 0.9rem;
-  transition: background-color 0.2s;
-}
-
-.create-btn-sidebar:hover:not(:disabled) {
-  background-color: #1177bb;
 }
 
 .create-btn-sidebar:disabled {
@@ -737,17 +741,6 @@ const selectionFrameStyle = computed(() => {
   color: #888;
 }
 
-.error {
-  color: #d32f2f;
-}
-
-.empty-state {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 2rem;
-  color: #555;
-}
-
 .selection-frame {
   position: absolute;
   background-color: rgba(0, 122, 204, 0.2);
@@ -756,8 +749,5 @@ const selectionFrameStyle = computed(() => {
   z-index: 100;
 }
 
-.arrow {
-  font-size: 0.6rem;
-  opacity: 0.6;
-}
+.invalid { border-color: #f44336 !important; }
 </style>
