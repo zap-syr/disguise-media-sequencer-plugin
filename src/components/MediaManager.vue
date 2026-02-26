@@ -1,6 +1,6 @@
 <template>
   <div class="media-manager" @click="handleContainerClick">
-    <!-- Top Bar: Hierarchical Tabs -->
+    <!-- Top Bar: Hierarchical Tabs & Search -->
     <div class="top-bar-container">
       <div class="top-bar">
         <div class="tabs-container">
@@ -16,9 +16,21 @@
             {{ folder.name.toUpperCase() }}
           </button>
         </div>
-        <button class="select-all-btn" @click.stop="toggleSelectAll">
-          {{ selectedItems.size > 0 ? 'DESELECT ALL' : 'SELECT ALL' }}
-        </button>
+
+        <div class="top-bar-right">
+          <div class="search-container">
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              placeholder="Search files..." 
+              class="search-input"
+              @click.stop
+            >
+          </div>
+          <button class="select-all-btn" @click.stop="toggleSelectAll">
+            {{ selectedItems.size > 0 ? 'DESELECT ALL' : 'SELECT ALL' }}
+          </button>
+        </div>
       </div>
 
       <div v-for="(levelFolders, index) in subFolderLevels" :key="index" class="top-bar sub-bar">
@@ -40,34 +52,38 @@
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
 
-    <div v-else class="content-area">
-      <div class="media-grid" ref="gridRef" @mousedown="startSelection">
-        <MediaCard
-          v-for="(item, index) in filteredMediaList"
-          :key="item.id"
-          :item="item"
-          :selected="selectedItems.has(item.id)"
-          class="media-card-item"
-          :data-id="item.id"
-          @click.stop="handleSelection(item, index, $event)"
-        />
-        <div v-if="filteredMediaList.length === 0" class="empty-state">No media found.</div>
-        <div v-if="isSelecting" class="selection-frame" :style="selectionFrameStyle"></div>
+    <div v-else class="main-layout">
+      <!-- Media Grid Area -->
+      <div class="content-area">
+        <div class="media-grid" ref="gridRef" @mousedown="startSelection">
+          <MediaCard
+            v-for="(item, index) in filteredMediaList"
+            :key="item.id"
+            :item="item"
+            :selected="selectedItems.has(item.id)"
+            class="media-card-item"
+            :data-id="item.id"
+            @click.stop="handleSelection(item, index, $event)"
+          />
+          <div v-if="filteredMediaList.length === 0" class="empty-state">
+            {{ searchQuery ? 'No files match your search.' : 'No media found.' }}
+          </div>
+          <div v-if="isSelecting" class="selection-frame" :style="selectionFrameStyle"></div>
+        </div>
       </div>
-    </div>
 
-    <!-- Bottom Bar: Controls -->
-    <div class="bottom-bar" @click.stop>
-      <div class="controls-left">
-        <!-- Mapping Drop-up -->
-        <div class="dropup control-item" ref="mappingRef">
-          <span class="view-label">MAPPING:</span>
-          <div class="dropup-container">
-            <button class="dropup-btn" @click="toggleMappingMenu">
+      <!-- Settings Sidebar -->
+      <div class="settings-sidebar" @click.stop>
+        <div class="sidebar-title">SETTINGS</div>
+        
+        <div class="sidebar-group">
+          <label class="sidebar-label">MAPPING</label>
+          <div class="dropdown-wrapper" ref="mappingRef">
+            <button class="dropdown-btn" @click="toggleMappingMenu">
               {{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}
-              <span class="arrow">▲</span>
+              <span class="arrow">▼</span>
             </button>
-            <ul v-if="isMappingMenuOpen" class="dropup-menu">
+            <ul v-if="isMappingMenuOpen" class="dropdown-menu">
               <li 
                 v-for="m in mappings" 
                 :key="m.uid" 
@@ -81,31 +97,68 @@
           </div>
         </div>
 
-        <label class="control-item">
-          <input type="checkbox" v-model="options.splitSection"> Split Section
-        </label>
-        <div class="control-item">
-          Overlap: <input type="number" v-model="options.overlap" class="input-number"> s
+        <div class="sidebar-group">
+          <label class="sidebar-label">MODE</label>
+          <select v-model="options.mode" class="sidebar-select">
+            <option value="Normal">Normal</option>
+            <option value="Locked">Locked</option>
+          </select>
         </div>
-        <div class="control-group">
-          <label class="control-item">
-            <input type="checkbox" v-model="options.addCueTag"> Add Cue Tag
-          </label>
+
+        <div class="sidebar-group">
+          <label class="sidebar-label">AT END POINT</label>
+          <select v-model="options.atEndPoint" class="sidebar-select">
+            <option value="Loop">Loop</option>
+            <option value="Ping-Pong">Ping-Pong</option>
+            <option value="Pause">Pause</option>
+          </select>
+        </div>
+
+        <div class="sidebar-group">
+          <label class="sidebar-label">OVERLAP (s)</label>
           <input 
-            v-if="options.addCueTag" 
+            type="number" 
+            v-model.number="options.overlap" 
+            class="sidebar-input-number"
+            min="0"
+            step="0.5"
+          >
+        </div>
+
+        <div class="sidebar-group divider"></div>
+
+        <div class="sidebar-group row">
+          <input type="checkbox" id="splitSection" v-model="options.splitSection">
+          <label for="splitSection">Split Section</label>
+        </div>
+
+        <div class="sidebar-group row">
+          <input type="checkbox" id="addCueTag" v-model="options.addCueTag">
+          <label for="addCueTag">Add Cue Tag</label>
+        </div>
+
+        <div v-if="options.addCueTag" class="sidebar-group">
+          <input 
             type="text" 
             v-model="options.cueValue" 
-            class="input-text" 
+            class="sidebar-input-text" 
             placeholder="e.g. 1.2.3"
             :class="{ invalid: !isCueValid && options.cueValue !== '' }"
           >
         </div>
-      </div>
-      <div class="controls-right">
-        <span class="selection-count">{{ selectedItems.size }} selected</span>
-        <button class="create-btn" :disabled="!isCreateLayersEnabled" @click="handleCreateLayers">
-          CREATE LAYERS
-        </button>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-footer">
+          <div class="selection-info">{{ selectedItems.size }} item(s) selected</div>
+          <button 
+            class="create-btn-sidebar" 
+            :disabled="!isCreateLayersEnabled" 
+            @click="handleCreateLayers"
+          >
+            CREATE LAYERS
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -127,6 +180,7 @@ const mappings = ref([]);
 const selectedMapping = ref(null);
 const isMappingMenuOpen = ref(false);
 const selectedItems = reactive(new Set());
+const searchQuery = ref('');
 
 // Navigation state
 const navigationPath = ref([]);
@@ -134,8 +188,10 @@ const isAllSelected = ref(true);
 
 // Options state
 const options = reactive({
-  splitSection: false,
+  mode: 'Normal',
+  atEndPoint: 'Loop',
   overlap: 0,
+  splitSection: false,
   addCueTag: false,
   cueValue: ''
 });
@@ -180,10 +236,21 @@ const allFiles = computed(() => {
 });
 
 const filteredMediaList = computed(() => {
-  if (isAllSelected.value) return allFiles.value;
-  if (navigationPath.value.length === 0) return [];
-  const currentFolder = navigationPath.value[navigationPath.value.length - 1];
-  return currentFolder.children?.filter(item => item.type === 'file') || [];
+  let list = [];
+  if (isAllSelected.value) {
+    list = allFiles.value;
+  } else if (navigationPath.value.length > 0) {
+    const currentFolder = navigationPath.value[navigationPath.value.length - 1];
+    list = currentFolder.children?.filter(item => item.type === 'file') || [];
+  }
+
+  // Apply search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    return list.filter(item => item.name.toLowerCase().includes(query));
+  }
+  
+  return list;
 });
 
 const isCueValid = computed(() => {
@@ -233,6 +300,11 @@ watch([isAllSelected, navigationPath], () => {
   selectedItems.clear();
   lastSelectedIndex = -1;
 }, { deep: true });
+
+// Ensure overlap is never negative
+watch(() => options.overlap, (newVal) => {
+  if (newVal < 0) options.overlap = 0;
+});
 
 onMounted(async () => {
   try {
@@ -312,7 +384,7 @@ function toggleSelectAll() {
 }
 
 function startSelection(event) {
-  if (event.target.closest('.media-card')) return;
+  if (event.target.closest('.media-card') || event.target.closest('.top-bar-container')) return;
   isSelecting.value = true;
   wasDragging.value = false;
   const rect = gridRef.value.getBoundingClientRect();
@@ -377,6 +449,7 @@ const selectionFrameStyle = computed(() => {
   flex-direction: column;
   background-color: #252526;
   border-bottom: 1px solid #333;
+  z-index: 10;
 }
 
 .top-bar {
@@ -384,6 +457,12 @@ const selectionFrameStyle = computed(() => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .sub-bar {
@@ -427,6 +506,27 @@ const selectionFrameStyle = computed(() => {
   background-color: rgba(0, 122, 204, 0.1);
 }
 
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  background-color: #1e1e1e;
+  border: 1px solid #444;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  width: 220px;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #007acc;
+  outline: none;
+}
+
 .select-all-btn {
   background: transparent;
   border: 1px solid #555;
@@ -435,6 +535,7 @@ const selectionFrameStyle = computed(() => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .select-all-btn:hover {
@@ -442,14 +543,22 @@ const selectionFrameStyle = computed(() => {
   color: white;
 }
 
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
 .content-area {
   flex: 1;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .media-grid {
-  height: 100%;
+  flex: 1;
   overflow-y: auto;
   padding: 20px;
   display: grid;
@@ -459,156 +568,162 @@ const selectionFrameStyle = computed(() => {
   position: relative;
 }
 
-.bottom-bar {
-  height: 50px;
+/* Settings Sidebar */
+.settings-sidebar {
+  width: 350px;
   background-color: #252526;
-  border-top: 1px solid #333;
+  border-left: 1px solid #333;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar-title {
   font-size: 0.9rem;
+  font-weight: bold;
+  color: #888;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
 }
 
-.controls-left, .controls-right {
+.sidebar-group {
   display: flex;
-  align-items: center;
-  gap: 20px;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
-.control-group {
-  display: flex;
+.sidebar-group.row {
+  flex-direction: row;
   align-items: center;
   gap: 10px;
-}
-
-.control-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #ccc;
+  margin-bottom: 12px;
   cursor: pointer;
 }
 
-.dropup {
-  position: relative;
-  display: flex;
-  align-items: center;
+.sidebar-group.divider {
+  height: 1px;
+  background-color: #333;
+  margin: 10px 0 20px;
 }
 
-.dropup-container {
-  position: relative;
+.sidebar-label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #aaa;
 }
 
-.dropup-btn {
+.sidebar-select, .sidebar-input-number, .sidebar-input-text {
   background-color: #333;
   border: 1px solid #444;
   color: white;
-  padding: 4px 12px;
-  border-radius: 3px;
-  font-size: 0.8rem;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.sidebar-input-number {
+  width: 100px;
+}
+
+.sidebar-input-text.invalid {
+  border-color: #f44336;
+}
+
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-btn {
+  width: 100%;
+  background-color: #333;
+  border: 1px solid #444;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
   cursor: pointer;
-  min-width: 150px;
   text-align: left;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.dropup-btn:hover {
-  background-color: #444;
-}
-
-.dropup-menu {
+.dropdown-menu {
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 0;
   width: 100%;
   background-color: #252526;
   border: 1px solid #444;
-  border-radius: 3px;
-  margin-bottom: 5px;
-  padding: 5px 0;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
   list-style: none;
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  padding: 5px 0;
 }
 
-.dropup-menu li {
+.dropdown-menu li {
   padding: 8px 12px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
-.dropup-menu li:hover {
+.dropdown-menu li:hover {
   background-color: #007acc;
   color: white;
 }
 
-.dropup-menu li.active {
+.dropdown-menu li.active {
   background-color: #37373d;
   color: #007acc;
-  font-weight: bold;
 }
 
-.dropup-menu li.disabled {
+.dropdown-menu li.disabled {
   color: #666;
   cursor: default;
 }
 
-.arrow {
-  font-size: 0.6rem;
-  margin-left: 10px;
+.sidebar-spacer {
+  flex: 1;
 }
 
-.input-number {
-  background-color: #333;
-  border: 1px solid #444;
-  color: white;
-  padding: 4px;
-  border-radius: 3px;
-  width: 40px;
-  text-align: center;
+.sidebar-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
 }
 
-.input-text {
-  background-color: #333;
-  border: 1px solid #444;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 3px;
-  width: 100px;
+.selection-info {
   font-size: 0.8rem;
-}
-
-.input-text.invalid {
-  border-color: #f44336;
-}
-
-.selection-count {
   color: #888;
-  font-size: 0.85rem;
+  margin-bottom: 15px;
 }
 
-.create-btn {
+.create-btn-sidebar {
+  width: 100%;
   background-color: #0e639c;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 2px;
+  padding: 12px;
+  border-radius: 4px;
   font-weight: 600;
   cursor: pointer;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
 }
 
-.create-btn:hover:not(:disabled) {
+.create-btn-sidebar:hover:not(:disabled) {
   background-color: #1177bb;
 }
 
-.create-btn:disabled {
+.create-btn-sidebar:disabled {
   background-color: #3a3d41;
   color: #757575;
   cursor: not-allowed;
@@ -639,5 +754,10 @@ const selectionFrameStyle = computed(() => {
   border: 1px solid rgba(0, 122, 204, 0.6);
   pointer-events: none;
   z-index: 100;
+}
+
+.arrow {
+  font-size: 0.6rem;
+  opacity: 0.6;
 }
 </style>

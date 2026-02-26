@@ -99,7 +99,6 @@ function buildFileHierarchy(files) {
 
     const relativePath = normalizedPath.substring(index + keyword.length);
     const parts = relativePath.split('/');
-    if (parts.length === 1 && parts[0].toLowerCase() === 'videoin_1.mov.apx') return;
 
     let currentLevel = root;
     let pathSoFar = '';
