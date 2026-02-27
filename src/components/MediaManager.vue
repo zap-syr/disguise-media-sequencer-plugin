@@ -54,6 +54,7 @@
           </div>
         </div>
 
+        <!-- Media Grid Area -->
         <div class="content-area">
           <div class="media-grid" ref="gridRef" @mousedown="startSelection">
             <MediaCard
@@ -78,11 +79,12 @@
         <div class="sidebar-title">SETTINGS</div>
         
         <div class="sidebar-content">
+          <!-- Mapping -->
           <div class="sidebar-group">
             <label class="sidebar-label">MAPPING</label>
             <div class="dropdown-wrapper" ref="mappingRef">
               <button class="dropdown-btn" @click="toggleMappingMenu">
-                {{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}
+                <span class="dropdown-text">{{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}</span>
                 <span class="arrow">▼</span>
               </button>
               <ul v-if="isMappingMenuOpen" class="dropdown-menu">
@@ -99,6 +101,53 @@
             </div>
           </div>
 
+          <!-- Insert Mode -->
+          <div class="sidebar-group">
+            <label class="sidebar-label">INSERT LOCATION</label>
+            <select v-model="options.insertMode" class="sidebar-select">
+              <option value="At Playhead">At Playhead</option>
+              <option value="Specific location">Specific location</option>
+            </select>
+          </div>
+
+          <!-- Target Track & Start Time (Conditional) -->
+          <template v-if="options.insertMode === 'Specific location'">
+            <div class="sidebar-group">
+              <label class="sidebar-label">TARGET TRACK</label>
+              <div class="dropdown-wrapper" ref="trackRef">
+                <button class="dropdown-btn" @click="toggleTrackMenu">
+                  <span class="dropdown-text">{{ selectedTrack ? selectedTrack.name : 'Select Track...' }}</span>
+                  <span class="arrow">▼</span>
+                </button>
+                <ul v-if="isTrackMenuOpen" class="dropdown-menu">
+                  <li 
+                    v-for="t in tracks" 
+                    :key="t.uid" 
+                    @click="selectTrack(t)"
+                    :class="{ active: selectedTrack?.uid === t.uid }"
+                  >
+                    {{ t.name }}
+                  </li>
+                  <li v-if="tracks.length === 0" class="disabled">No tracks found</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="sidebar-group">
+              <label class="sidebar-label">START TIME (HH:MM:SS:FF)</label>
+              <input 
+                type="text" 
+                v-model="options.startTime" 
+                class="sidebar-input-text" 
+                placeholder="00:00:00:00"
+                :class="{ invalid: !isStartTimeValid }"
+              >
+            </div>
+          </template>
+
+          <div class="sidebar-group divider"></div>
+
+          <!-- Mode -->
           <div class="sidebar-group">
             <label class="sidebar-label">MODE</label>
             <select v-model="options.mode" class="sidebar-select">
@@ -107,6 +156,7 @@
             </select>
           </div>
 
+          <!-- At End Point -->
           <div class="sidebar-group">
             <label class="sidebar-label">AT END POINT</label>
             <select v-model="options.atEndPoint" class="sidebar-select">
@@ -116,6 +166,7 @@
             </select>
           </div>
 
+          <!-- Still Duration -->
           <div class="sidebar-group">
             <label class="sidebar-label">STILL IMG DURATION (s)</label>
             <input 
@@ -127,6 +178,7 @@
             >
           </div>
 
+          <!-- Movie Duration -->
           <div class="sidebar-group">
             <label class="sidebar-label">MOVIE DURATION</label>
             <div class="duration-row">
@@ -145,6 +197,7 @@
             </div>
           </div>
 
+          <!-- Overlap -->
           <div class="sidebar-group">
             <label class="sidebar-label">OVERLAP (s)</label>
             <input 
@@ -158,6 +211,7 @@
 
           <div class="sidebar-group divider"></div>
 
+          <!-- Split Section & Cue Tag -->
           <div class="sidebar-group row">
             <input type="checkbox" id="splitSection" v-model="options.splitSection">
             <label for="splitSection">Split Section</label>
@@ -196,7 +250,7 @@
 
 <script setup>
 import { ref, onMounted, reactive, computed, onUnmounted, watch } from 'vue';
-import { getMediaList, getMappingList, createLayers } from '../services/disguiseService';
+import { getMediaList, getMappingList, getTrackList, createLayers } from '../services/disguiseService';
 import MediaCard from './MediaCard.vue';
 
 const props = defineProps({
@@ -206,15 +260,24 @@ const props = defineProps({
 const loading = ref(true);
 const isCreating = ref(false);
 const error = ref(null);
+
 const fullHierarchy = ref([]);
 const mappings = ref([]);
+const tracks = ref([]);
+
 const selectedMapping = ref(null);
+const selectedTrack = ref(null);
+
 const isMappingMenuOpen = ref(false);
+const isTrackMenuOpen = ref(false);
+
 const selectedItems = reactive(new Set());
 const searchQuery = ref('');
 
 // Options state
 const options = reactive({
+  insertMode: 'At Playhead',
+  startTime: '00:00:00:00',
   mode: 'Normal',
   atEndPoint: 'Loop',
   stillDuration: 5,
@@ -233,6 +296,7 @@ const isAllSelected = ref(true);
 // Drag Selection State
 const gridRef = ref(null);
 const mappingRef = ref(null);
+const trackRef = ref(null);
 const isSelecting = ref(false);
 const wasDragging = ref(false);
 const selectionStart = reactive({ x: 0, y: 0 });
@@ -278,7 +342,6 @@ const filteredMediaList = computed(() => {
     list = currentFolder.children?.filter(item => item.type === 'file') || [];
   }
 
-  // Apply search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     return list.filter(item => item.name.toLowerCase().includes(query));
@@ -294,11 +357,18 @@ const isCueValid = computed(() => {
   return regex.test(options.cueValue);
 });
 
+const isStartTimeValid = computed(() => {
+  if (options.insertMode !== 'Specific location') return true;
+  return /^([0-9]{2}):([0-5][0-9]):([0-5][0-9]):([0-5][0-9])$/.test(options.startTime);
+});
+
 const isCreateLayersEnabled = computed(() => {
   const hasSelection = selectedItems.size > 0;
   const hasMapping = !!selectedMapping.value;
   const validCue = isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true);
-  return hasSelection && hasMapping && validCue;
+  const validLocation = options.insertMode === 'At Playhead' || (selectedTrack.value && isStartTimeValid.value);
+  
+  return hasSelection && hasMapping && validCue && validLocation;
 });
 
 // --- Helpers ---
@@ -316,15 +386,31 @@ const selectFolderAtLevel = (folder, level) => {
 
 const isFolderInPath = (folder, level) => navigationPath.value[level]?.id === folder.id;
 
-const toggleMappingMenu = () => isMappingMenuOpen.value = !isMappingMenuOpen.value;
+// Dropdown Toggles
+const toggleMappingMenu = () => {
+  isMappingMenuOpen.value = !isMappingMenuOpen.value;
+  isTrackMenuOpen.value = false;
+};
 const selectMapping = (m) => {
   selectedMapping.value = m;
   isMappingMenuOpen.value = false;
 };
 
+const toggleTrackMenu = () => {
+  isTrackMenuOpen.value = !isTrackMenuOpen.value;
+  isMappingMenuOpen.value = false;
+};
+const selectTrack = (t) => {
+  selectedTrack.value = t;
+  isTrackMenuOpen.value = false;
+};
+
 const handleClickOutside = (e) => {
   if (mappingRef.value && !mappingRef.value.contains(e.target)) {
     isMappingMenuOpen.value = false;
+  }
+  if (trackRef.value && !trackRef.value.contains(e.target)) {
+    isTrackMenuOpen.value = false;
   }
 };
 
@@ -343,12 +429,14 @@ watch(() => options.movieDuration, (newVal) => { if (newVal < 0) options.movieDu
 onMounted(async () => {
   try {
     loading.value = true;
-    const [media, mps] = await Promise.all([
+    const [media, mps, trks] = await Promise.all([
       getMediaList(props.directorEndpoint),
-      getMappingList(props.directorEndpoint)
+      getMappingList(props.directorEndpoint),
+      getTrackList(props.directorEndpoint)
     ]);
     if (Array.isArray(media)) fullHierarchy.value = media;
     if (Array.isArray(mps)) mappings.value = mps;
+    if (Array.isArray(trks)) tracks.value = trks;
   } catch (err) {
     error.value = `Failed to load data: ${err.message}`;
     console.error(err);
@@ -375,11 +463,15 @@ async function handleCreateLayers() {
     isCreating.value = true;
     const selectedFiles = allFiles.value.filter(file => selectedItems.has(file.id));
     const selectedPaths = selectedFiles.map(file => file.path);
+    
     const requestOptions = {
       ...options,
-      mappingPath: selectedMapping.value.path
+      mappingPath: selectedMapping.value.path,
+      targetTrack: options.insertMode === 'Specific location' ? selectedTrack.value?.path : null
     };
+
     const result = await createLayers(props.directorEndpoint, requestOptions, selectedPaths);
+    
     if (result && (result.status === 'success' || result.code === 0)) {
       selectedItems.clear();
       lastSelectedIndex = -1;
@@ -509,7 +601,7 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-width: 0; /* Important for responsive shrinking */
+  min-width: 0;
 }
 
 .top-bar-container {
@@ -539,8 +631,8 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   align-items: center;
   gap: 10px;
-  overflow-x: auto; /* Enable horizontal scrolling for tabs */
-  padding-bottom: 5px; /* Space for scrollbar */
+  overflow-x: auto;
+  padding-bottom: 5px;
   scrollbar-width: thin;
 }
 
@@ -571,7 +663,7 @@ const selectionFrameStyle = computed(() => {
   cursor: pointer;
   font-size: 0.8rem;
   transition: all 0.2s;
-  white-space: nowrap; /* Prevent tab text wrapping */
+  white-space: nowrap;
 }
 
 .tab-btn:hover { background-color: #333; }
@@ -585,7 +677,7 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   align-items: center;
   gap: 15px;
-  flex-shrink: 0; /* Prevent search/buttons from disappearing */
+  flex-shrink: 0;
 }
 
 .search-input {
@@ -595,7 +687,12 @@ const selectionFrameStyle = computed(() => {
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.85rem;
-  width: 180px;
+  width: 220px;
+}
+
+.search-input:focus {
+  border-color: #007acc;
+  outline: none;
 }
 
 .select-all-btn {
@@ -607,6 +704,11 @@ const selectionFrameStyle = computed(() => {
   cursor: pointer;
   font-size: 0.8rem;
   white-space: nowrap;
+}
+
+.select-all-btn:hover {
+  background-color: #333;
+  color: white;
 }
 
 .content-area {
@@ -640,13 +742,13 @@ const selectionFrameStyle = computed(() => {
   font-size: 0.9rem;
   font-weight: bold;
   color: #888;
-  padding: 15px;
+  padding: 20px;
   border-bottom: 1px solid #333;
 }
 
 .sidebar-content {
   flex: 1;
-  overflow-y: auto; /* Make settings scrollable */
+  overflow-y: auto;
   padding: 20px;
 }
 
@@ -695,6 +797,10 @@ const selectionFrameStyle = computed(() => {
 .sidebar-input-number.mini { width: 60px; padding: 4px 8px; }
 .unit { font-size: 0.8rem; color: #888; }
 
+.sidebar-input-text.invalid {
+  border-color: #f44336;
+}
+
 .dropdown-wrapper { position: relative; }
 .dropdown-btn {
   width: 100%;
@@ -710,6 +816,12 @@ const selectionFrameStyle = computed(() => {
   align-items: center;
 }
 
+.dropdown-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -722,11 +834,14 @@ const selectionFrameStyle = computed(() => {
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   padding: 5px 0;
 }
 
 .dropdown-menu li { padding: 8px 12px; cursor: pointer; font-size: 0.85rem; }
 .dropdown-menu li:hover { background-color: #007acc; color: white; }
+.dropdown-menu li.active { background-color: #37373d; color: #007acc; }
+.dropdown-menu li.disabled { color: #666; cursor: default; }
 
 .sidebar-footer {
   padding: 20px;
@@ -774,6 +889,4 @@ const selectionFrameStyle = computed(() => {
   pointer-events: none;
   z-index: 100;
 }
-
-.invalid { border-color: #f44336 !important; }
 </style>
