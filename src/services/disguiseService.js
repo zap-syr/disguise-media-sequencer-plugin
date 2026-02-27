@@ -188,7 +188,7 @@ def run():
     media_paths = ${pathsList}
 
     for i, clip_path in enumerate(media_paths):
-        clip = resourceManager.loadOrCreate(clip_path, VideoClip)
+        clip = resourceManager.load(clip_path, VideoClip)
         if not clip:
             continue
 
@@ -212,7 +212,7 @@ def run():
             if mapping_fseq:
                 markDirty(mapping_fseq)
                 mapping_fseq.disableSequencing = True
-                mapping_resource = resourceManager.loadOrCreate(mapping_path, Projection)
+                mapping_resource = resourceManager.load(mapping_path, Projection)
                 mapping_fseq.sequence.setResource(current_start_beats, mapping_resource)
                 mapping_fseq.saveOnDelete()
 

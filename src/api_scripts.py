@@ -9,6 +9,9 @@ def getMediaList():
 def getMappingList():
       return (resourceManager.allResources(Projection))
 
+def getTrackList():
+      return (resourceManager.allResources(Track))
+
 def createLayers():
       current_track = guisystem.track
       current_playhead_beats = guisystem.player.tCurrent
