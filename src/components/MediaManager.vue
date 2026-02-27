@@ -54,7 +54,7 @@
           <div class="selection-group">
             <button 
               class="master-checkbox-btn" 
-              @click="toggleSelectAll"
+              @click.stop="toggleSelectAll"
               :disabled="filteredMediaList.length === 0"
               :title="isAllSelectedComputed ? 'Deselect All' : 'Select All'"
             >
