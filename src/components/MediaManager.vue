@@ -1,83 +1,102 @@
 <template>
-  <div class="media-manager" @click="handleContainerClick">
+  <div class="media-app" :class="{ 'is-dragging': isSelecting }" @click="handleContainerClick">
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
 
     <div v-else class="main-layout">
-      <!-- Left Panel: Navigation & Media -->
-      <div class="left-panel">
-        <div class="top-bar-container">
-          <div class="top-bar">
-            <div class="tabs-container">
-              <span class="view-label">VIEW:</span>
-              <button class="tab-btn" :class="{ active: isAllSelected }" @click="selectAll">ALL</button>
-              <button 
-                v-for="folder in rootLevelFolders" 
-                :key="folder.id"
-                class="tab-btn" 
-                :class="{ active: isFolderInPath(folder, 0) }"
-                @click="selectFolderAtLevel(folder, 0)"
-              >
-                {{ folder.name.toUpperCase() }}
-              </button>
-            </div>
-
-            <div class="top-bar-right">
-              <div class="search-container">
-                <input 
-                  type="text" 
-                  v-model="searchQuery" 
-                  placeholder="Search files..." 
-                  class="search-input"
-                  @click.stop
-                >
-              </div>
-              <button class="select-all-btn" @click.stop="toggleSelectAll">
-                {{ selectedItems.size > 0 ? 'DESELECT ALL' : 'SELECT ALL' }}
-              </button>
-            </div>
+      <!-- 1. Left Tree Sidebar -->
+      <aside class="tree-sidebar" @click.stop>
+        <div class="tree-sidebar-header">
+          <span class="tree-header-title">HIERARCHY</span>
+        </div>
+        
+        <div class="tree-container">
+          <div 
+            v-for="node in visibleSidebarFolders" 
+            :key="node.id"
+            :class="['tree-item', { 'is-selected': selectedFolderId === node.id }]"
+            :style="{ paddingLeft: `${node.depth * 16 + 12}px` }"
+            @click="selectFolder(node.id)"
+          >
+            <button 
+              class="chevron-btn" 
+              :class="{ 'is-expanded': expandedFolders.has(node.id), 'is-hidden': !node.hasChildren }"
+              @click.stop="toggleFolder(node.id)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            
+            <svg v-if="node.id === 'all'" class="folder-icon special-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <svg v-else class="folder-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+            
+            <span class="folder-name">{{ node.name }}</span>
           </div>
+        </div>
+      </aside>
 
-          <div v-for="(levelFolders, index) in subFolderLevels" :key="index" class="top-bar sub-bar">
-            <div class="tabs-container">
-              <span class="view-label"></span>
-              <button 
-                v-for="folder in levelFolders" 
-                :key="folder.id"
-                class="tab-btn" 
-                :class="{ active: isFolderInPath(folder, index + 1) }"
-                @click="selectFolderAtLevel(folder, index + 1)"
-              >
-                {{ folder.name.toUpperCase() }}
-              </button>
-            </div>
+      <!-- 2. Center Content Area -->
+      <main class="main-content">
+        <header class="top-nav-bar">
+          <div class="breadcrumb">
+            <template v-for="(crumb, index) in breadcrumbPath" :key="crumb.id">
+              <span class="crumb-text" @click="selectFolder(crumb.id)">{{ crumb.name }}</span>
+              <span v-if="index < breadcrumbPath.length - 1" class="crumb-divider">/</span>
+            </template>
+          </div>
+          
+          <div class="search-bar">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" v-model="searchQuery" :placeholder="selectedFolderId === 'all' ? 'Search all files...' : 'Search current folder...'" />
+          </div>
+        </header>
+
+        <div class="action-toolbar">
+          <div class="selection-group">
+            <button 
+              class="master-checkbox-btn" 
+              @click="toggleSelectAll"
+              :disabled="filteredMediaList.length === 0"
+              :title="isAllSelectedComputed ? 'Deselect All' : 'Select All'"
+            >
+              <svg v-if="isAllSelectedComputed && filteredMediaList.length > 0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffffff" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3" stroke="none"/><path d="M8 12l3 3 6-6" fill="none" stroke="#111111" stroke-width="3"/></svg>
+              <svg v-else-if="isIndeterminate" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#666666" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3" stroke="none"/><line x1="7" y1="12" x2="17" y2="12" stroke="#111111" stroke-width="3"/></svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"/></svg>
+            </button>
+            
+            <span class="status-text">
+              <template v-if="selectedItems.size > 0">
+                <span class="highlight">{{ selectedItems.size }}</span> of {{ filteredMediaList.length }} selected
+              </template>
+              <template v-else>
+                {{ filteredMediaList.length }} item(s)
+              </template>
+            </span>
           </div>
         </div>
 
-        <div class="content-area">
-          <div class="media-grid" ref="gridRef" @mousedown="startSelection">
-            <MediaCard
-              v-for="(item, index) in filteredMediaList"
-              :key="item.id"
-              :item="item"
-              :selected="selectedItems.has(item.id)"
-              class="media-card-item"
-              :data-id="item.id"
-              @click.stop="handleSelection(item, index, $event)"
-            />
-            <div v-if="filteredMediaList.length === 0" class="empty-state">
-              {{ searchQuery ? 'No files match your search.' : 'No media found.' }}
-            </div>
-            <div v-if="isSelecting" class="selection-frame" :style="selectionFrameStyle"></div>
+        <div class="media-grid" ref="gridRef" @mousedown="startSelection">
+          <div v-if="filteredMediaList.length === 0" class="empty-state">
+            {{ searchQuery ? 'No files match your search.' : 'No media found.' }}
           </div>
+          
+          <MediaCard
+            v-for="(item, index) in filteredMediaList"
+            :key="item.id"
+            :item="item"
+            :selected="selectedItems.has(item.id)"
+            class="media-card-item"
+            :data-id="item.id"
+            @click.stop="handleSelection(item, index, $event)"
+          />
+          <div v-if="isSelecting" class="selection-marquee" :style="selectionFrameStyle"></div>
         </div>
-      </div>
+      </main>
 
-      <!-- Settings Sidebar (New Design) -->
-      <div class="sidebar" @click.stop>
-        <div class="header-title">SETTINGS</div>
+      <!-- 3. Settings Sidebar (Right) -->
+      <div class="settings-sidebar" @click.stop>
+        <div class="settings-header-title">SETTINGS</div>
 
-        <div class="sidebar-content">
+        <div class="settings-sidebar-content">
           
           <!-- LAYER PROPERTIES -->
           <div class="group-box">
@@ -255,7 +274,7 @@
           </div>
         </div>
 
-        <div class="footer">
+        <div class="settings-footer">
           <div class="selection-info">{{ selectedItems.size }} item(s) selected</div>
           <button 
             class="create-btn" 
@@ -312,8 +331,8 @@ const options = reactive({
 });
 
 // Navigation state
-const navigationPath = ref([]);
-const isAllSelected = ref(true);
+const selectedFolderId = ref('all');
+const expandedFolders = ref(new Set(['Root']));
 
 // Drag Selection State
 const gridRef = ref(null);
@@ -328,40 +347,47 @@ let lastSelectedIndex = -1;
 
 // --- Computed Properties ---
 
-const rootLevelFolders = computed(() => fullHierarchy.value.filter(item => item.type === 'folder'));
-
-const subFolderLevels = computed(() => {
-  if (isAllSelected.value || navigationPath.value.length === 0) return [];
-  const levels = [];
-  let currentLevelFolders = navigationPath.value[0].children?.filter(i => i.type === 'folder') || [];
-  for (let i = 0; i < navigationPath.value.length; i++) {
-    if (currentLevelFolders.length > 0) levels.push(currentLevelFolders);
-    const nextInPath = navigationPath.value[i + 1];
-    if (nextInPath) currentLevelFolders = nextInPath.children?.filter(i => i.type === 'folder') || [];
-    else break;
-  }
-  return levels;
-});
-
-const allFiles = computed(() => {
-  const files = [];
-  const traverse = (items) => {
-    items.forEach(item => {
-      if (item.type === 'file') files.push(item);
-      else if (item.children) traverse(item.children);
-    });
+const visibleSidebarFolders = computed(() => {
+  const result = [{ id: 'all', name: 'ALL FILES', depth: 0, hasChildren: false }];
+  const traverse = (nodes, depth) => {
+    for (const node of nodes) {
+      if (node.type === 'folder') {
+        const hasChildren = node.children && node.children.some(c => c.type === 'folder');
+        result.push({ id: node.id, name: node.name, depth: depth, hasChildren: hasChildren });
+        if (expandedFolders.value.has(node.id) && node.children) {
+          traverse(node.children, depth + 1);
+        }
+      }
+    }
   };
-  traverse(fullHierarchy.value);
-  return files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+  traverse(fullHierarchy.value, 0);
+  return result;
 });
 
 const filteredMediaList = computed(() => {
   let list = [];
-  if (isAllSelected.value) {
-    list = allFiles.value;
-  } else if (navigationPath.value.length > 0) {
-    const currentFolder = navigationPath.value[navigationPath.value.length - 1];
-    list = currentFolder.children?.filter(item => item.type === 'file') || [];
+  if (selectedFolderId.value === 'all') {
+    // Collect all files
+    const gatherAllFiles = (nodes) => {
+      for (const node of nodes) {
+        if (node.type === 'file') list.push(node);
+        else if (node.children) gatherAllFiles(node.children);
+      }
+    };
+    gatherAllFiles(fullHierarchy.value);
+    list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+  } else {
+    let found = null;
+    const findFolder = (nodes) => {
+      for (const node of nodes) {
+        if (node.id === selectedFolderId.value) found = node;
+        if (!found && node.children) findFolder(node.children);
+      }
+    };
+    findFolder(fullHierarchy.value);
+    if (found && found.children) {
+      list = found.children.filter(item => item.type === 'file');
+    }
   }
 
   if (searchQuery.value) {
@@ -370,6 +396,23 @@ const filteredMediaList = computed(() => {
   }
   
   return list;
+});
+
+const breadcrumbPath = computed(() => {
+  if (selectedFolderId.value === 'all') return [{ id: 'all', name: 'ALL FILES' }];
+  const path = [];
+  const findPath = (nodes, currentPath) => {
+    for (const node of nodes) {
+      if (node.type === 'folder') {
+        const newPath = [...currentPath, { id: node.id, name: node.name }];
+        if (node.id === selectedFolderId.value) { path.push(...newPath); return true; }
+        if (node.children && findPath(node.children, newPath)) return true;
+      }
+    }
+    return false;
+  };
+  findPath(fullHierarchy.value, []);
+  return path;
 });
 
 const isCueValid = computed(() => {
@@ -393,20 +436,28 @@ const isCreateLayersEnabled = computed(() => {
   return hasSelection && hasMapping && validCue && validLocation;
 });
 
+const isAllSelectedComputed = computed(() => filteredMediaList.value.length > 0 && filteredMediaList.value.every(item => selectedItems.has(item.id)));
+const isIndeterminate = computed(() => selectedItems.size > 0 && selectedItems.size < filteredMediaList.value.length);
+
 // --- Helpers ---
 
-const selectAll = () => {
-  isAllSelected.value = true;
-  navigationPath.value = [];
+const toggleFolder = (id) => {
+  if (id === 'all') return;
+  const newExpanded = new Set(expandedFolders.value);
+  if (newExpanded.has(id)) newExpanded.delete(id);
+  else newExpanded.add(id);
+  expandedFolders.value = newExpanded;
 };
 
-const selectFolderAtLevel = (folder, level) => {
-  isAllSelected.value = false;
-  navigationPath.value = navigationPath.value.slice(0, level);
-  navigationPath.value.push(folder);
+const selectFolder = (id) => {
+  selectedFolderId.value = id;
+  if (id !== 'all' && !expandedFolders.value.has(id)) {
+    const newExpanded = new Set(expandedFolders.value);
+    newExpanded.add(id);
+    expandedFolders.value = newExpanded;
+  }
+  searchQuery.value = '';
 };
-
-const isFolderInPath = (folder, level) => navigationPath.value[level]?.id === folder.id;
 
 // Dropdown Toggles
 const toggleMappingMenu = () => {
@@ -439,10 +490,10 @@ const handleClickOutside = (e) => {
 
 // --- Watchers & Lifecycle ---
 
-watch([isAllSelected, navigationPath], () => {
+watch([selectedFolderId, searchQuery], () => {
   selectedItems.clear();
   lastSelectedIndex = -1;
-}, { deep: true });
+});
 
 // Input Validations
 watch(() => options.overlap, (newVal) => { if (newVal < 0) options.overlap = 0; });
@@ -484,7 +535,16 @@ async function handleCreateLayers() {
 
   try {
     isCreating.value = true;
-    const selectedFiles = allFiles.value.filter(file => selectedItems.has(file.id));
+    const allFilesFlat = [];
+    const traverse = (items) => {
+      items.forEach(item => {
+        if (item.type === 'file') allFilesFlat.push(item);
+        else if (item.children) traverse(item.children);
+      });
+    };
+    traverse(fullHierarchy.value);
+
+    const selectedFiles = allFilesFlat.filter(file => selectedItems.has(file.id));
     const selectedPaths = selectedFiles.map(file => file.path);
     
     const requestOptions = {
@@ -540,7 +600,7 @@ function handleContainerClick() {
 }
 
 function toggleSelectAll() {
-  if (selectedItems.size > 0) {
+  if (isAllSelectedComputed.value) {
     selectedItems.clear();
     lastSelectedIndex = -1;
   } else {
@@ -552,7 +612,7 @@ function toggleSelectAll() {
 }
 
 function startSelection(event) {
-  if (event.target.closest('.media-card') || event.target.closest('.top-bar-container')) return;
+  if (event.target.closest('.media-card') || event.target.closest('.top-nav-bar') || event.target.closest('.action-toolbar')) return;
   isSelecting.value = true;
   wasDragging.value = false;
   const rect = gridRef.value.getBoundingClientRect();
@@ -608,14 +668,18 @@ const selectionFrameStyle = computed(() => {
   box-sizing: border-box;
 }
 
-.media-manager {
+.media-app {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #121212;
-  color: #e0e0e0;
-  overflow: hidden;
+  background-color: #111111;
+  color: #cccccc;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+}
+
+.media-app.is-dragging {
+  user-select: none;
 }
 
 .main-layout {
@@ -624,127 +688,131 @@ const selectionFrameStyle = computed(() => {
   overflow: hidden;
 }
 
-.left-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-width: 0;
+/* --- Left Sidebar (Tree) --- */
+.tree-sidebar { 
+  width: 260px; 
+  min-width: 260px; 
+  background-color: #151515; 
+  border-right: 1px solid #2a2a2a; 
+  display: flex; 
+  flex-direction: column; 
+  height: 100%; 
 }
+.tree-sidebar-header { 
+  height: 52px; 
+  display: flex; 
+  align-items: center; 
+  padding: 0 16px; 
+  border-bottom: 1px solid #222222;
+}
+.tree-header-title { 
+  font-size: 11px; 
+  font-weight: 700; 
+  color: #666666; 
+  letter-spacing: 0.5px; 
+}
+.tree-container { 
+  overflow-y: auto; 
+  flex: 1; 
+  padding-top: 10px;
+}
+.tree-container::-webkit-scrollbar { width: 8px; }
+.tree-container::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
+.tree-item { 
+  display: flex; 
+  align-items: center; 
+  padding: 6px 8px; 
+  cursor: pointer; 
+  user-select: none; 
+}
+.tree-item:hover { background: #1f1f1f; }
+.tree-item.is-selected { background: #2a2a2a; color: #ffffff; }
+.chevron-btn { 
+  background: transparent; 
+  border: none; 
+  color: #555555; 
+  width: 20px; 
+  height: 20px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  cursor: pointer; 
+}
+.chevron-btn.is-expanded { transform: rotate(90deg); }
+.chevron-btn.is-hidden { visibility: hidden; }
+.folder-icon { margin: 0 8px 0 2px; color: #666666; }
+.tree-item.is-selected .folder-icon { color: #aaaaaa; }
+.folder-name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-.top-bar-container {
-  display: flex;
-  flex-direction: column;
-  background-color: #181818;
-  border-bottom: 1px solid #36373a;
-  z-index: 10;
+/* --- Main Content --- */
+.main-content { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  background-color: #111111; 
+  height: 100%; 
+  overflow: hidden; 
+  position: relative; 
+}
+.top-nav-bar { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  height: 52px; 
+  padding: 0 24px; 
+  background-color: #151515; 
+  border-bottom: 1px solid #222222; 
   flex-shrink: 0;
 }
+.breadcrumb { display: flex; align-items: center; font-size: 14px; text-transform: uppercase; font-weight: 600;}
+.crumb-text { cursor: pointer; color: #888888; transition: color 0.2s; }
+.crumb-text:hover { color: #ffffff; }
+.crumb-text:last-child { color: #dddddd; cursor: default; }
+.crumb-divider { margin: 0 8px; color: #444444; font-weight: 400;}
+.search-bar { display: flex; align-items: center; background: #0a0a0a; border: 1px solid #333333; border-radius: 6px; padding: 6px 12px; width: 260px; }
+.search-bar:focus-within { border-color: #666666; }
+.search-icon { color: #666666; margin-right: 8px; }
+.search-bar input { background: transparent; border: none; color: #cccccc; outline: none; width: 100%; font-size: 12px; }
 
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  gap: 20px;
-}
-
-.sub-bar {
-  border-top: 1px solid #36373a;
-  padding: 5px 20px;
-  background-color: #1e1e1e;
-}
-
-.tabs-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 5px;
-  scrollbar-width: thin;
-}
-
-.tabs-container::-webkit-scrollbar { height: 4px; }
-.tabs-container::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
-
-.view-label {
-  color: #888;
-  font-size: 0.8rem;
-  font-weight: bold;
-  margin-right: 5px;
-  min-width: 40px;
+.action-toolbar { 
+  height: 40px; 
+  display: flex; 
+  align-items: center; 
+  padding: 0 24px; 
+  background-color: #1a1a1a; 
+  border-bottom: 1px solid #2a2a2a; 
   flex-shrink: 0;
 }
+.selection-group { display: flex; align-items: center; gap: 12px; }
+.master-checkbox-btn { background: transparent; border: none; color: #777777; padding: 4px; margin-left: -4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
+.master-checkbox-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
+.master-checkbox-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.status-text { font-size: 12px; color: #888888; }
+.highlight { color: #ffffff; font-weight: 600; }
 
-.tab-btn {
-  background: transparent;
-  border: 1px solid #36373a;
-  color: #888;
-  padding: 5px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.tab-btn:hover { background-color: #2a2b2e; }
-.tab-btn.active {
-  border-color: #3b82f6;
-  color: #3b82f6;
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
-.top-bar-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex-shrink: 0;
-}
-
-.search-input {
-  background-color: #1e1e1e;
-  border: 1px solid #36373a;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  width: 220px;
-}
-
-.search-input:focus { border-color: #3b82f6; outline: none; }
-
-.select-all-btn {
-  background: transparent;
-  border: 1px solid #555;
-  color: #ccc;
-  padding: 5px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
-.select-all-btn:hover { background-color: #2a2b2e; color: white; }
-
-.content-area {
-  flex: 1;
+/* --- Grid View --- */
+.media-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+  gap: 16px; 
+  padding: 24px; 
+  overflow-y: auto; 
+  flex: 1; 
+  align-content: start; 
   position: relative;
-  overflow: hidden;
 }
 
-.media-grid {
-  height: 100%;
-  overflow-y: auto;
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  align-content: start;
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 40px; color: #555555; font-size: 14px; }
+.selection-marquee {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+  z-index: 100;
 }
 
 /* --- Settings Sidebar --- */
-.sidebar {
+.settings-sidebar {
   width: 320px;
   background: #1e1e1e;
   color: #dddddd;
@@ -756,7 +824,7 @@ const selectionFrameStyle = computed(() => {
   box-shadow: -5px 0 20px rgba(0,0,0,0.3);
 }
 
-.header-title {
+.settings-header-title {
   font-weight: 700;
   color: #888;
   font-size: 14px;
@@ -764,7 +832,7 @@ const selectionFrameStyle = computed(() => {
   padding: 20px 20px 10px 20px;
 }
 
-.sidebar-content {
+.settings-sidebar-content {
   flex: 1;
   overflow-y: auto;
   padding: 0 20px 20px 20px;
@@ -959,7 +1027,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .toggle-input-wrapper { margin-left: 2px; transition: opacity 0.3s ease; }
 
 /* Footer */
-.footer { 
+.settings-footer { 
   padding: 20px;
   background: #1e1e1e;
   border-top: 1px solid #36373a;
@@ -986,6 +1054,4 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .create-btn:disabled { background: #3a3a3a; color: #777; cursor: not-allowed; }
 
 .loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
-.empty-state { grid-column: 1 / -1; text-align: center; padding: 2rem; color: #555; }
-.selection-frame { position: absolute; background-color: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.6); pointer-events: none; z-index: 100; }
 </style>
