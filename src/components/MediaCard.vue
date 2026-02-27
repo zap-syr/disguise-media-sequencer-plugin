@@ -42,15 +42,70 @@ const mediaType = computed(() => {
 </script>
 
 <style scoped>
-.media-card { background: #181818; border: 1px solid #2a2a2a; border-radius: 6px; overflow: hidden; cursor: pointer; transition: border-color 0.1s; }
+.media-card { 
+  background: #181818; 
+  border: 1px solid #2a2a2a; 
+  border-radius: 6px; 
+  overflow: hidden; 
+  cursor: pointer; 
+  transition: border-color 0.1s; 
+  display: flex;
+  flex-direction: column;
+  height: 140px; /* Force consistent height */
+}
 .media-card:hover { border-color: #555555; }
 .media-card.is-card-selected { border-color: #ffffff; background: #252525; }
-.card-preview { height: 90px; display: flex; align-items: center; justify-content: center; background: #111111; color: #333333; border-bottom: 1px solid #2a2a2a; position: relative; }
+
+.card-preview { 
+  flex: 1; /* Take up remaining space pushing footer down */
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: #111111; 
+  color: #333333; 
+  border-bottom: 1px solid #2a2a2a; 
+  position: relative; 
+  min-height: 0; /* Important for flex children to not overflow */
+}
 .card-preview.image { color: #555555; }
 .card-preview.video { color: #444444; }
-.selected-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; }
-.card-footer { padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
-.file-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #dddddd; }
+
+.selected-overlay { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  bottom: 0; 
+  background: rgba(0, 0, 0, 0.5); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+}
+
+.card-footer { 
+  padding: 8px 10px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 2px; 
+  background: #181818; /* Ensure footer has solid background */
+  flex-shrink: 0; /* Prevent footer from shrinking */
+}
+.media-card.is-card-selected .card-footer {
+  background: #252525;
+}
+
+.file-name { 
+  font-size: 12px; 
+  font-weight: 500; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  color: #dddddd; 
+}
 .media-card.is-card-selected .file-name { color: #ffffff; }
-.file-type { font-size: 10px; color: #666666; }
+
+.file-type { 
+  font-size: 10px; 
+  color: #666666; 
+}
 </style>
