@@ -103,20 +103,29 @@
             <div class="group-header">LAYER PROPERTIES</div>
             <div class="control">
               <label>MAPPING</label>
-              <div class="dropdown-wrapper" ref="mappingRef">
-                <button class="dropdown-btn" @click="toggleMappingMenu">
-                  <span class="dropdown-text">{{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}</span>
-                </button>
-                <ul v-if="isMappingMenuOpen" class="dropdown-menu">
+              <div class="searchable-select" ref="mappingRef">
+                <input 
+                  type="text" 
+                  v-model="mappingSearchQuery"
+                  @focus="toggleMappingMenu(true)"
+                  :placeholder="selectedMapping ? selectedMapping.name : 'Search Mapping...'"
+                  class="standard-input dropdown-input"
+                />
+                <span class="dropdown-arrow">▼</span>
+                
+                <ul v-if="isMappingMenuOpen" class="dropdown-list">
                   <li 
-                    v-for="m in mappings" 
+                    v-for="m in filteredMappings" 
                     :key="m.uid" 
+                    class="dropdown-item"
+                    :class="{ selected: selectedMapping?.uid === m.uid }"
                     @click="selectMapping(m)"
-                    :class="{ active: selectedMapping?.uid === m.uid }"
                   >
                     {{ m.name }}
                   </li>
-                  <li v-if="mappings.length === 0" class="disabled">No mappings found</li>
+                  <li v-if="filteredMappings.length === 0" class="dropdown-empty">
+                    No results found
+                  </li>
                 </ul>
               </div>
             </div>
@@ -167,20 +176,30 @@
             <div class="row" :class="{ disabled: options.insertMode !== 'Specific location' }">
               <div class="control">
                 <label>TRACK</label>
-                <div class="dropdown-wrapper" ref="trackRef">
-                  <button class="dropdown-btn" @click="toggleTrackMenu" :disabled="options.insertMode !== 'Specific location'">
-                    <span class="dropdown-text">{{ selectedTrack ? selectedTrack.name : 'Select Track...' }}</span>
-                  </button>
-                  <ul v-if="isTrackMenuOpen" class="dropdown-menu">
+                <div class="searchable-select" ref="trackRef">
+                  <input 
+                    type="text" 
+                    v-model="trackSearchQuery"
+                    @focus="toggleTrackMenu(true)"
+                    :placeholder="selectedTrack ? selectedTrack.name : 'Search Track...'"
+                    class="standard-input dropdown-input"
+                    :disabled="options.insertMode !== 'Specific location'"
+                  />
+                  <span class="dropdown-arrow">▼</span>
+                  
+                  <ul v-if="isTrackMenuOpen" class="dropdown-list">
                     <li 
-                      v-for="t in tracks" 
+                      v-for="t in filteredTracks" 
                       :key="t.uid" 
+                      class="dropdown-item"
+                      :class="{ selected: selectedTrack?.uid === t.uid }"
                       @click="selectTrack(t)"
-                      :class="{ active: selectedTrack?.uid === t.uid }"
                     >
                       {{ t.name }}
                     </li>
-                    <li v-if="tracks.length === 0" class="disabled">No tracks found</li>
+                    <li v-if="filteredTracks.length === 0" class="dropdown-empty">
+                      No results found
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -312,6 +331,9 @@ const selectedTrack = ref(null);
 const isMappingMenuOpen = ref(false);
 const isTrackMenuOpen = ref(false);
 
+const mappingSearchQuery = ref('');
+const trackSearchQuery = ref('');
+
 const selectedItems = reactive(new Set());
 const searchQuery = ref('');
 
@@ -346,6 +368,18 @@ const initialSelection = new Set();
 let lastSelectedIndex = -1;
 
 // --- Computed Properties ---
+
+const filteredMappings = computed(() => {
+  if (!mappingSearchQuery.value) return mappings.value;
+  const query = mappingSearchQuery.value.toLowerCase();
+  return mappings.value.filter(m => m.name.toLowerCase().includes(query));
+});
+
+const filteredTracks = computed(() => {
+  if (!trackSearchQuery.value) return tracks.value;
+  const query = trackSearchQuery.value.toLowerCase();
+  return tracks.value.filter(t => t.name.toLowerCase().includes(query));
+});
 
 const visibleSidebarFolders = computed(() => {
   const result = [{ id: 'all', name: 'ALL FILES', depth: 0, hasChildren: false }];
@@ -460,31 +494,47 @@ const selectFolder = (id) => {
 };
 
 // Dropdown Toggles
-const toggleMappingMenu = () => {
-  isMappingMenuOpen.value = !isMappingMenuOpen.value;
+const toggleMappingMenu = (forceOpen = false) => {
+  if (forceOpen) {
+    isMappingMenuOpen.value = true;
+    mappingSearchQuery.value = '';
+  } else {
+    isMappingMenuOpen.value = !isMappingMenuOpen.value;
+    if (!isMappingMenuOpen.value) mappingSearchQuery.value = selectedMapping.value ? selectedMapping.value.name : '';
+  }
   isTrackMenuOpen.value = false;
 };
 const selectMapping = (m) => {
   selectedMapping.value = m;
   isMappingMenuOpen.value = false;
+  mappingSearchQuery.value = m.name;
 };
 
-const toggleTrackMenu = () => {
+const toggleTrackMenu = (forceOpen = false) => {
   if (options.insertMode !== 'Specific location') return;
-  isTrackMenuOpen.value = !isTrackMenuOpen.value;
+  if (forceOpen) {
+    isTrackMenuOpen.value = true;
+    trackSearchQuery.value = '';
+  } else {
+    isTrackMenuOpen.value = !isTrackMenuOpen.value;
+    if (!isTrackMenuOpen.value) trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
+  }
   isMappingMenuOpen.value = false;
 };
 const selectTrack = (t) => {
   selectedTrack.value = t;
   isTrackMenuOpen.value = false;
+  trackSearchQuery.value = t.name;
 };
 
 const handleClickOutside = (e) => {
   if (mappingRef.value && !mappingRef.value.contains(e.target)) {
     isMappingMenuOpen.value = false;
+    mappingSearchQuery.value = selectedMapping.value ? selectedMapping.value.name : '';
   }
   if (trackRef.value && !trackRef.value.contains(e.target)) {
     isTrackMenuOpen.value = false;
+    trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
   }
 };
 
@@ -977,6 +1027,69 @@ select:focus, .standard-input:focus {
   font-size: 10px;
   color: #777;
   pointer-events: none;
+}
+
+/* Custom Searchable Dropdown Styles */
+.searchable-select {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-input {
+  padding-right: 24px; /* Room for the arrow */
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 8px;
+  color: #888;
+  pointer-events: none;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #1e1e1e;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 100;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.dropdown-list::-webkit-scrollbar { width: 6px; }
+.dropdown-list::-webkit-scrollbar-track { background: #1e1e1e; }
+.dropdown-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+.dropdown-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #eee;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover { background: #3a3a3a; }
+.dropdown-item.selected { 
+  background: rgba(59, 130, 246, 0.2); 
+  color: #3b82f6; 
+  font-weight: 600;
+}
+
+.dropdown-empty {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #777;
+  text-align: center;
 }
 
 /* Dropdowns */
