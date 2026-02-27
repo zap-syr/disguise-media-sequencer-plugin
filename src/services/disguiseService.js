@@ -244,6 +244,10 @@ ${trackInitCode}
 
     created_layers_info = []
     current_start_beats = current_playhead_beats
+
+    # Initial split section if enabled
+    if SPLIT_SECTION:
+      current_track.splitSectionAtBeat(current_start_beats)
     
     media_paths = ${pathsList}
 

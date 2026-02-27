@@ -54,7 +54,6 @@
           </div>
         </div>
 
-        <!-- Media Grid Area -->
         <div class="content-area">
           <div class="media-grid" ref="gridRef" @mousedown="startSelection">
             <MediaCard
@@ -79,158 +78,167 @@
         <div class="sidebar-title">SETTINGS</div>
         
         <div class="sidebar-content">
-          <!-- Mapping -->
-          <div class="sidebar-group">
-            <label class="sidebar-label">MAPPING</label>
-            <div class="dropdown-wrapper" ref="mappingRef">
-              <button class="dropdown-btn" @click="toggleMappingMenu">
-                <span class="dropdown-text">{{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}</span>
-                <span class="arrow">▼</span>
-              </button>
-              <ul v-if="isMappingMenuOpen" class="dropdown-menu">
-                <li 
-                  v-for="m in mappings" 
-                  :key="m.uid" 
-                  @click="selectMapping(m)"
-                  :class="{ active: selectedMapping?.uid === m.uid }"
-                >
-                  {{ m.name }}
-                </li>
-                <li v-if="mappings.length === 0" class="disabled">No mappings found</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Insert Mode -->
-          <div class="sidebar-group">
-            <label class="sidebar-label">INSERT LOCATION</label>
-            <select v-model="options.insertMode" class="sidebar-select">
-              <option value="At Playhead">At Playhead</option>
-              <option value="Specific location">Specific location</option>
-            </select>
-          </div>
-
-          <!-- Target Track & Start Time (Conditional) -->
-          <template v-if="options.insertMode === 'Specific location'">
+          
+          <!-- LAYER SETTINGS -->
+          <div class="settings-section">
+            <div class="settings-section-header">LAYER SETTINGS</div>
+            
             <div class="sidebar-group">
-              <label class="sidebar-label">TARGET TRACK</label>
-              <div class="dropdown-wrapper" ref="trackRef">
-                <button class="dropdown-btn" @click="toggleTrackMenu">
-                  <span class="dropdown-text">{{ selectedTrack ? selectedTrack.name : 'Select Track...' }}</span>
+              <label class="sidebar-label">MAPPING</label>
+              <div class="dropdown-wrapper" ref="mappingRef">
+                <button class="dropdown-btn" @click="toggleMappingMenu">
+                  <span class="dropdown-text">{{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}</span>
                   <span class="arrow">▼</span>
                 </button>
-                <ul v-if="isTrackMenuOpen" class="dropdown-menu">
+                <ul v-if="isMappingMenuOpen" class="dropdown-menu">
                   <li 
-                    v-for="t in tracks" 
-                    :key="t.uid" 
-                    @click="selectTrack(t)"
-                    :class="{ active: selectedTrack?.uid === t.uid }"
+                    v-for="m in mappings" 
+                    :key="m.uid" 
+                    @click="selectMapping(m)"
+                    :class="{ active: selectedMapping?.uid === m.uid }"
                   >
-                    {{ t.name }}
+                    {{ m.name }}
                   </li>
-                  <li v-if="tracks.length === 0" class="disabled">No tracks found</li>
+                  <li v-if="mappings.length === 0" class="disabled">No mappings found</li>
                 </ul>
               </div>
             </div>
 
             <div class="sidebar-group">
-              <label class="sidebar-label">START TIME (HH:MM:SS:FF)</label>
-              <input 
-                type="text" 
-                v-model="options.startTime" 
-                class="sidebar-input-text" 
-                placeholder="00:00:00:00"
-                :class="{ invalid: !isStartTimeValid }"
-              >
+              <label class="sidebar-label">MODE</label>
+              <select v-model="options.mode" class="sidebar-select">
+                <option value="Normal">Normal</option>
+                <option value="Locked">Locked</option>
+              </select>
             </div>
-          </template>
+
+            <div class="sidebar-group">
+              <label class="sidebar-label">AT END POINT</label>
+              <select v-model="options.atEndPoint" class="sidebar-select">
+                <option value="Loop">Loop</option>
+                <option value="Ping-Pong">Ping-Pong</option>
+                <option value="Pause">Pause</option>
+              </select>
+            </div>
+          </div>
 
           <div class="sidebar-group divider"></div>
 
-          <!-- Mode -->
-          <div class="sidebar-group">
-            <label class="sidebar-label">MODE</label>
-            <select v-model="options.mode" class="sidebar-select">
-              <option value="Normal">Normal</option>
-              <option value="Locked">Locked</option>
-            </select>
-          </div>
+          <!-- INSERT SETTINGS -->
+          <div class="settings-section">
+            <div class="settings-section-header">INSERT SETTINGS</div>
 
-          <!-- At End Point -->
-          <div class="sidebar-group">
-            <label class="sidebar-label">AT END POINT</label>
-            <select v-model="options.atEndPoint" class="sidebar-select">
-              <option value="Loop">Loop</option>
-              <option value="Ping-Pong">Ping-Pong</option>
-              <option value="Pause">Pause</option>
-            </select>
-          </div>
+            <div class="sidebar-group">
+              <label class="sidebar-label">INSERT LOCATION</label>
+              <select v-model="options.insertMode" class="sidebar-select">
+                <option value="At Playhead">At Playhead</option>
+                <option value="Specific location">Specific location</option>
+              </select>
+            </div>
 
-          <!-- Still Duration -->
-          <div class="sidebar-group">
-            <label class="sidebar-label">STILL IMG DURATION (s)</label>
-            <input 
-              type="number" 
-              v-model.number="options.stillDuration" 
-              class="sidebar-input-number"
-              min="0"
-              step="1"
-            >
-          </div>
+            <template v-if="options.insertMode === 'Specific location'">
+              <div class="sidebar-group">
+                <label class="sidebar-label">TARGET TRACK</label>
+                <div class="dropdown-wrapper" ref="trackRef">
+                  <button class="dropdown-btn" @click="toggleTrackMenu">
+                    <span class="dropdown-text">{{ selectedTrack ? selectedTrack.name : 'Select Track...' }}</span>
+                    <span class="arrow">▼</span>
+                  </button>
+                  <ul v-if="isTrackMenuOpen" class="dropdown-menu">
+                    <li 
+                      v-for="t in tracks" 
+                      :key="t.uid" 
+                      @click="selectTrack(t)"
+                      :class="{ active: selectedTrack?.uid === t.uid }"
+                    >
+                      {{ t.name }}
+                    </li>
+                    <li v-if="tracks.length === 0" class="disabled">No tracks found</li>
+                  </ul>
+                </div>
+              </div>
 
-          <!-- Movie Duration -->
-          <div class="sidebar-group">
-            <label class="sidebar-label">MOVIE DURATION</label>
-            <div class="duration-row">
-              <label class="control-item">
-                <input type="checkbox" v-model="options.fitToContent"> Fit To Contents
-              </label>
+              <div class="sidebar-group">
+                <label class="sidebar-label">START TIME (HH:MM:SS:FF)</label>
+                <input 
+                  type="text" 
+                  v-model="options.startTime" 
+                  class="sidebar-input-text" 
+                  placeholder="00:00:00:00"
+                  :class="{ invalid: !isStartTimeValid }"
+                >
+              </div>
+            </template>
+
+            <div class="sidebar-group">
+              <label class="sidebar-label">MOVIE DURATION</label>
+              <div class="duration-row">
+                <label class="custom-checkbox">
+                  <input type="checkbox" v-model="options.fitToContent">
+                  <span class="checkmark"></span>
+                  Fit To Contents
+                </label>
+                <input 
+                  v-if="!options.fitToContent"
+                  type="number" 
+                  v-model.number="options.movieDuration" 
+                  class="sidebar-input-number mini"
+                  min="0"
+                  step="1"
+                >
+                <span v-if="!options.fitToContent" class="unit">s</span>
+              </div>
+            </div>
+
+            <div class="sidebar-group">
+              <label class="sidebar-label">STILL IMG DURATION (s)</label>
               <input 
-                v-if="!options.fitToContent"
                 type="number" 
-                v-model.number="options.movieDuration" 
-                class="sidebar-input-number mini"
+                v-model.number="options.stillDuration" 
+                class="sidebar-input-number"
                 min="0"
                 step="1"
               >
-              <span v-if="!options.fitToContent" class="unit">s</span>
+            </div>
+
+            <div class="sidebar-group">
+              <label class="sidebar-label">OVERLAP (s)</label>
+              <input 
+                type="number" 
+                v-model.number="options.overlap" 
+                class="sidebar-input-number"
+                min="0"
+                step="0.5"
+              >
+            </div>
+
+            <div class="sidebar-group row">
+              <label class="custom-checkbox">
+                <input type="checkbox" v-model="options.splitSection">
+                <span class="checkmark"></span>
+                Split Section
+              </label>
+            </div>
+
+            <div class="sidebar-group row">
+              <label class="custom-checkbox">
+                <input type="checkbox" v-model="options.addCueTag">
+                <span class="checkmark"></span>
+                Add Cue Tag
+              </label>
+            </div>
+
+            <div v-if="options.addCueTag" class="sidebar-group">
+              <input 
+                type="text" 
+                v-model="options.cueValue" 
+                class="sidebar-input-text" 
+                placeholder="e.g. 1.2.3"
+                :class="{ invalid: !isCueValid && options.cueValue !== '' }"
+              >
             </div>
           </div>
 
-          <!-- Overlap -->
-          <div class="sidebar-group">
-            <label class="sidebar-label">OVERLAP (s)</label>
-            <input 
-              type="number" 
-              v-model.number="options.overlap" 
-              class="sidebar-input-number"
-              min="0"
-              step="0.5"
-            >
-          </div>
-
-          <div class="sidebar-group divider"></div>
-
-          <!-- Split Section & Cue Tag -->
-          <div class="sidebar-group row">
-            <input type="checkbox" id="splitSection" v-model="options.splitSection">
-            <label for="splitSection">Split Section</label>
-          </div>
-
-          <div class="sidebar-group row">
-            <input type="checkbox" id="addCueTag" v-model="options.addCueTag">
-            <label for="addCueTag">Add Cue Tag</label>
-          </div>
-
-          <div v-if="options.addCueTag" class="sidebar-group">
-            <input 
-              type="text" 
-              v-model="options.cueValue" 
-              class="sidebar-input-text" 
-              placeholder="e.g. 1.2.3"
-              :class="{ invalid: !isCueValid && options.cueValue !== '' }"
-            >
-          </div>
         </div>
 
         <div class="sidebar-footer">
@@ -752,11 +760,24 @@ const selectionFrameStyle = computed(() => {
   padding: 20px;
 }
 
+.settings-section {
+  margin-bottom: 25px;
+}
+
+.settings-section-header {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #007acc;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .sidebar-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .sidebar-group.row {
@@ -769,13 +790,13 @@ const selectionFrameStyle = computed(() => {
 .duration-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
 }
 
 .sidebar-group.divider {
   height: 1px;
   background-color: #333;
-  margin: 10px 0 20px;
+  margin: 10px 0 25px;
 }
 
 .sidebar-label {
@@ -791,6 +812,12 @@ const selectionFrameStyle = computed(() => {
   padding: 8px;
   border-radius: 4px;
   font-size: 0.85rem;
+  transition: border-color 0.2s;
+}
+
+.sidebar-select:focus, .sidebar-input-number:focus, .sidebar-input-text:focus {
+  border-color: #007acc;
+  outline: none;
 }
 
 .sidebar-input-number { width: 100px; }
@@ -799,6 +826,70 @@ const selectionFrameStyle = computed(() => {
 
 .sidebar-input-text.invalid {
   border-color: #f44336;
+}
+
+/* Custom Checkbox Styles */
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 28px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  user-select: none;
+  color: #ccc;
+  min-height: 20px;
+}
+
+.custom-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: 18px;
+  width: 18px;
+  background-color: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.custom-checkbox:hover input ~ .checkmark {
+  background-color: #3e3e42;
+  border-color: #666;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+  background-color: #007acc;
+  border-color: #007acc;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.custom-checkbox .checkmark:after {
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .dropdown-wrapper { position: relative; }
@@ -814,6 +905,12 @@ const selectionFrameStyle = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: border-color 0.2s;
+}
+
+.dropdown-btn:hover, .dropdown-btn:focus {
+  border-color: #007acc;
+  outline: none;
 }
 
 .dropdown-text {
@@ -866,6 +963,11 @@ const selectionFrameStyle = computed(() => {
   cursor: pointer;
   text-transform: uppercase;
   font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.create-btn-sidebar:hover:not(:disabled) {
+  background-color: #1177bb;
 }
 
 .create-btn-sidebar:disabled {
