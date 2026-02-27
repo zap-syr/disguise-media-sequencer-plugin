@@ -591,7 +591,11 @@ function handleSelection(item, index, event) {
   }
 }
 
-function handleContainerClick() {
+function handleContainerClick(event) {
+  // Ignore clicks on any scrollbar
+  if (event.target && event.target.clientWidth && event.offsetX > event.target.clientWidth) return;
+  if (event.target && event.target.clientHeight && event.offsetY > event.target.clientHeight) return;
+
   if (!wasDragging.value) {
      selectedItems.clear();
      lastSelectedIndex = -1;
@@ -612,7 +616,15 @@ function toggleSelectAll() {
 }
 
 function startSelection(event) {
-  if (event.target.closest('.media-card') || event.target.closest('.top-nav-bar') || event.target.closest('.action-toolbar')) return;
+  // Prevent drag selection if clicking on a card, toolbar, OR if clicking on the scrollbar
+  if (
+    event.target.closest('.media-card') || 
+    event.target.closest('.top-nav-bar') || 
+    event.target.closest('.action-toolbar') ||
+    event.offsetX > event.target.clientWidth || // Clicking vertical scrollbar
+    event.offsetY > event.target.clientHeight   // Clicking horizontal scrollbar
+  ) return;
+  
   isSelecting.value = true;
   wasDragging.value = false;
   const rect = gridRef.value.getBoundingClientRect();
@@ -794,6 +806,7 @@ const selectionFrameStyle = computed(() => {
 .media-grid { 
   display: grid; 
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+  grid-auto-rows: 140px;
   gap: 16px; 
   padding: 24px; 
   overflow-y: auto; 
