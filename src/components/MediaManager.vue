@@ -73,22 +73,20 @@
         </div>
       </div>
 
-      <!-- Settings Sidebar -->
-      <div class="settings-sidebar" @click.stop>
-        <div class="sidebar-title">SETTINGS</div>
-        
+      <!-- Settings Sidebar (New Design) -->
+      <div class="sidebar" @click.stop>
+        <div class="header-title">SETTINGS</div>
+
         <div class="sidebar-content">
           
-          <!-- LAYER SETTINGS -->
-          <div class="settings-section">
-            <div class="settings-section-header">LAYER SETTINGS</div>
-            
-            <div class="sidebar-group">
-              <label class="sidebar-label">MAPPING</label>
+          <!-- LAYER PROPERTIES -->
+          <div class="group-box">
+            <div class="group-header">LAYER PROPERTIES</div>
+            <div class="control">
+              <label>MAPPING</label>
               <div class="dropdown-wrapper" ref="mappingRef">
                 <button class="dropdown-btn" @click="toggleMappingMenu">
                   <span class="dropdown-text">{{ selectedMapping ? selectedMapping.name : 'Select Mapping...' }}</span>
-                  <span class="arrow">▼</span>
                 </button>
                 <ul v-if="isMappingMenuOpen" class="dropdown-menu">
                   <li 
@@ -103,46 +101,56 @@
                 </ul>
               </div>
             </div>
-
-            <div class="sidebar-group">
-              <label class="sidebar-label">MODE</label>
-              <select v-model="options.mode" class="sidebar-select">
-                <option value="Normal">Normal</option>
-                <option value="Locked">Locked</option>
-              </select>
-            </div>
-
-            <div class="sidebar-group">
-              <label class="sidebar-label">AT END POINT</label>
-              <select v-model="options.atEndPoint" class="sidebar-select">
-                <option value="Loop">Loop</option>
-                <option value="Ping-Pong">Ping-Pong</option>
-                <option value="Pause">Pause</option>
-              </select>
+            <div class="row">
+              <div class="control">
+                <label>MODE</label>
+                <select v-model="options.mode">
+                  <option value="Normal">Normal</option>
+                  <option value="Locked">Locked</option>
+                </select>
+              </div>
+              <div class="control">
+                <label>AT END POINT</label>
+                <select v-model="options.atEndPoint">
+                  <option value="Loop">Loop</option>
+                  <option value="Ping-Pong">Ping-Pong</option>
+                  <option value="Pause">Pause</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div class="sidebar-group divider"></div>
-
           <!-- INSERT SETTINGS -->
-          <div class="settings-section">
-            <div class="settings-section-header">INSERT SETTINGS</div>
-
-            <div class="sidebar-group">
-              <label class="sidebar-label">INSERT LOCATION</label>
-              <select v-model="options.insertMode" class="sidebar-select">
-                <option value="At Playhead">At Playhead</option>
-                <option value="Specific location">Specific location</option>
-              </select>
+          <div class="group-box">
+            <div class="group-header">INSERT SETTINGS</div>
+            <div class="control">
+              <label>INSERT LOCATION</label>
+              <div class="segmented-control">
+                <button 
+                  type="button"
+                  class="segment" 
+                  :class="{ active: options.insertMode === 'At Playhead' }" 
+                  @click="options.insertMode = 'At Playhead'"
+                >
+                  At Playhead
+                </button>
+                <button 
+                  type="button"
+                  class="segment" 
+                  :class="{ active: options.insertMode === 'Specific location' }" 
+                  @click="options.insertMode = 'Specific location'"
+                >
+                  Specific Time
+                </button>
+              </div>
             </div>
 
-            <template v-if="options.insertMode === 'Specific location'">
-              <div class="sidebar-group">
-                <label class="sidebar-label">TARGET TRACK</label>
+            <div class="row" :class="{ disabled: options.insertMode !== 'Specific location' }">
+              <div class="control">
+                <label>TRACK</label>
                 <div class="dropdown-wrapper" ref="trackRef">
-                  <button class="dropdown-btn" @click="toggleTrackMenu">
+                  <button class="dropdown-btn" @click="toggleTrackMenu" :disabled="options.insertMode !== 'Specific location'">
                     <span class="dropdown-text">{{ selectedTrack ? selectedTrack.name : 'Select Track...' }}</span>
-                    <span class="arrow">▼</span>
                   </button>
                   <ul v-if="isTrackMenuOpen" class="dropdown-menu">
                     <li 
@@ -157,94 +165,100 @@
                   </ul>
                 </div>
               </div>
-
-              <div class="sidebar-group">
-                <label class="sidebar-label">START TIME (HH:MM:SS:FF)</label>
+              <div class="control">
+                <label>TIME</label>
                 <input 
                   type="text" 
                   v-model="options.startTime" 
-                  class="sidebar-input-text" 
+                  class="standard-input" 
                   placeholder="00:00:00:00"
-                  :class="{ invalid: !isStartTimeValid }"
-                >
+                  :class="{ invalid: options.insertMode === 'Specific location' && !isStartTimeValid }"
+                  :disabled="options.insertMode !== 'Specific location'" 
+                />
               </div>
-            </template>
-
-            <div class="sidebar-group">
-              <label class="sidebar-label">MOVIE DURATION</label>
-              <div class="duration-row">
-                <label class="custom-checkbox">
-                  <input type="checkbox" v-model="options.fitToContent">
-                  <span class="checkmark"></span>
-                  Fit To Contents
-                </label>
-                <input 
-                  v-if="!options.fitToContent"
-                  type="number" 
-                  v-model.number="options.movieDuration" 
-                  class="sidebar-input-number mini"
-                  min="0"
-                  step="1"
-                >
-                <span v-if="!options.fitToContent" class="unit">s</span>
-              </div>
-            </div>
-
-            <div class="sidebar-group">
-              <label class="sidebar-label">STILL IMG DURATION (s)</label>
-              <input 
-                type="number" 
-                v-model.number="options.stillDuration" 
-                class="sidebar-input-number"
-                min="0"
-                step="1"
-              >
-            </div>
-
-            <div class="sidebar-group">
-              <label class="sidebar-label">OVERLAP (s)</label>
-              <input 
-                type="number" 
-                v-model.number="options.overlap" 
-                class="sidebar-input-number"
-                min="0"
-                step="0.5"
-              >
-            </div>
-
-            <div class="sidebar-group row">
-              <label class="custom-checkbox">
-                <input type="checkbox" v-model="options.splitSection">
-                <span class="checkmark"></span>
-                Split Section
-              </label>
-            </div>
-
-            <div class="sidebar-group row">
-              <label class="custom-checkbox">
-                <input type="checkbox" v-model="options.addCueTag">
-                <span class="checkmark"></span>
-                Add Cue Tag
-              </label>
-            </div>
-
-            <div v-if="options.addCueTag" class="sidebar-group">
-              <input 
-                type="text" 
-                v-model="options.cueValue" 
-                class="sidebar-input-text" 
-                placeholder="e.g. 1.2.3"
-                :class="{ invalid: !isCueValid && options.cueValue !== '' }"
-              >
             </div>
           </div>
 
+          <!-- CONTENT DURATION -->
+          <div class="group-box">
+            <div class="group-header">CONTENT DURATION</div>
+            
+            <div class="control">
+              <label>MOVIE DURATION</label>
+              <div class="toggle-group">
+                <label class="ios-toggle space-between">
+                  <span class="label-text">Fit To Contents</span>
+                  <div class="switch">
+                    <input type="checkbox" v-model="options.fitToContent">
+                    <span class="slider"></span>
+                  </div>
+                </label>
+                
+                <div class="input-with-unit width-half toggle-input-wrapper" :class="{ disabled: options.fitToContent }">
+                  <input type="number" v-model.number="options.movieDuration" min="0" step="1" :disabled="options.fitToContent" />
+                  <span class="unit">s</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="control">
+              <label>STILL IMG DURATION</label>
+              <div class="input-with-unit width-half">
+                <input type="number" v-model.number="options.stillDuration" min="0" step="1" />
+                <span class="unit">s</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PLACEMENT & TIMING -->
+          <div class="group-box">
+            <div class="group-header">PLACEMENT & TIMING</div>
+            <div class="control">
+              <label>OVERLAP</label>
+              <div class="input-with-unit width-half">
+                <input type="number" v-model.number="options.overlap" min="0" step="0.5" />
+                <span class="unit">s</span>
+              </div>
+            </div>
+            
+            <div class="toggle-list">
+              <label class="ios-toggle space-between">
+                <span class="label-text">Split Section</span>
+                <div class="switch">
+                  <input type="checkbox" v-model="options.splitSection">
+                  <span class="slider"></span>
+                </div>
+              </label>
+              
+              <div class="toggle-group">
+                <label class="ios-toggle space-between">
+                  <span class="label-text">Add Cue Tag</span>
+                  <div class="switch">
+                    <input type="checkbox" v-model="options.addCueTag">
+                    <span class="slider"></span>
+                  </div>
+                </label>
+                
+                <div class="toggle-input-wrapper" :class="{ disabled: !options.addCueTag }">
+                  <input 
+                    type="text" 
+                    v-model="options.cueValue" 
+                    class="standard-input" 
+                    placeholder="e.g. 1.2.3" 
+                    :disabled="!options.addCueTag"
+                    :class="{ invalid: options.addCueTag && !isCueValid && options.cueValue !== '' }"
+                  />
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
 
-        <div class="sidebar-footer">
+        <div class="footer">
           <div class="selection-info">{{ selectedItems.size }} item(s) selected</div>
           <button 
-            class="create-btn-sidebar" 
+            class="create-btn" 
             :disabled="!isCreateLayersEnabled || isCreating" 
             @click="handleCreateLayers"
           >
@@ -294,7 +308,7 @@ const options = reactive({
   overlap: 0,
   splitSection: false,
   addCueTag: false,
-  cueValue: ''
+  cueValue: '1'
 });
 
 // Navigation state
@@ -405,6 +419,7 @@ const selectMapping = (m) => {
 };
 
 const toggleTrackMenu = () => {
+  if (options.insertMode !== 'Specific location') return;
   isTrackMenuOpen.value = !isTrackMenuOpen.value;
   isMappingMenuOpen.value = false;
 };
@@ -589,13 +604,18 @@ const selectionFrameStyle = computed(() => {
 </script>
 
 <style scoped>
+* {
+  box-sizing: border-box;
+}
+
 .media-manager {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #1e1e1e;
+  background-color: #121212;
   color: #e0e0e0;
   overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .main-layout {
@@ -615,8 +635,8 @@ const selectionFrameStyle = computed(() => {
 .top-bar-container {
   display: flex;
   flex-direction: column;
-  background-color: #252526;
-  border-bottom: 1px solid #333;
+  background-color: #181818;
+  border-bottom: 1px solid #36373a;
   z-index: 10;
   flex-shrink: 0;
 }
@@ -630,9 +650,9 @@ const selectionFrameStyle = computed(() => {
 }
 
 .sub-bar {
-  border-top: 1px solid #333;
+  border-top: 1px solid #36373a;
   padding: 5px 20px;
-  background-color: #2d2d2d;
+  background-color: #1e1e1e;
 }
 
 .tabs-container {
@@ -644,14 +664,8 @@ const selectionFrameStyle = computed(() => {
   scrollbar-width: thin;
 }
 
-.tabs-container::-webkit-scrollbar {
-  height: 4px;
-}
-
-.tabs-container::-webkit-scrollbar-thumb {
-  background: #444;
-  border-radius: 2px;
-}
+.tabs-container::-webkit-scrollbar { height: 4px; }
+.tabs-container::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
 
 .view-label {
   color: #888;
@@ -664,7 +678,7 @@ const selectionFrameStyle = computed(() => {
 
 .tab-btn {
   background: transparent;
-  border: 1px solid #444;
+  border: 1px solid #36373a;
   color: #888;
   padding: 5px 15px;
   border-radius: 4px;
@@ -674,11 +688,11 @@ const selectionFrameStyle = computed(() => {
   white-space: nowrap;
 }
 
-.tab-btn:hover { background-color: #333; }
+.tab-btn:hover { background-color: #2a2b2e; }
 .tab-btn.active {
-  border-color: #007acc;
-  color: #007acc;
-  background-color: rgba(0, 122, 204, 0.1);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
 }
 
 .top-bar-right {
@@ -690,7 +704,7 @@ const selectionFrameStyle = computed(() => {
 
 .search-input {
   background-color: #1e1e1e;
-  border: 1px solid #444;
+  border: 1px solid #36373a;
   color: white;
   padding: 6px 12px;
   border-radius: 4px;
@@ -698,10 +712,7 @@ const selectionFrameStyle = computed(() => {
   width: 220px;
 }
 
-.search-input:focus {
-  border-color: #007acc;
-  outline: none;
-}
+.search-input:focus { border-color: #3b82f6; outline: none; }
 
 .select-all-btn {
   background: transparent;
@@ -714,10 +725,7 @@ const selectionFrameStyle = computed(() => {
   white-space: nowrap;
 }
 
-.select-all-btn:hover {
-  background-color: #333;
-  color: white;
-}
+.select-all-btn:hover { background-color: #2a2b2e; color: white; }
 
 .content-area {
   flex: 1;
@@ -735,260 +743,249 @@ const selectionFrameStyle = computed(() => {
   align-content: start;
 }
 
-/* Settings Sidebar */
-.settings-sidebar {
-  width: 350px;
-  background-color: #252526;
-  border-left: 1px solid #333;
+/* --- Settings Sidebar --- */
+.sidebar {
+  width: 320px;
+  background: #1e1e1e;
+  color: #dddddd;
   display: flex;
   flex-direction: column;
+  border-left: 1px solid #36373a;
   height: 100%;
   flex-shrink: 0;
+  box-shadow: -5px 0 20px rgba(0,0,0,0.3);
 }
 
-.sidebar-title {
-  font-size: 0.9rem;
-  font-weight: bold;
+.header-title {
+  font-weight: 700;
   color: #888;
-  padding: 20px;
-  border-bottom: 1px solid #333;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  padding: 20px 20px 10px 20px;
 }
 
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 0 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.settings-section {
-  margin-bottom: 25px;
+/* Group cards */
+.group-box {
+  background: #2a2b2e;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #36373a;
 }
 
-.settings-section-header {
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: #007acc;
-  margin-bottom: 15px;
+.group-header {
+  font-size: 11px;
+  color: #3b82f6;
+  font-weight: 700;
+  margin-bottom: 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.sidebar-group {
+.control { margin-bottom: 14px; }
+.control:last-child { margin-bottom: 0; }
+.row { display: flex; gap: 12px; transition: opacity 0.3s ease; }
+.row .control { flex: 1; margin-bottom: 0; }
+
+.disabled { opacity: 0.3; pointer-events: none; }
+
+label {
+  display: block;
+  font-size: 10px;
+  color: #a0a0a0;
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Horizontal Switcher (Segmented Control) */
+.segmented-control {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 18px;
+  background: #181818;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 2px;
+  width: 100%;
 }
 
-.sidebar-group.row {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.duration-row {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.sidebar-group.divider {
-  height: 1px;
-  background-color: #333;
-  margin: 10px 0 25px;
-}
-
-.sidebar-label {
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: #aaa;
-}
-
-.sidebar-select, .sidebar-input-number, .sidebar-input-text {
-  background-color: #333;
-  border: 1px solid #444;
-  color: white;
-  padding: 8px;
+.segment {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #888;
+  padding: 8px 10px;
+  font-size: 11px;
+  font-weight: 600;
   border-radius: 4px;
-  font-size: 0.85rem;
-  transition: border-color 0.2s;
-}
-
-.sidebar-select:focus, .sidebar-input-number:focus, .sidebar-input-text:focus {
-  border-color: #007acc;
+  cursor: pointer;
+  transition: all 0.2s ease;
   outline: none;
 }
 
-.sidebar-input-number { width: 100px; }
-.sidebar-input-number.mini { width: 60px; padding: 4px 8px; }
-.unit { font-size: 0.8rem; color: #888; }
-
-.sidebar-input-text.invalid {
-  border-color: #f44336;
+.segment:hover { color: #ccc; }
+.segment.active {
+  background: #3a3a3a;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
-/* Custom Checkbox Styles */
-.custom-checkbox {
-  display: flex;
-  align-items: center;
+/* Inputs and Selects */
+select, .standard-input {
+  width: 100%;
+  background: #181818;
+  border: 1px solid #3a3a3a;
+  color: #eee;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 8px auto;
+  padding-right: 24px;
+}
+
+select:focus, .standard-input:focus { 
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
+}
+
+.standard-input.invalid { border-color: #ef4444; }
+
+.input-with-unit {
   position: relative;
-  padding-left: 28px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  user-select: none;
-  color: #ccc;
-  min-height: 20px;
+  width: 80px;
+  flex-shrink: 0;
+  transition: opacity 0.3s ease;
+}
+.width-half { width: 50%; }
+
+.input-with-unit input {
+  width: 100%;
+  background: #181818;
+  border: 1px solid #3a3a3a;
+  color: #eee;
+  padding: 8px 24px 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+  transition: all 0.2s;
 }
 
-.custom-checkbox input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
+.input-with-unit input:focus { border-color: #3b82f6; }
 
-.checkmark {
+.unit {
   position: absolute;
+  right: 10px;
   top: 50%;
-  left: 0;
   transform: translateY(-50%);
-  height: 18px;
-  width: 18px;
-  background-color: #333;
-  border: 1px solid #555;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  font-size: 10px;
+  color: #777;
+  pointer-events: none;
 }
 
-.custom-checkbox:hover input ~ .checkmark {
-  background-color: #3e3e42;
-  border-color: #666;
-}
-
-.custom-checkbox input:checked ~ .checkmark {
-  background-color: #007acc;
-  border-color: #007acc;
-}
-
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-.custom-checkbox input:checked ~ .checkmark:after {
-  display: block;
-}
-
-.custom-checkbox .checkmark:after {
-  left: 5px;
-  top: 1px;
-  width: 4px;
-  height: 9px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
+/* Dropdowns */
 .dropdown-wrapper { position: relative; }
 .dropdown-btn {
   width: 100%;
-  background-color: #333;
-  border: 1px solid #444;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 0.85rem;
+  background: #181818;
+  border: 1px solid #3a3a3a;
+  color: #eee;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
   cursor: pointer;
+  text-align: left;
   display: flex;
   justify-content: space-between;
   align-items: center;
   transition: border-color 0.2s;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23888888%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 8px auto;
+  padding-right: 24px;
 }
-
-.dropdown-btn:hover, .dropdown-btn:focus {
-  border-color: #007acc;
-  outline: none;
-}
-
-.dropdown-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.dropdown-btn:focus { border-color: #3b82f6; }
+.dropdown-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
+  top: 100%; left: 0; width: 100%;
   background-color: #252526;
   border: 1px solid #444;
-  border-radius: 0 0 4px 4px;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
   list-style: none;
   z-index: 1000;
   max-height: 200px;
   overflow-y: auto;
   box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   padding: 5px 0;
+  margin: 0;
 }
+.dropdown-menu li { padding: 8px 12px; cursor: pointer; font-size: 12px; }
+.dropdown-menu li:hover { background-color: #3b82f6; color: white; }
+.dropdown-menu li.active { background-color: #37373d; color: #3b82f6; }
 
-.dropdown-menu li { padding: 8px 12px; cursor: pointer; font-size: 0.85rem; }
-.dropdown-menu li:hover { background-color: #007acc; color: white; }
-.dropdown-menu li.active { background-color: #37373d; color: #007acc; }
-.dropdown-menu li.disabled { color: #666; cursor: default; }
+/* Toggles (iOS style) */
+.toggle-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.ios-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; text-transform: none; }
+.ios-toggle.space-between { justify-content: space-between; }
+.label-text { font-size: 12px; color: #ccc; font-weight: 500; text-transform: none; }
 
-.sidebar-footer {
+.switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3a3a; transition: .3s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: #888; transition: .3s; border-radius: 50%; }
+input:checked + .slider { background-color: #3b82f6; }
+input:checked + .slider:before { transform: translateX(16px); background-color: white; }
+
+.toggle-group { display: flex; flex-direction: column; gap: 8px; }
+.toggle-input-wrapper { margin-left: 2px; transition: opacity 0.3s ease; }
+
+/* Footer */
+.footer { 
   padding: 20px;
-  border-top: 1px solid #333;
-  background-color: #252526;
+  background: #1e1e1e;
+  border-top: 1px solid #36373a;
 }
-
-.selection-info {
-  font-size: 0.8rem;
-  color: #888;
-  margin-bottom: 15px;
+.selection-info { 
+  font-size: 11px; 
+  color: #777; 
+  text-align: left; 
+  margin-bottom: 12px; 
 }
-
-.create-btn-sidebar {
+.create-btn {
   width: 100%;
-  background-color: #0e639c;
-  color: white;
-  border: none;
   padding: 12px;
-  border-radius: 4px;
-  font-weight: 600;
+  background: #3b82f6;
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+  border-radius: 6px;
   cursor: pointer;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
 }
+.create-btn:hover:not(:disabled) { background: #2563eb; }
+.create-btn:disabled { background: #3a3a3a; color: #777; cursor: not-allowed; }
 
-.create-btn-sidebar:hover:not(:disabled) {
-  background-color: #1177bb;
-}
-
-.create-btn-sidebar:disabled {
-  background-color: #3a3d41;
-  color: #757575;
-  cursor: not-allowed;
-}
-
-.loading, .error {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
-}
-
-.selection-frame {
-  position: absolute;
-  background-color: rgba(0, 122, 204, 0.2);
-  border: 1px solid rgba(0, 122, 204, 0.6);
-  pointer-events: none;
-  z-index: 100;
-}
+.loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 2rem; color: #555; }
+.selection-frame { position: absolute; background-color: rgba(59, 130, 246, 0.2); border: 1px solid rgba(59, 130, 246, 0.6); pointer-events: none; z-index: 100; }
 </style>
