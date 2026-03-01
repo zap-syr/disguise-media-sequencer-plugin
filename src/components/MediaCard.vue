@@ -10,9 +10,7 @@
         <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2" ry="2"/></svg>
       </template>
 
-      <div v-if="selected" class="selected-overlay">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
+      <div v-if="selected" class="selected-overlay"></div>
     </div>
     <div class="card-footer">
       <span class="file-name" :title="item.name">{{ item.name }}</span>
@@ -63,27 +61,31 @@ const mediaType = computed(() => {
 
 <style scoped>
 .media-card { 
-  background: #181818; 
-  border: 1px solid #2a2a2a; 
+  background: #242424; 
+  border: 1px solid #333333; 
   border-radius: 6px; 
   overflow: hidden; 
   cursor: pointer; 
-  transition: border-color 0.1s; 
+  transition: all 0.2s ease; 
   display: flex;
   flex-direction: column;
   height: 140px; /* Force consistent height */
 }
 .media-card:hover { border-color: #555555; }
-.media-card.is-card-selected { border-color: #ffffff; background: #252525; }
+.media-card.is-card-selected { 
+  border: 1px solid #0a84ff; 
+  box-shadow: 0 0 0 1px #0a84ff, 0 0 15px rgba(10, 132, 255, 0.5);
+  background: #242424; 
+}
 
 .card-preview { 
   flex: 1; /* Take up remaining space pushing footer down */
   display: flex; 
   align-items: center; 
   justify-content: center; 
-  background: #111111; 
+  background: #151515; 
   color: #333333; 
-  border-bottom: 1px solid #2a2a2a; 
+  border-bottom: 1px solid #333333; 
   position: relative; 
   min-height: 0; /* Important for flex children to not overflow */
 }
@@ -102,7 +104,7 @@ const mediaType = computed(() => {
   left: 0; 
   right: 0; 
   bottom: 0; 
-  background: rgba(0, 0, 0, 0.5); 
+  background: rgba(10, 132, 255, 0.15); 
   display: flex; 
   align-items: center; 
   justify-content: center; 
@@ -113,11 +115,11 @@ const mediaType = computed(() => {
   display: flex; 
   flex-direction: column; 
   gap: 2px; 
-  background: #181818; /* Ensure footer has solid background */
+  background: #242424; /* Ensure footer has solid background */
   flex-shrink: 0; /* Prevent footer from shrinking */
 }
 .media-card.is-card-selected .card-footer {
-  background: #252525;
+  background: #242424;
 }
 
 .file-name { 
@@ -126,7 +128,7 @@ const mediaType = computed(() => {
   white-space: nowrap; 
   overflow: hidden; 
   text-overflow: ellipsis; 
-  color: #dddddd; 
+  color: #888888; 
 }
 .media-card.is-card-selected .file-name { color: #ffffff; }
 

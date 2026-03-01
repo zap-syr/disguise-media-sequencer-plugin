@@ -15,7 +15,7 @@
             v-for="node in visibleSidebarFolders" 
             :key="node.id"
             :class="['tree-item', { 'is-selected': selectedFolderId === node.id }]"
-            :style="{ paddingLeft: `${node.depth * 16 + 12}px` }"
+            :style="{ paddingLeft: `${node.depth * 16 + 12}px`, '--padding-left': `${node.depth * 16 + 12}px` }"
             @click="selectFolder(node.id)"
           >
             <button 
@@ -672,6 +672,7 @@ function startSelection(event) {
     event.target.closest('.media-card') || 
     event.target.closest('.top-nav-bar') || 
     event.target.closest('.action-toolbar') ||
+    event.target.closest('.global-top-bar') ||
     event.offsetX > event.target.clientWidth || // Clicking vertical scrollbar
     event.offsetY > event.target.clientHeight   // Clicking horizontal scrollbar
   ) return;
@@ -731,13 +732,21 @@ const selectionFrameStyle = computed(() => {
   box-sizing: border-box;
 }
 
+.app-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; }
+.global-top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 24px; background-color: #242424; border-bottom: 1px solid #333333; flex-shrink: 0; }
+.top-bar-left { width: 240px; }
+.brand-title { font-weight: 700; font-size: 14px; letter-spacing: 1px; color: #ffffff; }
+.top-bar-right { display: flex; align-items: center; gap: 16px; width: 240px; justify-content: flex-end; }
+.system-icon { color: #888888; cursor: pointer; transition: color 0.2s; }
+.system-icon:hover { color: #ffffff; }
+.user-avatar { width: 28px; height: 28px; border-radius: 50%; background-color: #0a84ff; border: 2px solid #ffffff; cursor: pointer; }
 .media-app {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: #111111;
+  background-color: transparent;
   color: #cccccc;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
 }
 
@@ -755,7 +764,7 @@ const selectionFrameStyle = computed(() => {
 .tree-sidebar { 
   width: 260px; 
   min-width: 260px; 
-  background-color: #151515; 
+  background-color: transparent; 
   border-right: 1px solid #2a2a2a; 
   display: flex; 
   flex-direction: column; 
@@ -781,7 +790,7 @@ const selectionFrameStyle = computed(() => {
 }
 .tree-container::-webkit-scrollbar { width: 8px; }
 .tree-container::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
-.tree-item { 
+.tree-item { border-left: 3px solid transparent; 
   display: flex; 
   align-items: center; 
   padding: 6px 8px; 
@@ -789,7 +798,7 @@ const selectionFrameStyle = computed(() => {
   user-select: none; 
 }
 .tree-item:hover { background: #1f1f1f; }
-.tree-item.is-selected { background: #2a2a2a; color: #ffffff; }
+.tree-item.is-selected { background: rgba(10, 132, 255, 0.1); border-left: 3px solid #0a84ff; color: #ffffff; padding-left: calc(var(--padding-left) - 3px); }
 .chevron-btn { 
   background: transparent; 
   border: none; 
@@ -812,7 +821,7 @@ const selectionFrameStyle = computed(() => {
   flex: 1; 
   display: flex; 
   flex-direction: column; 
-  background-color: #111111; 
+  background-color: transparent; 
   height: 100%; 
   overflow: hidden; 
   position: relative; 
@@ -823,7 +832,7 @@ const selectionFrameStyle = computed(() => {
   align-items: center; 
   height: 52px; 
   padding: 0 24px; 
-  background-color: #151515; 
+  background-color: transparent; 
   border-bottom: 1px solid #222222; 
   flex-shrink: 0;
 }
@@ -832,7 +841,7 @@ const selectionFrameStyle = computed(() => {
 .crumb-text:hover { color: #ffffff; }
 .crumb-text:last-child { color: #dddddd; cursor: default; }
 .crumb-divider { margin: 0 8px; color: #444444; font-weight: 400;}
-.search-bar { display: flex; align-items: center; background: #0a0a0a; border: 1px solid #333333; border-radius: 6px; padding: 6px 12px; width: 260px; }
+.search-bar { display: flex; align-items: center; background: #151515; border: 1px solid #333333; border-radius: 6px; padding: 6px 12px; width: 260px; }
 .search-bar:focus-within { border-color: #666666; }
 .search-icon { color: #666666; margin-right: 8px; }
 .search-bar input { background: transparent; border: none; color: #cccccc; outline: none; width: 100%; font-size: 12px; }
@@ -907,15 +916,15 @@ const selectionFrameStyle = computed(() => {
 
 /* Group cards */
 .group-box {
-  background: #2a2b2e;
+  background: #242424;
   border-radius: 8px;
   padding: 16px;
-  border: 1px solid #36373a;
+  border: 1px solid #333333;
 }
 
 .group-header {
   font-size: 11px;
-  color: #3b82f6;
+  color: #0a84ff;
   font-weight: 700;
   margin-bottom: 14px;
   text-transform: uppercase;
@@ -992,7 +1001,7 @@ select {
 }
 
 select:focus, .standard-input:focus { 
-  border-color: #3b82f6;
+  border-color: #0a84ff;
   box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
 }
 
@@ -1018,7 +1027,7 @@ select:focus, .standard-input:focus {
   transition: all 0.2s;
 }
 
-.input-with-unit input:focus { border-color: #3b82f6; }
+.input-with-unit input:focus { border-color: #0a84ff; }
 
 .unit {
   position: absolute;
@@ -1082,7 +1091,7 @@ select:focus, .standard-input:focus {
 .dropdown-item:hover { background: #3a3a3a; }
 .dropdown-item.selected { 
   background: rgba(59, 130, 246, 0.2); 
-  color: #3b82f6; 
+  color: #0a84ff; 
   font-weight: 600;
 }
 
@@ -1115,7 +1124,7 @@ select:focus, .standard-input:focus {
   background-size: 8px auto;
   padding-right: 24px;
 }
-.dropdown-btn:focus { border-color: #3b82f6; }
+.dropdown-btn:focus { border-color: #0a84ff; }
 .dropdown-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .dropdown-menu {
@@ -1134,8 +1143,8 @@ select:focus, .standard-input:focus {
   margin: 0;
 }
 .dropdown-menu li { padding: 8px 12px; cursor: pointer; font-size: 12px; }
-.dropdown-menu li:hover { background-color: #3b82f6; color: white; }
-.dropdown-menu li.active { background-color: #37373d; color: #3b82f6; }
+.dropdown-menu li:hover { background-color: #0a84ff; color: white; }
+.dropdown-menu li.active { background-color: #37373d; color: #0a84ff; }
 
 /* Toggles (iOS style) */
 .toggle-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
@@ -1147,7 +1156,7 @@ select:focus, .standard-input:focus {
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3a3a; transition: .3s; border-radius: 34px; }
 .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: #888; transition: .3s; border-radius: 50%; }
-input:checked + .slider { background-color: #3b82f6; }
+input:checked + .slider { background-color: #0a84ff; }
 input:checked + .slider:before { transform: translateX(16px); background-color: white; }
 
 .toggle-group { display: flex; flex-direction: column; gap: 8px; }
@@ -1168,7 +1177,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .create-btn {
   width: 100%;
   padding: 12px;
-  background: #3b82f6;
+  background: #0a84ff;
   border: none;
   color: #ffffff;
   font-weight: 700;
@@ -1177,7 +1186,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   cursor: pointer;
   transition: background 0.2s;
 }
-.create-btn:hover:not(:disabled) { background: #2563eb; }
+.create-btn:hover:not(:disabled) { background: #0060d1; }
 .create-btn:disabled { background: #3a3a3a; color: #777; cursor: not-allowed; }
 
 .loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
