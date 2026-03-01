@@ -166,6 +166,37 @@
             </div>
           </div>
 
+          <!-- CONTENT DURATION -->
+          <div class="group-box">
+            <div class="group-header">LAYER DURATION</div>
+            
+            <div class="control">
+              <label>MOVIE DURATION</label>
+              <div class="toggle-group">
+                <label class="ios-toggle space-between">
+                  <span class="label-text">Fit To Contents</span>
+                  <div class="switch">
+                    <input type="checkbox" v-model="options.fitToContent">
+                    <span class="slider"></span>
+                  </div>
+                </label>
+                
+                <div class="input-with-unit width-half toggle-input-wrapper" :class="{ disabled: options.fitToContent }">
+                  <input type="number" v-model.number="options.movieDuration" min="0" step="1" :disabled="options.fitToContent" />
+                  <span class="unit">s</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="control">
+              <label>STILL IMG DURATION</label>
+              <div class="input-with-unit width-half">
+                <input type="number" v-model.number="options.stillDuration" min="0" step="1" />
+                <span class="unit">s</span>
+              </div>
+            </div>
+          </div>
+
           <!-- INSERT SETTINGS -->
           <div class="group-box">
             <div class="group-header">INSERT SETTINGS</div>
@@ -233,42 +264,7 @@
                 />
               </div>
             </div>
-          </div>
-
-          <!-- CONTENT DURATION -->
-          <div class="group-box">
-            <div class="group-header">CONTENT DURATION</div>
-            
-            <div class="control">
-              <label>MOVIE DURATION</label>
-              <div class="toggle-group">
-                <label class="ios-toggle space-between">
-                  <span class="label-text">Fit To Contents</span>
-                  <div class="switch">
-                    <input type="checkbox" v-model="options.fitToContent">
-                    <span class="slider"></span>
-                  </div>
-                </label>
-                
-                <div class="input-with-unit width-half toggle-input-wrapper" :class="{ disabled: options.fitToContent }">
-                  <input type="number" v-model.number="options.movieDuration" min="0" step="1" :disabled="options.fitToContent" />
-                  <span class="unit">s</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="control">
-              <label>STILL IMG DURATION</label>
-              <div class="input-with-unit width-half">
-                <input type="number" v-model.number="options.stillDuration" min="0" step="1" />
-                <span class="unit">s</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- PLACEMENT & TIMING -->
-          <div class="group-box">
-            <div class="group-header">PLACEMENT & TIMING</div>
+          
             <div class="control">
               <label>OVERLAP</label>
               <div class="input-with-unit width-half">
@@ -306,13 +302,13 @@
                   />
                 </div>
               </div>
-
+              
             </div>
           </div>
         </div>
 
         <div class="settings-footer">
-          <div class="selection-info">{{ selectedItems.size }} item(s) selected</div>
+          <!-- <div class="selection-info">{{ selectedItems.size }} item(s) selected</div> -->
           <button 
             class="create-btn" 
             :disabled="!isCreateLayersEnabled || isCreating" 
@@ -952,7 +948,8 @@ const selectionFrameStyle = computed(() => {
 
 .control { margin-bottom: 14px; }
 .control:last-child { margin-bottom: 0; }
-.row { display: flex; gap: 12px; transition: opacity 0.3s ease; }
+.row { display: flex; gap: 12px; transition: opacity 0.3s ease; margin-bottom: 14px; }
+.row:last-child { margin-bottom: 0; }
 .row .control { flex: 1; margin-bottom: 0; }
 
 .disabled { opacity: 0.3; pointer-events: none; }
