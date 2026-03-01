@@ -84,6 +84,7 @@
             :key="item.id"
             :item="item"
             :selected="selectedItems.has(item.id)"
+            :director-endpoint="props.directorEndpoint"
             class="media-card-item"
             :data-id="item.id"
             @click.stop="handleSelection(item, index, $event)"

@@ -4,12 +4,15 @@
     :class="{ 'is-card-selected': selected }"
   >
     <div class="card-preview" :class="mediaType">
+      <img v-if="thumbnailUrl && !thumbnailError" :src="thumbnailUrl" @error="thumbnailError = true" class="thumbnail-image" />
+      <template v-else>
+        <svg v-if="mediaType === 'image'" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2" ry="2"/></svg>
+      </template>
+
       <div v-if="selected" class="selected-overlay">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
-      
-      <svg v-if="mediaType === 'image'" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2" ry="2"/></svg>
     </div>
     <div class="card-footer">
       <span class="file-name" :title="item.name">{{ item.name }}</span>
@@ -19,7 +22,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   item: {
@@ -29,7 +32,24 @@ const props = defineProps({
   selected: {
     type: Boolean,
     default: false
+  },
+  directorEndpoint: {
+    type: String,
+    required: true
   }
+});
+
+const thumbnailError = ref(false);
+
+const thumbnailUrl = computed(() => {
+  if (props.item && props.item.uid && props.directorEndpoint) {
+    let endpoint = props.directorEndpoint;
+    if (!endpoint.startsWith('http://') && !endpoint.startsWith('https://')) {
+      endpoint = 'http://' + endpoint;
+    }
+    return `${endpoint}/api/v1/thumbnail/${props.item.uid}`;
+  }
+  return null;
 });
 
 const mediaType = computed(() => {
@@ -69,6 +89,12 @@ const mediaType = computed(() => {
 }
 .card-preview.image { color: #555555; }
 .card-preview.video { color: #444444; }
+
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .selected-overlay { 
   position: absolute; 
