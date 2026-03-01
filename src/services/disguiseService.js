@@ -232,6 +232,7 @@ ${trackInitCode}
     FIT_TO_CONTENTS = ${options.fitToContent ? 'True' : 'False'}
     SPLIT_SECTION = ${options.splitSection ? 'True' : 'False'}
     ADD_CUE_TAG = ${options.addCueTag ? 'True' : 'False'}
+    ANIMATE_BRIGHTNESS = ${options.animateBrightness ? 'True' : 'False'}
 
     mapping_path = r'${options.mappingPath}'
     cue_tag = '${options.cueValue}'
@@ -239,6 +240,7 @@ ${trackInitCode}
     still_duration_seconds = ${options.stillDuration}
     movie_duration_seconds = ${options.movieDuration}
     overlap_seconds = ${options.overlap}
+    brightness_duration_seconds = ${options.brightnessDuration}
 
     overlap_beats = current_track.timeToBeat(current_track.beatToTime(current_playhead_beats) + overlap_seconds) - current_playhead_beats
 
@@ -303,6 +305,17 @@ ${trackInitCode}
                 end_fseq.disableSequencing = True
                 end_fseq.sequence.setFloat(current_start_beats, AT_END_POINT)
                 end_fseq.saveOnDelete()
+
+            if ANIMATE_BRIGHTNESS:
+                brightness_fseq = new_layer.findSequence("Brightness")
+                if brightness_fseq:
+                    current_insert_beat = current_start_beats
+                    markDirty(brightness_fseq)
+                    brightness_fseq.disableSequencing = False
+                    brightness_fseq.sequence.setFloat(current_start_beats, 0)
+                    brightness_duration_beats = current_track.timeToBeat(current_track.beatToTime(current_start_beats) + brightness_duration_seconds) - current_start_beats
+                    brightness_fseq.sequence.setFloat(current_start_beats + brightness_duration_beats, 1)
+                    brightness_fseq.saveOnDelete()
 
             created_layers_info.append({
                 "name": new_layer.name,

@@ -147,6 +147,23 @@
                 </select>
               </div>
             </div>
+
+            <div class="toggle-list">
+              <div class="toggle-group">
+                <label class="ios-toggle space-between">
+                  <span class="label-text">Animate Brightness</span>
+                  <div class="switch">
+                    <input type="checkbox" v-model="options.animateBrightness">
+                    <span class="slider"></span>
+                  </div>
+                </label>
+                
+                <div class="input-with-unit width-half toggle-input-wrapper" :class="{ disabled: !options.animateBrightness }">
+                  <input type="number" v-model.number="options.brightnessDuration" min="0" step="0.5" :disabled="!options.animateBrightness" />
+                  <span class="unit">s</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- INSERT SETTINGS -->
@@ -350,7 +367,9 @@ const options = reactive({
   overlap: 0,
   splitSection: false,
   addCueTag: false,
-  cueValue: '1'
+  cueValue: '1',
+  animateBrightness: false,
+  brightnessDuration: 1
 });
 
 // Navigation state
