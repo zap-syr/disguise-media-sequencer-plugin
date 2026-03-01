@@ -5,12 +5,20 @@
 
     <div v-else class="main-layout">
       <!-- 1. Left Tree Sidebar -->
-      <aside class="tree-sidebar" @click.stop>
+      <aside 
+        class="tree-sidebar" 
+        :class="{ 'is-collapsed': isSidebarCollapsed, 'is-resizing': isResizing }"
+        :style="{ width: isSidebarCollapsed ? '50px' : `${sidebarWidth}px`, minWidth: isSidebarCollapsed ? '50px' : `${sidebarWidth}px` }"
+        @click.stop
+      >
         <div class="tree-sidebar-header">
-          <span class="tree-header-title">HIERARCHY</span>
+          <button class="panel-toggle-btn" @click="toggleSidebar" title="Toggle Sidebar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="9" y1="3" y2="21"/></svg>
+          </button>
+          <span class="tree-header-title" :class="{ 'hidden': isSidebarCollapsed }">HIERARCHY</span>
         </div>
         
-        <div class="tree-container">
+        <div class="tree-container" :class="{ 'hidden': isSidebarCollapsed }">
           <div 
             v-for="node in visibleSidebarFolders" 
             :key="node.id"
@@ -32,6 +40,8 @@
             <span class="folder-name">{{ node.name }}</span>
           </div>
         </div>
+
+        <div class="resize-handle" v-show="!isSidebarCollapsed" @mousedown.prevent="startResize"></div>
       </aside>
 
       <!-- 2. Center Content Area -->
@@ -308,7 +318,6 @@
         </div>
 
         <div class="settings-footer">
-          <!-- <div class="selection-info">{{ selectedItems.size }} item(s) selected</div> -->
           <button 
             class="create-btn" 
             :disabled="!isCreateLayersEnabled || isCreating" 
@@ -350,6 +359,38 @@ const trackSearchQuery = ref('');
 
 const selectedItems = reactive(new Set());
 const searchQuery = ref('');
+
+// Sidebar state
+const isSidebarCollapsed = ref(false);
+const sidebarWidth = ref(260);
+const isResizing = ref(false);
+
+function toggleSidebar() {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+}
+
+function startResize(event) {
+  isResizing.value = true;
+  window.addEventListener('mousemove', doResize);
+  window.addEventListener('mouseup', stopResize);
+  document.body.style.cursor = 'col-resize';
+}
+
+function doResize(event) {
+  if (isResizing.value) {
+    let newWidth = event.clientX;
+    if (newWidth < 150) newWidth = 150;
+    if (newWidth > 300) newWidth = 300;
+    sidebarWidth.value = newWidth;
+  }
+}
+
+function stopResize() {
+  isResizing.value = false;
+  window.removeEventListener('mousemove', doResize);
+  window.removeEventListener('mouseup', stopResize);
+  document.body.style.cursor = '';
+}
 
 // Options state
 const options = reactive({
@@ -747,14 +788,6 @@ const selectionFrameStyle = computed(() => {
   box-sizing: border-box;
 }
 
-.app-wrapper { display: flex; flex-direction: column; height: 100%; width: 100%; }
-.global-top-bar { display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 24px; background-color: #242424; border-bottom: 1px solid #333333; flex-shrink: 0; }
-.top-bar-left { width: 240px; }
-.brand-title { font-weight: 700; font-size: 14px; letter-spacing: 1px; color: #ffffff; }
-.top-bar-right { display: flex; align-items: center; gap: 16px; width: 240px; justify-content: flex-end; }
-.system-icon { color: #888888; cursor: pointer; transition: color 0.2s; }
-.system-icon:hover { color: #ffffff; }
-.user-avatar { width: 28px; height: 28px; border-radius: 50%; background-color: #0a84ff; border: 2px solid #ffffff; cursor: pointer; }
 .media-app {
   display: flex;
   flex-direction: column;
@@ -777,43 +810,90 @@ const selectionFrameStyle = computed(() => {
 
 /* --- Left Sidebar (Tree) --- */
 .tree-sidebar { 
-  width: 260px; 
-  min-width: 260px; 
   background-color: transparent; 
   border-right: 1px solid #2a2a2a; 
   display: flex; 
   flex-direction: column; 
   height: 100%; 
+  transition: width 0.3s ease, min-width 0.3s ease;
+  position: relative;
+  flex-shrink: 0;
 }
+.tree-sidebar.is-resizing {
+  transition: none;
+}
+
 .tree-sidebar-header { 
   height: 52px; 
   display: flex; 
   align-items: center; 
-  padding: 0 16px; 
+  padding: 0 13px; 
   border-bottom: 1px solid #222222;
+  position: relative;
+  overflow: hidden;
 }
+
+.panel-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.panel-toggle-btn:hover {
+  color: #fff;
+  background: #2a2a2a;
+}
+
 .tree-header-title { 
+  position: absolute;
+  left: 52px;
   font-size: 11px; 
   font-weight: 700; 
   color: #666666; 
   letter-spacing: 0.5px; 
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
 }
+.tree-header-title.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .tree-container { 
-  overflow-y: auto; 
+  overflow: auto; 
   flex: 1; 
   padding-top: 10px;
+  transition: opacity 0.2s ease;
 }
-.tree-container::-webkit-scrollbar { width: 8px; }
+.tree-container.hidden {
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.tree-container::-webkit-scrollbar { width: 8px; height: 8px; }
 .tree-container::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
-.tree-item { border-left: 3px solid transparent; 
+
+.tree-item { 
+  border-left: 3px solid transparent; 
   display: flex; 
   align-items: center; 
   padding: 6px 8px; 
   cursor: pointer; 
   user-select: none; 
+  width: max-content;
+  min-width: 100%;
 }
 .tree-item:hover { background: #1f1f1f; }
 .tree-item.is-selected { background: rgba(10, 132, 255, 0.1); border-left: 3px solid #0a84ff; color: #ffffff; padding-left: calc(var(--padding-left) - 3px); }
+
 .chevron-btn { 
   background: transparent; 
   border: none; 
@@ -827,9 +907,27 @@ const selectionFrameStyle = computed(() => {
 }
 .chevron-btn.is-expanded { transform: rotate(90deg); }
 .chevron-btn.is-hidden { visibility: hidden; }
+
 .folder-icon { margin: 0 8px 0 2px; color: #666666; }
 .tree-item.is-selected .folder-icon { color: #aaaaaa; }
-.folder-name { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.folder-name { 
+  font-size: 13px; 
+  white-space: nowrap; 
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+}
+.resize-handle:hover {
+  background-color: rgba(10, 132, 255, 0.2);
+}
 
 /* --- Main Content --- */
 .main-content { 
