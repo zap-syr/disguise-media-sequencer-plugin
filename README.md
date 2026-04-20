@@ -1,4 +1,4 @@
-# Disguise Designer Media Manager Plugin
+# Disguise Media Sequencer Plugin
 
 This plugin provides an advanced media management and automated layer creation interface for Disguise Designer. It allows users to browse project media, configure playback settings, and automatically sequence layers onto the current track.
 
