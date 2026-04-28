@@ -53,10 +53,22 @@
               <span v-if="index < breadcrumbPath.length - 1" class="crumb-divider">/</span>
             </template>
           </div>
-          
-          <div class="search-bar">
-            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" v-model="searchQuery" :placeholder="selectedFolderId === 'all' ? 'Search all files...' : 'Search current folder...'" />
+
+          <div class="top-nav-right">
+            <div class="search-bar">
+              <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" v-model="searchQuery" :placeholder="selectedFolderId === 'all' ? 'Search all files...' : 'Search current folder...'" />
+            </div>
+
+            <button
+              class="refresh-btn"
+              :class="{ 'is-refreshing': isRefreshing }"
+              :disabled="isRefreshing"
+              title="Refresh media, mappings and tracks"
+              @click="handleRefresh"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+            </button>
           </div>
         </header>
 
@@ -364,6 +376,7 @@ const props = defineProps({
 
 const loading = ref(true);
 const isCreating = ref(false);
+const isRefreshing = ref(false);
 const error = ref(null);
 
 const fullHierarchy = ref([]);
@@ -683,6 +696,25 @@ onUnmounted(() => {
 
 // --- UI Logic ---
 
+async function handleRefresh() {
+  if (isRefreshing.value) return;
+  try {
+    isRefreshing.value = true;
+    const [media, mps, trks] = await Promise.all([
+      getMediaList(props.directorEndpoint),
+      getMappingList(props.directorEndpoint),
+      getTrackList(props.directorEndpoint)
+    ]);
+    if (Array.isArray(media)) fullHierarchy.value = media;
+    if (Array.isArray(mps)) mappings.value = mps;
+    if (Array.isArray(trks)) tracks.value = trks;
+  } catch (err) {
+    console.error('Refresh failed:', err);
+  } finally {
+    isRefreshing.value = false;
+  }
+}
+
 async function handleCreateLayers() {
   if (!isCreateLayersEnabled.value || isCreating.value) return;
 
@@ -1000,10 +1032,31 @@ const selectionFrameStyle = computed(() => {
 .crumb-text:hover { color: #ffffff; }
 .crumb-text:last-child { color: #dddddd; cursor: default; }
 .crumb-divider { margin: 0 8px; color: #444444; font-weight: 400;}
+.top-nav-right { display: flex; align-items: center; gap: 8px; }
 .search-bar { display: flex; align-items: center; background: #151515; border: 1px solid #333333; border-radius: 6px; padding: 6px 12px; width: 260px; }
 .search-bar:focus-within { border-color: #666666; }
 .search-icon { color: #666666; margin-right: 8px; }
 .search-bar input { background: transparent; border: none; color: #cccccc; outline: none; width: 100%; font-size: 12px; }
+
+.refresh-btn {
+  background: transparent;
+  border: 1px solid #333333;
+  color: #888888;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.refresh-btn:hover:not(:disabled) { color: #ffffff; border-color: #555555; background: #1f1f1f; }
+.refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.refresh-btn.is-refreshing svg { animation: spin 0.8s linear infinite; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 .action-toolbar { 
   height: 40px; 
