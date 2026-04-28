@@ -42,16 +42,9 @@ jobs:
           REF="${{ github.event.inputs.version || github.ref_name }}"
           VERSION="${REF#v}"
 
-          echo "--- VERSION: '$VERSION'"
-          echo "--- CHANGELOG.md first 10 lines (raw hex):"
-          head -5 CHANGELOG.md | cat -A
-
           CHANGELOG=$(awk \
             "/^## \[${VERSION}\]/{found=1; next} found && /^## \[/{exit} found" \
             CHANGELOG.md | tr -d '\r')
-
-          echo "--- Extracted CHANGELOG:"
-          echo "$CHANGELOG"
 
           if [ -z "$CHANGELOG" ]; then
             echo "ERROR: No changelog entry found for version ${VERSION}"
