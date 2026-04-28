@@ -439,7 +439,7 @@ const options = reactive({
   overlap: 0,
   splitSection: false,
   addCueTag: false,
-  cueValue: '1',
+  cueValue: '',
   addMidiNote: false,
   midiNoteValue: '',
   animateBrightness: false,
