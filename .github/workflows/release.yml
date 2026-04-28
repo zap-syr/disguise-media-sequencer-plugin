@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to release (e.g. v1.0.1)'
+        required: true
 
 jobs:
   release:
@@ -24,7 +29,8 @@ jobs:
 
       - name: Write d3plugin.json
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          REF="${{ github.event.inputs.version || github.ref_name }}"
+          VERSION="${REF#v}"
           echo "{\"name\":\"Media Sequencer\",\"version\":\"$VERSION\",\"entry\":\"index.html\"}" \
             > dist/d3plugin.json
 
@@ -34,4 +40,5 @@ jobs:
       - name: Create release and upload asset
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
           files: "Media Sequencer.zip"
