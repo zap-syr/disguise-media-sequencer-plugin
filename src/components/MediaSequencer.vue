@@ -665,6 +665,7 @@ watch([selectedFolderId, searchQuery], () => {
 watch(() => options.overlap, (newVal) => { if (newVal < 0) options.overlap = 0; });
 watch(() => options.stillDuration, (newVal) => { if (newVal < 0) options.stillDuration = 0; });
 watch(() => options.movieDuration, (newVal) => { if (newVal < 0) options.movieDuration = 0; });
+watch(() => options.brightnessDuration, (newVal) => { if (newVal < 0) options.brightnessDuration = 0; });
 
 onMounted(async () => {
   try {
