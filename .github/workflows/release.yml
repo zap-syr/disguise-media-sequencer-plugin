@@ -41,7 +41,17 @@ jobs:
         run: |
           REF="${{ github.event.inputs.version || github.ref_name }}"
           VERSION="${REF#v}"
-          awk "/^## \[$VERSION\]/{ found=1; next } found && /^## \[/{ exit } found{ print }" CHANGELOG.md > release_notes.md
+
+          CHANGELOG=$(awk \
+            "/^## \[${VERSION}\]/{found=1; next} found && /^## \[/{exit} found" \
+            CHANGELOG.md | tr -d '\r')
+
+          if [ -z "$CHANGELOG" ]; then
+            echo "ERROR: No changelog entry found for version ${VERSION}"
+            exit 1
+          fi
+
+          echo "$CHANGELOG" > release_notes.md
 
       - name: Create release and upload asset
         uses: softprops/action-gh-release@v2
