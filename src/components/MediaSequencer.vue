@@ -300,19 +300,41 @@
                     <span class="slider"></span>
                   </div>
                 </label>
-                
+
                 <div class="toggle-input-wrapper" :class="{ disabled: !options.addCueTag }">
-                  <input 
-                    type="text" 
-                    v-model="options.cueValue" 
-                    class="standard-input" 
-                    placeholder="e.g. 1.2.3" 
+                  <input
+                    type="text"
+                    v-model="options.cueValue"
+                    class="standard-input"
+                    placeholder="e.g. 1.2.3"
                     :disabled="!options.addCueTag"
                     :class="{ invalid: options.addCueTag && !isCueValid && options.cueValue !== '' }"
                   />
                 </div>
               </div>
-              
+
+              <div class="toggle-group">
+                <label class="ios-toggle space-between">
+                  <span class="label-text">Add MIDI Note</span>
+                  <div class="switch">
+                    <input type="checkbox" v-model="options.addMidiNote">
+                    <span class="slider"></span>
+                  </div>
+                </label>
+
+                <div class="toggle-input-wrapper" :class="{ disabled: !options.addMidiNote }">
+                  <input
+                    type="text"
+                    v-model="options.midiNoteValue"
+                    class="standard-input"
+                    placeholder="e.g. 9.1"
+                    :disabled="!options.addMidiNote"
+                    :class="{ invalid: options.addMidiNote && !isMidiNoteValid && options.midiNoteValue !== '' }"
+                    @input="handleMidiNoteInput"
+                  />
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -405,6 +427,8 @@ const options = reactive({
   splitSection: false,
   addCueTag: false,
   cueValue: '1',
+  addMidiNote: false,
+  midiNoteValue: '',
   animateBrightness: false,
   brightnessDuration: 1
 });
@@ -506,6 +530,14 @@ const breadcrumbPath = computed(() => {
   return path;
 });
 
+const isMidiNoteValid = computed(() => {
+  if (!options.addMidiNote) return true;
+  const val = options.midiNoteValue;
+  if (!val) return false;
+  if (!/^\d+(\.\d+)?$/.test(val)) return false;
+  return val.replace('.', '').length <= 6;
+});
+
 const isCueValid = computed(() => {
   if (!options.addCueTag) return true;
   const segment = '([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])';
@@ -522,13 +554,27 @@ const isCreateLayersEnabled = computed(() => {
   const hasSelection = selectedItems.size > 0;
   const hasMapping = !!selectedMapping.value;
   const validCue = isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true);
+  const validMidi = isMidiNoteValid.value && (options.addMidiNote ? options.midiNoteValue !== '' : true);
   const validLocation = options.insertMode === 'At Playhead' || (selectedTrack.value && isStartTimeValid.value);
-  
-  return hasSelection && hasMapping && validCue && validLocation;
+
+  return hasSelection && hasMapping && validCue && validMidi && validLocation;
 });
 
 const isAllSelectedComputed = computed(() => filteredMediaList.value.length > 0 && filteredMediaList.value.every(item => selectedItems.has(item.id)));
 const isIndeterminate = computed(() => selectedItems.size > 0 && selectedItems.size < filteredMediaList.value.length);
+
+function handleMidiNoteInput(event) {
+  let v = event.target.value.replace(/[^0-9.]/g, '');
+  const di = v.indexOf('.');
+  if (di !== -1) v = v.slice(0, di + 1) + v.slice(di + 1).replace(/\./g, '');
+  let result = '', digits = 0;
+  for (const ch of v) {
+    if (ch === '.') { result += ch; }
+    else if (digits < 6) { result += ch; digits++; }
+  }
+  options.midiNoteValue = result;
+  event.target.value = result;
+}
 
 // --- Helpers ---
 

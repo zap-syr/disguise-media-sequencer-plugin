@@ -232,10 +232,12 @@ ${trackInitCode}
     FIT_TO_CONTENTS = ${options.fitToContent ? 'True' : 'False'}
     SPLIT_SECTION = ${options.splitSection ? 'True' : 'False'}
     ADD_CUE_TAG = ${options.addCueTag ? 'True' : 'False'}
+    ADD_MIDI_NOTE = ${options.addMidiNote ? 'True' : 'False'}
     ANIMATE_BRIGHTNESS = ${options.animateBrightness ? 'True' : 'False'}
 
     mapping_path = r'${options.mappingPath}'
     cue_tag = '${options.cueValue}'
+    midi_note_value = '${options.midiNoteValue}'
 
     still_duration_seconds = ${options.stillDuration}
     movie_duration_seconds = ${options.movieDuration}
@@ -336,7 +338,19 @@ ${trackInitCode}
                 
                 tag = Tag(1, tag_text)
                 current_track.setTagAtBeat(current_start_beats, tag)
-            
+
+            if ADD_MIDI_NOTE:
+                midi_text = midi_note_value
+                try:
+                    parts = midi_note_value.split('.')
+                    last_num = int(parts[-1])
+                    parts[-1] = str(last_num + i)
+                    midi_text = '.'.join(parts)
+                except:
+                    pass
+                midi_tag = Tag(2, midi_text)
+                current_track.setTagAtBeat(current_start_beats, midi_tag)
+
             # Next iteration calculations
             current_start_beats = current_start_beats + clip_length_beats - overlap_beats
 
