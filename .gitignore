@@ -25,4 +25,5 @@ dist-ssr
 
 examples/
 GEMINI.md
+CLAUDE.md
 .gemini/
