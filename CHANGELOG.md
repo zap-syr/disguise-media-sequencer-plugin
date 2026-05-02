@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.0.2] - 2026-05-02
+
+### Fixed
+- Replaced hardcoded 30fps frame-to-seconds conversion with a dynamic lookup. The Python script now reads `state.globalRefreshRate.asDouble` at execution time and halves the value when it exceeds 30 (e.g. 50 Hz → 25 fps, 60 Hz → 30 fps), ensuring the `HH:MM:SS:FF` start time is converted correctly for both 25 and 30 fps timelines.
+
 ## [1.0.1] - 2026-04-28
 
 ### Added
