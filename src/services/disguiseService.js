@@ -197,28 +197,21 @@ export async function createLayers(directorIp, options, selectedPaths) {
 `;
 
   if (options.insertMode === 'Specific location' && options.targetTrack && options.startTime) {
-    // Parse HH:MM:SS:FF into seconds
-    // Note: Assuming standard 30fps or similar if strictly needed, but basic sum of seconds is:
-    // HH * 3600 + MM * 60 + SS + FF / frame_rate
-    // Disguise time is usually in seconds. Let's assume standard 30fps for the fraction, 
-    // or provide the string directly to a time parser if d3 supports it.
-    // For safety, parsing it here to a float of seconds:
     const timeParts = options.startTime.split(':').map(Number);
     const hours = timeParts[0] || 0;
     const minutes = timeParts[1] || 0;
     const seconds = timeParts[2] || 0;
     const frames = timeParts[3] || 0;
-    
-    // Assuming 30fps default if not specified otherwise, or just use seconds if frames are 0.
-    const totalSeconds = (hours * 3600) + (minutes * 60) + seconds + (frames / 30);
 
     trackInitCode = `
     target_track_path = r'${options.targetTrack}'
     current_track = resourceManager.load(target_track_path, Track)
     if not current_track:
         return {"status": "error", "message": "Could not load target track"}
-    
-    start_time_seconds = ${totalSeconds}
+
+    refresh_rate = state.globalRefreshRate.asDouble
+    fps = refresh_rate / 2.0 if refresh_rate > 30 else refresh_rate
+    start_time_seconds = (${hours} * 3600) + (${minutes} * 60) + ${seconds} + (${frames} / fps)
     current_playhead_beats = current_track.timeToBeat(start_time_seconds)
 `;
   }
