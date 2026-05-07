@@ -125,7 +125,7 @@
           <div class="group-box">
             <div class="group-header">LAYER PROPERTIES</div>
             <div class="control">
-              <label>MAPPING</label>
+              <label>Mapping</label>
               <div class="searchable-select" ref="mappingRef">
                 <input 
                   type="text" 
@@ -154,14 +154,14 @@
             </div>
             <div class="row">
               <div class="control">
-                <label>MODE</label>
+                <label>Mode</label>
                 <select v-model="options.mode">
                   <option value="Normal">Normal</option>
                   <option value="Locked">Locked</option>
                 </select>
               </div>
               <div class="control">
-                <label>AT END POINT</label>
+                <label>At End Point</label>
                 <select v-model="options.atEndPoint">
                   <option value="Loop">Loop</option>
                   <option value="Ping-Pong">Ping-Pong</option>
@@ -180,9 +180,12 @@
                   </div>
                 </label>
                 
-                <div class="input-with-unit width-half toggle-input-wrapper" :class="{ disabled: !options.animateBrightness }">
-                  <input type="number" v-model.number="options.brightnessDuration" min="0" step="0.5" :disabled="!options.animateBrightness" />
-                  <span class="unit">s</span>
+                <div class="inline-row toggle-input-wrapper" :class="{ disabled: !options.animateBrightness }">
+                  <span class="label-text-secondary">Time</span>
+                  <div class="input-with-unit">
+                    <input type="number" v-model.number="options.brightnessDuration" min="0" step="0.5" :disabled="!options.animateBrightness" />
+                    <span class="unit">s</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -193,7 +196,7 @@
             <div class="group-header">LAYER DURATION</div>
             
             <div class="control">
-              <label>MOVIE DURATION</label>
+              <label>Movie Duration</label>
               <div class="toggle-group">
                 <label class="ios-toggle space-between">
                   <span class="label-text">Fit To Contents</span>
@@ -203,18 +206,24 @@
                   </div>
                 </label>
                 
-                <div class="input-with-unit width-half toggle-input-wrapper" :class="{ disabled: options.fitToContent }">
-                  <input type="number" v-model.number="options.movieDuration" min="0" step="1" :disabled="options.fitToContent" />
-                  <span class="unit">s</span>
+                <div class="inline-row toggle-input-wrapper" :class="{ disabled: options.fitToContent }">
+                  <span class="label-text-secondary">Time</span>
+                  <div class="input-with-unit">
+                    <input type="number" v-model.number="options.movieDuration" min="0" step="1" :disabled="options.fitToContent" />
+                    <span class="unit">s</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="control">
-              <label>STILL IMG DURATION</label>
-              <div class="input-with-unit width-half">
-                <input type="number" v-model.number="options.stillDuration" min="0" step="1" />
-                <span class="unit">s</span>
+              <label>Still Image Duration</label>
+              <div class="inline-row">
+                <span class="label-text-secondary">Time</span>
+                <div class="input-with-unit">
+                  <input type="number" v-model.number="options.stillDuration" min="0" step="1" />
+                  <span class="unit">s</span>
+                </div>
               </div>
             </div>
           </div>
@@ -223,7 +232,7 @@
           <div class="group-box">
             <div class="group-header">INSERT SETTINGS</div>
             <div class="control">
-              <label>INSERT LOCATION</label>
+              <label>Insert Location</label>
               <div class="segmented-control">
                 <button 
                   type="button"
@@ -244,12 +253,12 @@
               </div>
             </div>
 
-            <div class="row" :class="{ disabled: options.insertMode !== 'Specific location' }">
+            <div class="stacked-controls" :class="{ disabled: options.insertMode !== 'Specific location' }">
               <div class="control">
-                <label>TRACK</label>
+                <label>Track</label>
                 <div class="searchable-select" ref="trackRef">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     v-model="trackSearchQuery"
                     @focus="toggleTrackMenu(true)"
                     :placeholder="selectedTrack ? selectedTrack.name : 'Search Track...'"
@@ -257,41 +266,76 @@
                     :disabled="options.insertMode !== 'Specific location'"
                   />
                   <span class="dropdown-arrow">▼</span>
-                  
-                  <ul v-if="isTrackMenuOpen" class="dropdown-list">
-                    <li 
-                      v-for="t in filteredTracks" 
-                      :key="t.uid" 
-                      class="dropdown-item"
-                      :class="{ selected: selectedTrack?.uid === t.uid }"
-                      @click="selectTrack(t)"
-                    >
-                      {{ t.name }}
-                    </li>
-                    <li v-if="filteredTracks.length === 0" class="dropdown-empty">
-                      No results found
-                    </li>
-                  </ul>
+
+                  <div v-if="isTrackMenuOpen" class="dropdown-list">
+                    <ul class="dropdown-list-scroll">
+                      <li
+                        v-for="t in filteredTracks"
+                        :key="t.uid"
+                        class="dropdown-item"
+                        :class="{ selected: selectedTrack?.uid === t.uid }"
+                        @click="selectTrack(t)"
+                      >
+                        {{ t.name }}
+                      </li>
+                      <li v-if="filteredTracks.length === 0" class="dropdown-empty">
+                        No results found
+                      </li>
+                    </ul>
+                    <div class="dropdown-create-item" @click.stop="startCreateTrack">
+                      + Create New Track
+                    </div>
+                  </div>
                 </div>
               </div>
+
+              <div v-if="isCreatingTrack" class="create-track-panel" @click.stop>
+                <label>New Track Name</label>
+                <input
+                  ref="newTrackNameInput"
+                  type="text"
+                  v-model="newTrackName"
+                  class="standard-input"
+                  placeholder="Enter a unique track name..."
+                  @keyup.enter="confirmCreateTrack"
+                  @keyup.escape="cancelCreateTrack"
+                />
+                <div v-if="newTrackNameError && newTrackName !== ''" class="create-track-error">
+                  {{ newTrackNameError }}
+                </div>
+                <div class="create-track-actions">
+                  <button class="create-track-cancel-btn" @click.stop="cancelCreateTrack">Cancel</button>
+                  <button
+                    class="create-track-confirm-btn"
+                    :disabled="!!newTrackNameError || isCreatingTrackLoading"
+                    @click.stop="confirmCreateTrack"
+                  >
+                    {{ isCreatingTrackLoading ? 'Creating...' : 'Create' }}
+                  </button>
+                </div>
+              </div>
+
               <div class="control">
-                <label>TIME</label>
-                <input 
-                  type="text" 
-                  v-model="options.startTime" 
-                  class="standard-input" 
+                <label>Time</label>
+                <input
+                  type="text"
+                  v-model="options.startTime"
+                  class="standard-input"
                   placeholder="00:00:00:00"
                   :class="{ invalid: options.insertMode === 'Specific location' && !isStartTimeValid }"
-                  :disabled="options.insertMode !== 'Specific location'" 
+                  :disabled="options.insertMode !== 'Specific location'"
                 />
               </div>
             </div>
-          
+
             <div class="control">
-              <label>OVERLAP</label>
-              <div class="input-with-unit width-half">
-                <input type="number" v-model.number="options.overlap" min="0" step="0.5" />
-                <span class="unit">s</span>
+              <label>Overlap</label>
+              <div class="inline-row">
+                <span class="label-text">Time</span>
+                <div class="input-with-unit">
+                  <input type="number" v-model.number="options.overlap" min="0" step="0.5" />
+                  <span class="unit">s</span>
+                </div>
               </div>
             </div>
             
@@ -303,7 +347,13 @@
                   <span class="slider"></span>
                 </div>
               </label>
-              
+            </div>
+          </div>
+
+          <!-- TAGS -->
+          <div class="group-box">
+            <div class="group-header">TAGS</div>
+            <div class="toggle-list">
               <div class="toggle-group">
                 <label class="ios-toggle space-between">
                   <span class="label-text">Add Cue Tag</span>
@@ -346,7 +396,6 @@
                   />
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -366,8 +415,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive, computed, onUnmounted, watch } from 'vue';
-import { getMediaList, getMappingList, getTrackList, createLayers } from '../services/disguiseService';
+import { ref, onMounted, reactive, computed, onUnmounted, watch, nextTick } from 'vue';
+import { getMediaList, getMappingList, getTrackList, createLayers, createTrack } from '../services/disguiseService';
 import MediaCard from './MediaCard.vue';
 
 const props = defineProps({
@@ -454,6 +503,12 @@ const expandedFolders = ref(new Set(['Root']));
 const gridRef = ref(null);
 const mappingRef = ref(null);
 const trackRef = ref(null);
+const newTrackNameInput = ref(null);
+
+// Create Track state
+const isCreatingTrack = ref(false);
+const newTrackName = ref('');
+const isCreatingTrackLoading = ref(false);
 const isSelecting = ref(false);
 const wasDragging = ref(false);
 const selectionStart = reactive({ x: 0, y: 0 });
@@ -563,6 +618,13 @@ const isStartTimeValid = computed(() => {
   return /^([0-9]{2}):([0-5][0-9]):([0-5][0-9]):([0-5][0-9])$/.test(options.startTime);
 });
 
+const newTrackNameError = computed(() => {
+  const name = newTrackName.value.trim();
+  if (!name) return 'Name is required';
+  if (tracks.value.some(t => t.name.toLowerCase() === name.toLowerCase())) return 'Name already exists';
+  return null;
+});
+
 const isCreateLayersEnabled = computed(() => {
   const hasSelection = selectedItems.size > 0;
   const hasMapping = !!selectedMapping.value;
@@ -631,9 +693,15 @@ const toggleTrackMenu = (forceOpen = false) => {
   if (forceOpen) {
     isTrackMenuOpen.value = true;
     trackSearchQuery.value = '';
+    isCreatingTrack.value = false;
+    newTrackName.value = '';
   } else {
     isTrackMenuOpen.value = !isTrackMenuOpen.value;
-    if (!isTrackMenuOpen.value) trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
+    if (!isTrackMenuOpen.value) {
+      trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
+      isCreatingTrack.value = false;
+      newTrackName.value = '';
+    }
   }
   isMappingMenuOpen.value = false;
 };
@@ -641,7 +709,36 @@ const selectTrack = (t) => {
   selectedTrack.value = t;
   isTrackMenuOpen.value = false;
   trackSearchQuery.value = t.name;
+  isCreatingTrack.value = false;
+  newTrackName.value = '';
 };
+
+function startCreateTrack() {
+  isTrackMenuOpen.value = false;
+  trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
+  isCreatingTrack.value = true;
+  newTrackName.value = '';
+}
+
+async function confirmCreateTrack() {
+  if (newTrackNameError.value || isCreatingTrackLoading.value) return;
+  isCreatingTrackLoading.value = true;
+  try {
+    const newTrack = await createTrack(props.directorEndpoint, newTrackName.value.trim());
+    tracks.value.push(newTrack);
+    tracks.value.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    selectTrack(newTrack);
+  } catch (err) {
+    console.error('Failed to create track:', err);
+  } finally {
+    isCreatingTrackLoading.value = false;
+  }
+}
+
+function cancelCreateTrack() {
+  isCreatingTrack.value = false;
+  newTrackName.value = '';
+}
 
 const handleClickOutside = (e) => {
   if (mappingRef.value && !mappingRef.value.contains(e.target)) {
@@ -659,6 +756,13 @@ const handleClickOutside = (e) => {
 watch([selectedFolderId, searchQuery], () => {
   selectedItems.clear();
   lastSelectedIndex = -1;
+});
+
+watch(isCreatingTrack, async (val) => {
+  if (val) {
+    await nextTick();
+    newTrackNameInput.value?.focus();
+  }
 });
 
 // Input Validations
@@ -1141,7 +1245,7 @@ const selectionFrameStyle = computed(() => {
   font-weight: 700;
   margin-bottom: 14px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 .control { margin-bottom: 14px; }
@@ -1149,16 +1253,19 @@ const selectionFrameStyle = computed(() => {
 .row { display: flex; gap: 12px; transition: opacity 0.3s ease; margin-bottom: 14px; }
 .row:last-child { margin-bottom: 0; }
 .row .control { flex: 1; margin-bottom: 0; }
+.stacked-controls { transition: opacity 0.3s ease; margin-bottom: 14px; }
+.stacked-controls .control { margin-bottom: 14px; }
+.stacked-controls .control:last-child { margin-bottom: 0; }
+.inline-row { display: flex; align-items: center; justify-content: space-between; }
 
 .disabled { opacity: 0.3; pointer-events: none; }
 
 label {
   display: block;
-  font-size: 10px;
-  color: #a0a0a0;
+  font-size: 12px;
+  color: #cccccc;
   margin-bottom: 6px;
   font-weight: 600;
-  text-transform: uppercase;
 }
 
 /* Horizontal Switcher (Segmented Control) */
@@ -1282,17 +1389,35 @@ select:focus, .standard-input:focus {
   border: 1px solid #3a3a3a;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  max-height: 150px;
-  overflow-y: auto;
   z-index: 100;
   margin: 0;
-  padding: 4px 0;
+  padding: 0;
   list-style: none;
+  overflow: hidden;
 }
 
-.dropdown-list::-webkit-scrollbar { width: 6px; }
-.dropdown-list::-webkit-scrollbar-track { background: #1e1e1e; }
-.dropdown-list::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+/* Plain list dropdowns (e.g. mapping) scroll the whole list */
+ul.dropdown-list {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+/* Scrollable section inside structured dropdowns (e.g. track) */
+.dropdown-list-scroll {
+  max-height: 150px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 0;
+}
+
+.dropdown-list::-webkit-scrollbar,
+.dropdown-list-scroll::-webkit-scrollbar { width: 6px; }
+.dropdown-list::-webkit-scrollbar-track,
+.dropdown-list-scroll::-webkit-scrollbar-track { background: #1e1e1e; }
+.dropdown-list::-webkit-scrollbar-thumb,
+.dropdown-list-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
 
 .dropdown-item {
   padding: 8px 12px;
@@ -1364,7 +1489,8 @@ select:focus, .standard-input:focus {
 .toggle-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
 .ios-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; text-transform: none; }
 .ios-toggle.space-between { justify-content: space-between; }
-.label-text { font-size: 12px; color: #ccc; font-weight: 500; text-transform: none; }
+.label-text { font-size: 12px; color: #aaaaaa; font-weight: 500; text-transform: none; }
+.label-text-secondary { font-size: 11px; color: #777777; font-weight: 500; }
 
 .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -1404,4 +1530,65 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .create-btn:disabled { background: #3a3a3a; color: #777; cursor: not-allowed; }
 
 .loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
+
+/* Create New Track — dropdown entry */
+.dropdown-create-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #0a84ff;
+  cursor: pointer;
+  border-top: 1px solid #2e2e2e;
+  background: #1e1e1e;
+  transition: background 0.2s;
+}
+.dropdown-create-item:hover { background: rgba(10, 132, 255, 0.15); }
+
+/* Create New Track — full-width panel */
+.create-track-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: #1a1a1a;
+  border: 1px solid #0a84ff44;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.create-track-error {
+  font-size: 11px;
+  color: #ef4444;
+  padding: 0 2px;
+}
+
+.create-track-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.create-track-cancel-btn,
+.create-track-confirm-btn {
+  flex: 1;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.create-track-cancel-btn {
+  background: #2a2a2a;
+  color: #aaa;
+}
+.create-track-cancel-btn:hover { background: #333; color: #fff; }
+
+.create-track-confirm-btn {
+  background: #0a84ff;
+  color: #fff;
+}
+.create-track-confirm-btn:hover:not(:disabled) { background: #0060d1; }
+.create-track-confirm-btn:disabled { background: #2e2e2e; color: #555; cursor: not-allowed; }
 </style>

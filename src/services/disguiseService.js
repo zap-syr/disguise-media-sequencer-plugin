@@ -357,3 +357,24 @@ return run()
 
   return await executePython(directorIp, script);
 }
+
+/**
+ * Creates a new Track resource in Disguise.
+ * @param {string} directorIp - The IP address and port.
+ * @param {string} trackName - The desired track name (must be unique).
+ * @returns {Promise<{uid: string, path: string, name: string}>}
+ */
+export async function createTrack(directorIp, trackName) {
+  const script = `
+def run():
+    track = resourceManager.loadOrCreate("objects/track/${trackName}.apx", Track)
+    return track
+return run()
+`;
+  const result = await executePython(directorIp, script);
+  if (!result || !result.path) throw new Error('Failed to create track');
+  const pathParts = result.path.split('/');
+  let name = pathParts[pathParts.length - 1];
+  if (name.toLowerCase().endsWith('.apx')) name = name.slice(0, -4);
+  return { uid: result.uid, path: result.path, name };
+}
