@@ -364,6 +364,41 @@
             <div class="toggle-list">
               <div class="toggle-group">
                 <label class="ios-toggle space-between">
+                  <span class="label-text">Add Timecode Tag</span>
+                  <div class="switch">
+                    <input type="checkbox" v-model="options.addTimecodeTag">
+                    <span class="slider"></span>
+                  </div>
+                </label>
+
+                <div class="toggle-input-wrapper timecode-grid" :class="{ disabled: !options.addTimecodeTag }">
+                  <div>
+                    <span class="label-text-secondary">Start Time</span>
+                    <input
+                      type="text"
+                      v-model="options.timecodeStart"
+                      class="standard-input"
+                      placeholder="00:00:00:00"
+                      :disabled="!options.addTimecodeTag"
+                      :class="{ invalid: options.addTimecodeTag && !isTimecodeStartValid && options.timecodeStart !== '' }"
+                    />
+                  </div>
+                  <div>
+                    <span class="label-text-secondary">Increment</span>
+                    <input
+                      type="text"
+                      v-model="options.timecodeIncrement"
+                      class="standard-input"
+                      placeholder="00:00:00:00"
+                      :disabled="!options.addTimecodeTag"
+                      :class="{ invalid: options.addTimecodeTag && !isTimecodeIncrementValid && options.timecodeIncrement !== '' }"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="toggle-group">
+                <label class="ios-toggle space-between">
                   <span class="label-text">Add Cue Tag</span>
                   <div class="switch">
                     <input type="checkbox" v-model="options.addCueTag">
@@ -495,6 +530,9 @@ const options = reactive({
   movieDuration: 30,
   overlap: 0,
   splitSection: false,
+  addTimecodeTag: false,
+  timecodeStart: '00:00:00:00',
+  timecodeIncrement: '00:00:00:00',
   addCueTag: false,
   cueValue: '',
   addMidiNote: false,
@@ -625,10 +663,15 @@ const isCueValid = computed(() => {
   return regex.test(options.cueValue);
 });
 
+const TIMECODE_RE = /^([0-9]{2}):([0-5][0-9]):([0-5][0-9]):([0-5][0-9])$/;
+
 const isStartTimeValid = computed(() => {
   if (options.insertMode !== 'Specific location') return true;
-  return /^([0-9]{2}):([0-5][0-9]):([0-5][0-9]):([0-5][0-9])$/.test(options.startTime);
+  return TIMECODE_RE.test(options.startTime);
 });
+
+const isTimecodeStartValid = computed(() => !options.addTimecodeTag || TIMECODE_RE.test(options.timecodeStart));
+const isTimecodeIncrementValid = computed(() => !options.addTimecodeTag || TIMECODE_RE.test(options.timecodeIncrement));
 
 const newTrackNameError = computed(() => {
   const name = newTrackName.value.trim();
@@ -642,9 +685,10 @@ const isCreateLayersEnabled = computed(() => {
   const hasMapping = !!selectedMapping.value;
   const validCue = isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true);
   const validMidi = isMidiNoteValid.value && (options.addMidiNote ? options.midiNoteValue !== '' : true);
+  const validTimecode = isTimecodeStartValid.value && isTimecodeIncrementValid.value;
   const validLocation = options.insertMode === 'At Playhead' || (selectedTrack.value && isStartTimeValid.value);
 
-  return hasSelection && hasMapping && validCue && validMidi && validLocation;
+  return hasSelection && hasMapping && validCue && validMidi && validTimecode && validLocation;
 });
 
 const isAllSelectedComputed = computed(() => filteredMediaList.value.length > 0 && filteredMediaList.value.every(item => selectedItems.has(item.id)));
@@ -1555,6 +1599,14 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 
 .toggle-group { display: flex; flex-direction: column; gap: 8px; }
 .toggle-input-wrapper { margin-left: 2px; transition: opacity 0.3s ease; }
+
+.timecode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+.timecode-grid .label-text-secondary { display: block; margin-bottom: 4px; }
 
 /* Footer */
 .settings-footer { 

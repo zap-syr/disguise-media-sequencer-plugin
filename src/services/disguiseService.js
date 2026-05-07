@@ -224,13 +224,19 @@ ${trackInitCode}
     AT_END_POINT = ${endPointVal}
     FIT_TO_CONTENTS = ${options.fitToContent ? 'True' : 'False'}
     SPLIT_SECTION = ${options.splitSection ? 'True' : 'False'}
+    ADD_TIMECODE_TAG = ${options.addTimecodeTag ? 'True' : 'False'}
     ADD_CUE_TAG = ${options.addCueTag ? 'True' : 'False'}
     ADD_MIDI_NOTE = ${options.addMidiNote ? 'True' : 'False'}
     ANIMATE_BRIGHTNESS = ${options.animateBrightness ? 'True' : 'False'}
 
     mapping_path = r'${options.mappingPath}'
+    timecode_start = '${options.timecodeStart}'
+    timecode_increment = '${options.timecodeIncrement}'
     cue_tag = '${options.cueValue}'
     midi_note_value = '${options.midiNoteValue}'
+
+    refresh_rate_val = state.globalRefreshRate.asDouble
+    tag_fps = int(refresh_rate_val / 2.0 if refresh_rate_val > 30 else refresh_rate_val)
 
     still_duration_seconds = ${options.stillDuration}
     movie_duration_seconds = ${options.movieDuration}
@@ -316,6 +322,20 @@ ${trackInitCode}
                 "name": new_layer.name,
                 "uid": new_layer.uid
             })
+
+            if ADD_TIMECODE_TAG:
+                tc_s = timecode_start.split(':')
+                tc_i = timecode_increment.split(':')
+                start_f = ((int(tc_s[0]) * 3600) + (int(tc_s[1]) * 60) + int(tc_s[2])) * tag_fps + int(tc_s[3])
+                inc_f = ((int(tc_i[0]) * 3600) + (int(tc_i[1]) * 60) + int(tc_i[2])) * tag_fps + int(tc_i[3])
+                total_f = start_f + i * inc_f
+                fr = total_f % tag_fps
+                sc = (total_f // tag_fps) % 60
+                mn = (total_f // tag_fps // 60) % 60
+                hr = total_f // tag_fps // 3600
+                tc_text = '{:02d}:{:02d}:{:02d}:{:02d}'.format(hr, mn, sc, fr)
+                tc_tag = Tag(0, tc_text)
+                current_track.setTagAtBeat(current_start_beats, tc_tag)
 
             if ADD_CUE_TAG:
                 # Handle incrementing cue tag if it's numeric
