@@ -384,7 +384,7 @@
                     />
                   </div>
                   <div>
-                    <span class="label-text-secondary">Increment</span>
+                    <span class="label-text-secondary">Increment Time</span>
                     <input
                       type="text"
                       v-model="options.timecodeIncrement"
@@ -420,7 +420,7 @@
 
               <div class="toggle-group">
                 <label class="ios-toggle space-between">
-                  <span class="label-text">Add MIDI Note</span>
+                  <span class="label-text">Add MIDI Tag</span>
                   <div class="switch">
                     <input type="checkbox" v-model="options.addMidiNote">
                     <span class="slider"></span>
