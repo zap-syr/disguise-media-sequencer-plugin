@@ -155,18 +155,26 @@
             <div class="row">
               <div class="control">
                 <label>Mode</label>
-                <select v-model="options.mode">
-                  <option value="Normal">Normal</option>
-                  <option value="Locked">Locked</option>
-                </select>
+                <div class="searchable-select" ref="modeRef">
+                  <div class="dropdown-trigger" @click="toggleModeMenu">{{ options.mode }}</div>
+                  <span class="dropdown-arrow">▼</span>
+                  <ul v-if="isModeMenuOpen" class="dropdown-list">
+                    <li class="dropdown-item" :class="{ selected: options.mode === 'Normal' }" @click="selectMode('Normal')">Normal</li>
+                    <li class="dropdown-item" :class="{ selected: options.mode === 'Locked' }" @click="selectMode('Locked')">Locked</li>
+                  </ul>
+                </div>
               </div>
               <div class="control">
                 <label>At End Point</label>
-                <select v-model="options.atEndPoint">
-                  <option value="Loop">Loop</option>
-                  <option value="Ping-Pong">Ping-Pong</option>
-                  <option value="Pause">Pause</option>
-                </select>
+                <div class="searchable-select" ref="atEndPointRef">
+                  <div class="dropdown-trigger" @click="toggleAtEndPointMenu">{{ options.atEndPoint }}</div>
+                  <span class="dropdown-arrow">▼</span>
+                  <ul v-if="isAtEndPointMenuOpen" class="dropdown-list">
+                    <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Loop' }" @click="selectAtEndPoint('Loop')">Loop</li>
+                    <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Ping-Pong' }" @click="selectAtEndPoint('Ping-Pong')">Ping-Pong</li>
+                    <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Pause' }" @click="selectAtEndPoint('Pause')">Pause</li>
+                  </ul>
+                </div>
               </div>
             </div>
 
@@ -327,11 +335,11 @@
                 />
               </div>
             </div>
-
+            
             <div class="control">
-              <label>Overlap</label>
+              <label>Overlap Layers</label>
               <div class="inline-row">
-                <span class="label-text">Time</span>
+                <span class="label-text-secondary">Time</span>
                 <div class="input-with-unit">
                   <input type="number" v-model.number="options.overlap" min="0" step="0.5" />
                   <span class="unit">s</span>
@@ -503,6 +511,10 @@ const expandedFolders = ref(new Set(['Root']));
 const gridRef = ref(null);
 const mappingRef = ref(null);
 const trackRef = ref(null);
+const modeRef = ref(null);
+const atEndPointRef = ref(null);
+const isModeMenuOpen = ref(false);
+const isAtEndPointMenuOpen = ref(false);
 const newTrackNameInput = ref(null);
 
 // Create Track state
@@ -713,6 +725,27 @@ const selectTrack = (t) => {
   newTrackName.value = '';
 };
 
+const toggleModeMenu = () => {
+  isModeMenuOpen.value = !isModeMenuOpen.value;
+  isAtEndPointMenuOpen.value = false;
+  isMappingMenuOpen.value = false;
+  isTrackMenuOpen.value = false;
+};
+const selectMode = (val) => {
+  options.mode = val;
+  isModeMenuOpen.value = false;
+};
+const toggleAtEndPointMenu = () => {
+  isAtEndPointMenuOpen.value = !isAtEndPointMenuOpen.value;
+  isModeMenuOpen.value = false;
+  isMappingMenuOpen.value = false;
+  isTrackMenuOpen.value = false;
+};
+const selectAtEndPoint = (val) => {
+  options.atEndPoint = val;
+  isAtEndPointMenuOpen.value = false;
+};
+
 function startCreateTrack() {
   isTrackMenuOpen.value = false;
   trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
@@ -748,6 +781,12 @@ const handleClickOutside = (e) => {
   if (trackRef.value && !trackRef.value.contains(e.target)) {
     isTrackMenuOpen.value = false;
     trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
+  }
+  if (modeRef.value && !modeRef.value.contains(e.target)) {
+    isModeMenuOpen.value = false;
+  }
+  if (atEndPointRef.value && !atEndPointRef.value.contains(e.target)) {
+    isAtEndPointMenuOpen.value = false;
   }
 };
 
@@ -1380,6 +1419,21 @@ select:focus, .standard-input:focus {
   pointer-events: none;
 }
 
+.dropdown-trigger {
+  width: 100%;
+  background: #181818;
+  border: 1px solid #3a3a3a;
+  color: #eee;
+  padding: 8px 24px 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  user-select: none;
+}
+.dropdown-trigger:hover { border-color: #555; }
+
 .dropdown-list {
   position: absolute;
   top: calc(100% + 4px);
@@ -1553,6 +1607,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   border: 1px solid #0a84ff44;
   border-radius: 6px;
   margin-top: 4px;
+  margin-bottom: 14px;
 }
 
 .create-track-error {
