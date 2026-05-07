@@ -349,7 +349,7 @@
             
             <div class="toggle-list">
               <label class="ios-toggle space-between">
-                <span class="label-text">Split Section</span>
+                <label>Split Section</label>
                 <div class="switch">
                   <input type="checkbox" v-model="options.splitSection">
                   <span class="slider"></span>
