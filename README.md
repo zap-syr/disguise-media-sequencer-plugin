@@ -1,12 +1,20 @@
-## Download the latest release
-
-[Download Media Sequencer Plugin](https://github.com/zap-syr/disguise-media-sequencer-plugin/releases/latest/download/Media.Sequencer.zip)
-
 # Disguise Media Sequencer Plugin
 
-This plugin provides an advanced media management and automated layer creation interface for Disguise Designer. It allows users to browse project media, configure playback settings, and automatically sequence layers onto the current track.
+This plugin offers an advanced interface for media browsing and automated layer generation within Disguise Designer. It enables users to navigate and select project media assets, configure layer parameters, and define timeline placement to facilitate the automated sequencing of video layers.
 
-## Media Browser
+![plugin ui](https://github.com/zap-syr/disguise-media-sequencer-plugin/blob/.github/aux-images/plugin-ui.png)
+
+## Download
+
+Download the latest release - [Media Sequencer](https://github.com/zap-syr/disguise-media-sequencer-plugin/releases/latest/download/Media.Sequencer.zip)
+
+## Installation
+
+To install the plugin, follow the official Disguise documentation steps - [Installing Plugins](https://help.disguise.one/designer/plugins/designer-plugin-overview#installing-plugins)
+
+## PLugin Chore
+
+### Media Browser
 
 The center workspace gives you a full view of your project Media Assets, organized into the same folder hierarchy as they appear in your project.
 
@@ -19,16 +27,11 @@ The center workspace gives you a full view of your project Media Assets, organiz
 
 Thumbnails are fetched live from Designer for each media item.
 
-## Creating Layers
+### Creating Layers
 
 Select one or more Media Assets, configure your settings in the right panel, and click **Create Layers**. The plugin will sequence a Video layer for each selected item onto the timeline in order.
 
-## Settings
-
-
-### Mapping
-
-Select the projection mapping applied to all created layers. The dropdown is searchable.
+## Settings Panel
 
 ### Layer Properties
 
@@ -75,5 +78,6 @@ Optional tags written to the timeline at the start of each layer.
 
 Found a bug or have a feature request? [Open an issue](https://github.com/zap-syr/disguise-media-sequencer-plugin/issues/new)
 
-## License 
+## License
+
 This project is licensed under the terms of the MIT License.
