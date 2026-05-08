@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.1.1] - 2026-05-08
+
+### Fixed
+- **Add Cue Tag validation** - replaced the previous 0–255 per-segment restriction with the correct Disguise Designer rules: max 11 total digits (dots excluded), formats `{num}`, `{num.num}`, and `{num.num.num}` only. Input is sanitised in real time (non-digit/dot characters stripped, dots capped at 2, digit count capped at 11) and a trailing dot is stripped on blur.
+- **New Track name casing** - the New Track name input now converts any uppercase character to lowercase as the user types, matching the behaviour of Disguise Designer where all track names are lowercase.
+
 ## [1.1.0] - 2026-05-07
 
 ### Added
