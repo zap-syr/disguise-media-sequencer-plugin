@@ -305,6 +305,7 @@
                   v-model="newTrackName"
                   class="standard-input"
                   placeholder="Enter a unique track name..."
+                  @input="newTrackName = $event.target.value.toLowerCase()"
                   @keyup.enter="confirmCreateTrack"
                   @keyup.escape="cancelCreateTrack"
                 />
@@ -414,6 +415,8 @@
                     placeholder="e.g. 1.2.3"
                     :disabled="!options.addCueTag"
                     :class="{ invalid: options.addCueTag && !isCueValid && options.cueValue !== '' }"
+                    @input="handleCueTagInput"
+                    @blur="handleCueTagBlur"
                   />
                 </div>
               </div>
@@ -658,9 +661,10 @@ const isMidiNoteValid = computed(() => {
 
 const isCueValid = computed(() => {
   if (!options.addCueTag) return true;
-  const segment = '([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])';
-  const regex = new RegExp(`^${segment}(\\.${segment}){0,2}$`);
-  return regex.test(options.cueValue);
+  const val = options.cueValue.replace(/\.$/, '');
+  if (!val) return false;
+  if (!/^\d+(\.\d+){0,2}$/.test(val)) return false;
+  return val.replace(/\./g, '').length <= 11;
 });
 
 const TIMECODE_RE = /^([0-9]{2}):([0-5][0-9]):([0-5][0-9]):([0-5][0-9])$/;
@@ -693,6 +697,31 @@ const isCreateLayersEnabled = computed(() => {
 
 const isAllSelectedComputed = computed(() => filteredMediaList.value.length > 0 && filteredMediaList.value.every(item => selectedItems.has(item.id)));
 const isIndeterminate = computed(() => selectedItems.size > 0 && selectedItems.size < filteredMediaList.value.length);
+
+function handleCueTagInput(event) {
+  let v = event.target.value.replace(/[^0-9.]/g, '');
+  let dotCount = 0;
+  let stripped = '';
+  for (const ch of v) {
+    if (ch === '.') {
+      if (dotCount < 2) { stripped += ch; dotCount++; }
+    } else {
+      stripped += ch;
+    }
+  }
+  let result = '';
+  let digits = 0;
+  for (const ch of stripped) {
+    if (ch === '.') { result += ch; }
+    else if (digits < 11) { result += ch; digits++; }
+  }
+  options.cueValue = result;
+  event.target.value = result;
+}
+
+function handleCueTagBlur() {
+  options.cueValue = options.cueValue.replace(/\.$/, '');
+}
 
 function handleMidiNoteInput(event) {
   let v = event.target.value.replace(/[^0-9.]/g, '');
