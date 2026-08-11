@@ -94,9 +94,56 @@
               </template>
             </span>
           </div>
+
+          <div class="view-controls">
+            <div class="segmented-control compact grid-size-control" v-if="viewMode === 'grid'">
+              <button
+                type="button"
+                class="segment"
+                :class="{ active: gridSize === 'small' }"
+                title="Small thumbnails"
+                @click="gridSize = 'small'"
+              >S</button>
+              <button
+                type="button"
+                class="segment"
+                :class="{ active: gridSize === 'medium' }"
+                title="Medium thumbnails"
+                @click="gridSize = 'medium'"
+              >M</button>
+              <button
+                type="button"
+                class="segment"
+                :class="{ active: gridSize === 'large' }"
+                title="Large thumbnails"
+                @click="gridSize = 'large'"
+              >L</button>
+            </div>
+
+            <div class="segmented-control compact view-mode-control">
+              <button
+                type="button"
+                class="segment icon-segment"
+                :class="{ active: viewMode === 'grid' }"
+                title="Grid view"
+                @click="viewMode = 'grid'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              </button>
+              <button
+                type="button"
+                class="segment icon-segment"
+                :class="{ active: viewMode === 'list' }"
+                title="List view"
+                @click="viewMode = 'list'"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="media-grid" ref="gridRef" @mousedown="startSelection">
+        <div class="media-grid" ref="gridRef" :class="viewMode === 'list' ? 'is-list-view' : `grid-size-${gridSize}`" @mousedown="startSelection">
           <div v-if="filteredMediaList.length === 0" class="empty-state">
             {{ searchQuery ? 'No files match your search.' : 'No media found.' }}
           </div>
@@ -107,6 +154,7 @@
             :item="item"
             :selected="selectedItems.has(item.id)"
             :director-endpoint="props.directorEndpoint"
+            :view-mode="viewMode"
             class="media-card-item"
             :data-id="item.id"
             @click.stop="handleSelection(item, index, $event)"
@@ -521,6 +569,28 @@ function stopResize() {
   window.removeEventListener('mouseup', stopResize);
   document.body.style.cursor = '';
 }
+
+// View mode state
+function readStoredView(key, allowed, fallback) {
+  try {
+    const stored = localStorage.getItem(key);
+    return allowed.includes(stored) ? stored : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+const viewMode = ref(readStoredView('mediaSequencer.viewMode', ['grid', 'list'], 'grid'));
+const gridSize = ref(readStoredView('mediaSequencer.gridSize', ['small', 'medium', 'large'], 'medium'));
+
+watch([viewMode, gridSize], ([newViewMode, newGridSize]) => {
+  try {
+    localStorage.setItem('mediaSequencer.viewMode', newViewMode);
+    localStorage.setItem('mediaSequencer.gridSize', newGridSize);
+  } catch (e) {
+    // localStorage unavailable in this context — ignore
+  }
+});
 
 // Options state
 const options = reactive({
@@ -1275,13 +1345,13 @@ const selectionFrameStyle = computed(() => {
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-.action-toolbar { 
-  height: 40px; 
-  display: flex; 
-  align-items: center; 
-  padding: 0 24px; 
-  background-color: #1a1a1a; 
-  border-bottom: 1px solid #2a2a2a; 
+.action-toolbar {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #2a2a2a;
   flex-shrink: 0;
 }
 .selection-group { display: flex; align-items: center; gap: 12px; }
@@ -1291,17 +1361,31 @@ const selectionFrameStyle = computed(() => {
 .status-text { font-size: 12px; color: #888888; }
 .highlight { color: #ffffff; font-weight: 600; }
 
+/* --- View controls --- */
+.view-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.segmented-control.compact { display: inline-flex; width: auto; padding: 2px; }
+.segmented-control.compact .segment { flex: none; width: auto; padding: 5px 10px; }
+.segmented-control.compact .segment.icon-segment { display: flex; align-items: center; justify-content: center; padding: 5px 8px; }
+
 /* --- Grid View --- */
-.media-grid { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
-  grid-auto-rows: 140px;
-  gap: 16px; 
-  padding: 24px; 
-  overflow-y: auto; 
-  flex: 1; 
-  align-content: start; 
+.media-grid {
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  align-content: start;
   position: relative;
+}
+.media-grid.grid-size-small { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); grid-auto-rows: 100px; }
+.media-grid.grid-size-medium { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); grid-auto-rows: 140px; }
+.media-grid.grid-size-large { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); grid-auto-rows: 190px; }
+
+/* --- List View --- */
+.media-grid.is-list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .empty-state { grid-column: 1 / -1; text-align: center; padding: 40px; color: #555555; font-size: 14px; }
