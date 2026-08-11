@@ -86,6 +86,7 @@ const mediaType = computed(() => {
   height: 100%; /* Sized by the grid's grid-auto-rows */
 }
 .media-card:hover { border-color: #555555; }
+.media-card.no-transition { transition: none; }
 .media-card.is-card-selected {
   border: 1px solid #0a84ff;
   box-shadow: 0 0 0 1px #0a84ff, 0 0 15px rgba(10, 132, 255, 0.5);
@@ -107,7 +108,10 @@ const mediaType = computed(() => {
   border-style: solid;
   border-width: 0 0 0 3px;
   border-color: #0a84ff;
-  box-shadow: none;
+  /* Same shadow shape as the grid-selected glow, just fully transparent —
+     keeps the box-shadow layer count matched so it fades instead of
+     popping when switching between grid and list view. */
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0), 0 0 15px rgba(10, 132, 255, 0);
   background: rgba(10, 132, 255, 0.10);
 }
 
@@ -201,8 +205,8 @@ const mediaType = computed(() => {
   height: 18px;
   padding: 0 4px;
   border-radius: 9px;
-  background: #0a84ff;
-  color: #ffffff;
+  background: #ffffff;
+  color: #0a84ff;
   font-size: 10px;
   font-weight: 700;
   display: flex;
@@ -217,8 +221,8 @@ const mediaType = computed(() => {
   height: 16px;
   padding: 0 4px;
   border-radius: 8px;
-  background: #0a84ff;
-  color: #ffffff;
+  background: #ffffff;
+  color: #0a84ff;
   font-size: 10px;
   font-weight: 700;
   display: flex;

@@ -102,21 +102,21 @@
                 class="segment"
                 :class="{ active: gridSize === 'small' }"
                 title="Small thumbnails"
-                @click="gridSize = 'small'"
+                @click.stop="gridSize = 'small'"
               >S</button>
               <button
                 type="button"
                 class="segment"
                 :class="{ active: gridSize === 'medium' }"
                 title="Medium thumbnails"
-                @click="gridSize = 'medium'"
+                @click.stop="gridSize = 'medium'"
               >M</button>
               <button
                 type="button"
                 class="segment"
                 :class="{ active: gridSize === 'large' }"
                 title="Large thumbnails"
-                @click="gridSize = 'large'"
+                @click.stop="gridSize = 'large'"
               >L</button>
             </div>
 
@@ -126,7 +126,7 @@
                 class="segment icon-segment"
                 :class="{ active: viewMode === 'grid' }"
                 title="Grid view"
-                @click="viewMode = 'grid'"
+                @click.stop="viewMode = 'grid'"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
               </button>
@@ -135,7 +135,7 @@
                 class="segment icon-segment"
                 :class="{ active: viewMode === 'list' }"
                 title="List view"
-                @click="viewMode = 'list'"
+                @click.stop="viewMode = 'list'"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
               </button>
@@ -157,7 +157,7 @@
             :view-mode="viewMode"
             :selection-order="selectionOrderMap.get(item.id)"
             :show-order="selectedItems.size > 1"
-            class="media-card-item"
+            :class="['media-card-item', { 'no-transition': isViewSwitching }]"
             :data-id="item.id"
             @click.stop="handleSelection(item, index, $event)"
           />
@@ -592,6 +592,23 @@ watch([viewMode, gridSize], ([newViewMode, newGridSize]) => {
   } catch (e) {
     // localStorage unavailable in this context — ignore
   }
+});
+
+// Switching view mode changes a card's border/box-shadow/background via CSS
+// classes while its size snaps instantly (size isn't transitioned) — without
+// this, the color/glow transition keeps animating for 200ms around the
+// already-reshaped card, which reads as a flash. Suppress transitions for the
+// one frame the class change lands, then restore them for hover/click feedback.
+const isViewSwitching = ref(false);
+watch(viewMode, () => {
+  isViewSwitching.value = true;
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        isViewSwitching.value = false;
+      });
+    });
+  });
 });
 
 // Options state
