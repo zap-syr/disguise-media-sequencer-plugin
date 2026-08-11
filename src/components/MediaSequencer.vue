@@ -1118,7 +1118,7 @@ function startSelection(event) {
   if (!event.ctrlKey && !event.metaKey) selectedItems.clear();
   initialSelection.clear();
   selectedItems.forEach(id => initialSelection.add(id));
-  dragOrder = Array.from(initialSelection);
+  dragOrder = [];
 }
 
 function updateSelection(event) {
@@ -1142,15 +1142,21 @@ function updateSelection(event) {
       const isIntersecting = !(cardLeft > boxRight || cardRight < boxLeft || cardTop > boxBottom || cardBottom < boxTop);
       if (isIntersecting) currentlyIntersecting.add(id);
   });
-  // Keep already-ordered cards that are still covered (or were part of the
-  // pre-drag selection), then append newly-swept cards in DOM order — this
-  // preserves the direction the box was dragged in instead of always
-  // snapping back to reading order every tick.
-  dragOrder = dragOrder.filter(id => currentlyIntersecting.has(id) || initialSelection.has(id));
+  // Cards selected before this drag started are toggled by the box (Explorer/
+  // Finder-style Ctrl/Cmd-drag): covering them deselects them, stepping back
+  // off restores them. Recomputed fresh every tick, not cumulative.
+  const toggledPreExisting = Array.from(initialSelection).filter(id => !currentlyIntersecting.has(id));
+
+  // Cards not part of the pre-drag selection accumulate in sweep order —
+  // added the first time the box covers them, dropped once it moves off —
+  // preserving the direction the box was dragged in.
+  dragOrder = dragOrder.filter(id => !initialSelection.has(id) && currentlyIntersecting.has(id));
   currentlyIntersecting.forEach(id => {
-    if (!dragOrder.includes(id)) dragOrder.push(id);
+    if (!initialSelection.has(id) && !dragOrder.includes(id)) dragOrder.push(id);
   });
+
   selectedItems.clear();
+  toggledPreExisting.forEach(id => selectedItems.add(id));
   dragOrder.forEach(id => selectedItems.add(id));
 }
 
