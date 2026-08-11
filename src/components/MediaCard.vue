@@ -97,14 +97,16 @@ const mediaType = computed(() => {
   align-items: center;
   height: 44px;
   flex-shrink: 0;
-  border: none;
-  border-left: 3px solid transparent;
+  border-style: solid;
+  border-width: 0 0 0 3px;
+  border-color: transparent;
   border-radius: 4px;
 }
 .media-card.is-list:hover { border-color: transparent; border-left-color: #555555; }
 .media-card.is-list.is-card-selected {
-  border: none;
-  border-left: 3px solid #0a84ff;
+  border-style: solid;
+  border-width: 0 0 0 3px;
+  border-color: #0a84ff;
   box-shadow: none;
   background: rgba(10, 132, 255, 0.10);
 }
