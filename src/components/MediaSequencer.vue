@@ -155,6 +155,8 @@
             :selected="selectedItems.has(item.id)"
             :director-endpoint="props.directorEndpoint"
             :view-mode="viewMode"
+            :selection-order="selectionOrderMap.get(item.id)"
+            :show-order="selectedItems.size > 1"
             class="media-card-item"
             :data-id="item.id"
             @click.stop="handleSelection(item, index, $event)"
@@ -638,6 +640,7 @@ const selectionStart = reactive({ x: 0, y: 0 });
 const selectionEnd = reactive({ x: 0, y: 0 });
 const initialSelection = new Set();
 let lastSelectedIndex = -1;
+let dragOrder = [];
 
 // --- Computed Properties ---
 
@@ -767,6 +770,12 @@ const isCreateLayersEnabled = computed(() => {
 
 const isAllSelectedComputed = computed(() => filteredMediaList.value.length > 0 && filteredMediaList.value.every(item => selectedItems.has(item.id)));
 const isIndeterminate = computed(() => selectedItems.size > 0 && selectedItems.size < filteredMediaList.value.length);
+
+const selectionOrderMap = computed(() => {
+  const map = new Map();
+  Array.from(selectedItems).forEach((id, i) => map.set(id, i + 1));
+  return map;
+});
 
 function handleCueTagInput(event) {
   let v = event.target.value.replace(/[^0-9.]/g, '');
@@ -1016,8 +1025,10 @@ async function handleCreateLayers() {
     };
     traverse(fullHierarchy.value);
 
-    const selectedFiles = allFilesFlat.filter(file => selectedItems.has(file.id));
-    const selectedPaths = selectedFiles.map(file => file.path);
+    const filesById = new Map(allFilesFlat.map(file => [file.id, file]));
+    const selectedPaths = Array.from(selectedItems)
+      .map(id => filesById.get(id)?.path)
+      .filter(Boolean);
     
     const requestOptions = {
       ...options,
@@ -1049,10 +1060,9 @@ function handleSelection(item, index, event) {
     else selectedItems.add(id);
     lastSelectedIndex = index;
   } else if (event.shiftKey && lastSelectedIndex !== -1) {
-    const start = Math.min(lastSelectedIndex, index);
-    const end = Math.max(lastSelectedIndex, index);
     selectedItems.clear();
-    for (let i = start; i <= end; i++) {
+    const step = index >= lastSelectedIndex ? 1 : -1;
+    for (let i = lastSelectedIndex; i !== index + step; i += step) {
       const currentItem = filteredMediaList.value[i];
       selectedItems.add(currentItem.id);
     }
@@ -1108,6 +1118,7 @@ function startSelection(event) {
   if (!event.ctrlKey && !event.metaKey) selectedItems.clear();
   initialSelection.clear();
   selectedItems.forEach(id => initialSelection.add(id));
+  dragOrder = Array.from(initialSelection);
 }
 
 function updateSelection(event) {
@@ -1121,7 +1132,7 @@ function updateSelection(event) {
   const boxRight = Math.max(selectionStart.x, selectionEnd.x);
   const boxBottom = Math.max(selectionStart.y, selectionEnd.y);
   const cards = gridRef.value.querySelectorAll('.media-card-item');
-  const tempSelected = new Set(initialSelection);
+  const currentlyIntersecting = new Set();
   cards.forEach(card => {
       const id = card.dataset.id;
       const cardLeft = card.offsetLeft;
@@ -1129,10 +1140,18 @@ function updateSelection(event) {
       const cardRight = cardLeft + card.offsetWidth;
       const cardBottom = cardTop + card.offsetHeight;
       const isIntersecting = !(cardLeft > boxRight || cardRight < boxLeft || cardTop > boxBottom || cardBottom < boxTop);
-      if (isIntersecting) tempSelected.add(id);
+      if (isIntersecting) currentlyIntersecting.add(id);
+  });
+  // Keep already-ordered cards that are still covered (or were part of the
+  // pre-drag selection), then append newly-swept cards in DOM order — this
+  // preserves the direction the box was dragged in instead of always
+  // snapping back to reading order every tick.
+  dragOrder = dragOrder.filter(id => currentlyIntersecting.has(id) || initialSelection.has(id));
+  currentlyIntersecting.forEach(id => {
+    if (!dragOrder.includes(id)) dragOrder.push(id);
   });
   selectedItems.clear();
-  tempSelected.forEach(id => selectedItems.add(id));
+  dragOrder.forEach(id => selectedItems.add(id));
 }
 
 function endSelection() {

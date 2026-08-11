@@ -11,8 +11,10 @@
       </template>
 
       <div v-if="selected" class="selected-overlay"></div>
+      <div v-if="showOrder && selected && viewMode !== 'list'" class="order-badge">{{ selectionOrder }}</div>
     </div>
     <div class="card-footer">
+      <span v-if="showOrder && selected && viewMode === 'list'" class="order-pill">{{ selectionOrder }}</span>
       <span class="file-name" :title="item.name">{{ item.name }}</span>
       <span class="file-type">{{ mediaType.toUpperCase() }}</span>
     </div>
@@ -38,6 +40,14 @@ const props = defineProps({
   viewMode: {
     type: String,
     default: 'grid'
+  },
+  selectionOrder: {
+    type: Number,
+    default: undefined
+  },
+  showOrder: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -176,8 +186,41 @@ const mediaType = computed(() => {
 }
 .media-card.is-card-selected .file-name { color: #ffffff; }
 
-.file-type { 
-  font-size: 10px; 
-  color: #666666; 
+.file-type {
+  font-size: 10px;
+  color: #666666;
+}
+
+.order-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #0a84ff;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.order-pill {
+  flex-shrink: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #0a84ff;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
