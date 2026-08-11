@@ -15,7 +15,10 @@
     </div>
     <div class="card-footer">
       <span v-if="showOrder && selected && viewMode === 'list'" class="order-pill">{{ selectionOrder }}</span>
-      <span class="file-name" :title="item.name">{{ item.name }}</span>
+      <span class="file-name" :title="item.subfolderPath ? `${item.name}  (in ${item.subfolderPath})` : item.name">
+        {{ item.name }}
+        <span v-if="item.subfolderPath" class="file-subfolder">· {{ item.subfolderPath }}</span>
+      </span>
       <span class="file-type">{{ mediaType.toUpperCase() }}</span>
     </div>
   </div>
@@ -191,6 +194,11 @@ const mediaType = computed(() => {
   color: #888888; 
 }
 .media-card.is-card-selected .file-name { color: #ffffff; }
+
+.file-subfolder {
+  color: #666666;
+  font-weight: 400;
+}
 
 .file-type {
   font-size: 10px;

@@ -84,7 +84,23 @@
               <svg v-else-if="isIndeterminate" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#666666" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3" stroke="none"/><line x1="7" y1="12" x2="17" y2="12" stroke="#111111" stroke-width="3"/></svg>
               <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"/></svg>
             </button>
-            
+
+            <button
+              class="subfolder-toggle-btn"
+              :class="{ 'is-active': includeSubfolders }"
+              :disabled="selectedFolderId === 'all'"
+              :title="selectedFolderId === 'all' ? 'Already showing all files' : (includeSubfolders ? 'Showing files from subfolders' : 'Show files from subfolders')"
+              @click.stop="includeSubfolders = !includeSubfolders"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4v14"/>
+                <path d="M4 7h4"/>
+                <path d="M4 17h4"/>
+                <rect x="10" y="4" width="10" height="6" rx="1.5"/>
+                <rect x="10" y="14" width="10" height="6" rx="1.5"/>
+              </svg>
+            </button>
+
             <span class="status-text">
               <template v-if="selectedItems.size > 0">
                 <span class="highlight">{{ selectedItems.size }}</span> of {{ filteredMediaList.length }} selected
@@ -582,13 +598,24 @@ function readStoredView(key, allowed, fallback) {
   }
 }
 
+function readStoredBoolean(key, fallback) {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored === null ? fallback : stored === 'true';
+  } catch (e) {
+    return fallback;
+  }
+}
+
 const viewMode = ref(readStoredView('mediaSequencer.viewMode', ['grid', 'list'], 'grid'));
 const gridSize = ref(readStoredView('mediaSequencer.gridSize', ['small', 'medium', 'large'], 'medium'));
+const includeSubfolders = ref(readStoredBoolean('mediaSequencer.includeSubfolders', false));
 
-watch([viewMode, gridSize], ([newViewMode, newGridSize]) => {
+watch([viewMode, gridSize, includeSubfolders], ([newViewMode, newGridSize, newIncludeSubfolders]) => {
   try {
     localStorage.setItem('mediaSequencer.viewMode', newViewMode);
     localStorage.setItem('mediaSequencer.gridSize', newGridSize);
+    localStorage.setItem('mediaSequencer.includeSubfolders', newIncludeSubfolders);
   } catch (e) {
     // localStorage unavailable in this context — ignore
   }
@@ -690,17 +717,30 @@ const visibleSidebarFolders = computed(() => {
   return result;
 });
 
+// Flattens a folder subtree into its files. Files below the starting point are
+// tagged with `subfolderPath` (the folder names crossed to reach them, relative
+// to wherever the walk started) so the UI can disambiguate same-named files
+// from different subfolders — files sitting directly in the starting level are
+// left as the original object, untagged.
+function flattenFiles(nodes) {
+  const list = [];
+  const walk = (items, folderChain) => {
+    items.forEach(item => {
+      if (item.type === 'file') {
+        list.push(folderChain.length ? { ...item, subfolderPath: folderChain.join(' / ') } : item);
+      } else if (item.children) {
+        walk(item.children, [...folderChain, item.name]);
+      }
+    });
+  };
+  walk(nodes, []);
+  return list;
+}
+
 const filteredMediaList = computed(() => {
   let list = [];
   if (selectedFolderId.value === 'all') {
-    // Collect all files
-    const gatherAllFiles = (nodes) => {
-      for (const node of nodes) {
-        if (node.type === 'file') list.push(node);
-        else if (node.children) gatherAllFiles(node.children);
-      }
-    };
-    gatherAllFiles(fullHierarchy.value);
+    list = flattenFiles(fullHierarchy.value);
     list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
   } else {
     let found = null;
@@ -712,7 +752,12 @@ const filteredMediaList = computed(() => {
     };
     findFolder(fullHierarchy.value);
     if (found && found.children) {
-      list = found.children.filter(item => item.type === 'file');
+      if (includeSubfolders.value) {
+        list = flattenFiles(found.children);
+        list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+      } else {
+        list = found.children.filter(item => item.type === 'file');
+      }
     }
   }
 
@@ -720,7 +765,7 @@ const filteredMediaList = computed(() => {
     const query = searchQuery.value.toLowerCase();
     return list.filter(item => item.name.toLowerCase().includes(query));
   }
-  
+
   return list;
 });
 
@@ -1033,14 +1078,7 @@ async function handleCreateLayers() {
 
   try {
     isCreating.value = true;
-    const allFilesFlat = [];
-    const traverse = (items) => {
-      items.forEach(item => {
-        if (item.type === 'file') allFilesFlat.push(item);
-        else if (item.children) traverse(item.children);
-      });
-    };
-    traverse(fullHierarchy.value);
+    const allFilesFlat = flattenFiles(fullHierarchy.value);
 
     const filesById = new Map(allFilesFlat.map(file => [file.id, file]));
     const selectedPaths = Array.from(selectedItems)
@@ -1400,6 +1438,12 @@ const selectionFrameStyle = computed(() => {
 .master-checkbox-btn { background: transparent; border: none; color: #777777; padding: 4px; margin-left: -4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
 .master-checkbox-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
 .master-checkbox-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.subfolder-toggle-btn { background: transparent; border: none; color: #777777; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
+.subfolder-toggle-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
+.subfolder-toggle-btn.is-active { background: rgba(10, 132, 255, 0.15); color: #0a84ff; }
+.subfolder-toggle-btn.is-active:hover:not(:disabled) { background: rgba(10, 132, 255, 0.25); color: #0a84ff; }
+.subfolder-toggle-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .status-text { font-size: 12px; color: #888888; }
 .highlight { color: #ffffff; font-weight: 600; }
 
