@@ -27,3 +27,4 @@ examples/
 GEMINI.md
 CLAUDE.md
 .gemini/
+.claude/*
