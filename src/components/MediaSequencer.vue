@@ -85,22 +85,6 @@
               <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"/></svg>
             </button>
 
-            <button
-              class="subfolder-toggle-btn"
-              :class="{ 'is-active': includeSubfolders }"
-              :disabled="selectedFolderId === 'all'"
-              :title="selectedFolderId === 'all' ? 'Already showing all files' : (includeSubfolders ? 'Showing files from subfolders' : 'Show files from subfolders')"
-              @click.stop="includeSubfolders = !includeSubfolders"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4v14"/>
-                <path d="M4 7h4"/>
-                <path d="M4 17h4"/>
-                <rect x="10" y="4" width="10" height="6" rx="1.5"/>
-                <rect x="10" y="14" width="10" height="6" rx="1.5"/>
-              </svg>
-            </button>
-
             <span class="status-text">
               <template v-if="selectedItems.size > 0">
                 <span class="highlight">{{ selectedItems.size }}</span> of {{ filteredMediaList.length }} selected
@@ -154,6 +138,22 @@
                 @click.stop="viewMode = 'list'"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </button>
+              <button
+                type="button"
+                class="segment icon-segment subfolder-segment"
+                :class="{ active: includeSubfolders }"
+                :disabled="selectedFolderId === 'all'"
+                :title="selectedFolderId === 'all' ? 'Already showing all files' : (includeSubfolders ? 'Showing files from subfolders' : 'Show files from subfolders')"
+                @click.stop="includeSubfolders = !includeSubfolders"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4v14"/>
+                  <path d="M4 7h4"/>
+                  <path d="M4 17h4"/>
+                  <rect x="10" y="4" width="10" height="6" rx="1.5"/>
+                  <rect x="10" y="14" width="10" height="6" rx="1.5"/>
+                </svg>
               </button>
             </div>
           </div>
@@ -1439,11 +1439,6 @@ const selectionFrameStyle = computed(() => {
 .master-checkbox-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
 .master-checkbox-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-.subfolder-toggle-btn { background: transparent; border: none; color: #777777; padding: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
-.subfolder-toggle-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
-.subfolder-toggle-btn.is-active { background: rgba(10, 132, 255, 0.15); color: #0a84ff; }
-.subfolder-toggle-btn.is-active:hover:not(:disabled) { background: rgba(10, 132, 255, 0.25); color: #0a84ff; }
-.subfolder-toggle-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .status-text { font-size: 12px; color: #888888; }
 .highlight { color: #ffffff; font-weight: 600; }
 
@@ -1574,12 +1569,15 @@ label {
   outline: none;
 }
 
-.segment:hover { color: #ccc; }
+.segment:hover:not(:disabled) { color: #ccc; }
 .segment.active {
   background: #3a3a3a;
   color: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
+.segment:disabled { opacity: 0.3; cursor: not-allowed; }
+.subfolder-segment { margin-left: 6px; position: relative; }
+.subfolder-segment::before { content: ''; position: absolute; left: -4px; top: 3px; bottom: 3px; width: 1px; background: #3a3a3a; }
 
 /* Inputs and Selects */
 select, .standard-input {
