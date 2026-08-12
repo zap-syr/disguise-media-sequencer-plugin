@@ -3,10 +3,24 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.1.2] - 2026-08-12
+
+### Added
+- **Grid / List view toggle** - switch the media card panel between a Grid layout (with Small / Medium / Large thumbnail size options) and a compact List layout, via a segmented control in the action toolbar. Selection is preserved across view and size changes, and the choice persists between sessions.
+- **Media card selection order** - cards now remember the order they were selected in (click, shift-click, and marquee drag all contribute to the order), shown as a numbered badge on each selected card once more than one is selected. Layers are created in this chosen order instead of their position in the folder.
+- **Include subfolders** - a toggle next to the Grid/List switcher recursively shows files from all subfolders of the currently selected folder, not just its direct children. Files pulled in from a subfolder display their relative folder path alongside the filename to disambiguate files that share a name across different subfolders.
+
+### Fixed
+- **Stale selection after toggling "Include subfolders"** - the current selection and Shift+Click anchor weren't reset when toggling subfolder inclusion changed which files were visible, which could throw an error on a subsequent Shift+Click and left hidden files still counted toward "selected". The toggle now resets selection the same way changing folders or searching already did.
+- **List view card corner radius** - list-view media cards used a 4px corner radius instead of the 6px used by every other card and control in the app; corrected for visual consistency.
+
+### Changed
+- **Marquee-drag selection performance** - drag-selecting over a large folder no longer does a linear scan per intersecting card on every mouse move; selection-order bookkeeping is now constant-time per card.
+
 ## [1.1.1] - 2026-05-08
 
 ### Fixed
-- **Add Cue Tag validation** - replaced the previous 0–255 per-segment restriction with the correct Disguise Designer rules: max 11 total digits (dots excluded), formats `{num}`, `{num.num}`, and `{num.num.num}` only. Input is sanitised in real time (non-digit/dot characters stripped, dots capped at 2, digit count capped at 11) and a trailing dot is stripped on blur.
+- **Add Cue Tag validation** - replaced the previous 0-255 per-segment restriction with the correct Disguise Designer rules: max 11 total digits (dots excluded), formats `{num}`, `{num.num}`, and `{num.num.num}` only. Input is sanitised in real time (non-digit/dot characters stripped, dots capped at 2, digit count capped at 11) and a trailing dot is stripped on blur.
 - **New Track name casing** - the New Track name input now converts any uppercase character to lowercase as the user types, matching the behaviour of Disguise Designer where all track names are lowercase.
 
 ## [1.1.0] - 2026-05-07
