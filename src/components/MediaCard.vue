@@ -104,7 +104,7 @@ const mediaType = computed(() => {
   border-style: solid;
   border-width: 0 0 0 3px;
   border-color: transparent;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .media-card.is-list:hover { border-color: transparent; border-left-color: #555555; }
 .media-card.is-list.is-card-selected {

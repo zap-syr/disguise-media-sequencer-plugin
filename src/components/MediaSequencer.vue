@@ -589,27 +589,24 @@ function stopResize() {
 }
 
 // View mode state
-function readStoredView(key, allowed, fallback) {
+// Reads a stored value from localStorage, running it through `parse`. `parse`
+// returns the usable value, or `undefined` to signal "invalid/unusable" and
+// fall back. Missing keys (stored === null) always fall back without calling
+// `parse`, so `parse` never has to special-case null itself.
+function readStored(key, fallback, parse) {
   try {
     const stored = localStorage.getItem(key);
-    return allowed.includes(stored) ? stored : fallback;
+    if (stored === null) return fallback;
+    const parsed = parse(stored);
+    return parsed === undefined ? fallback : parsed;
   } catch (e) {
     return fallback;
   }
 }
 
-function readStoredBoolean(key, fallback) {
-  try {
-    const stored = localStorage.getItem(key);
-    return stored === null ? fallback : stored === 'true';
-  } catch (e) {
-    return fallback;
-  }
-}
-
-const viewMode = ref(readStoredView('mediaSequencer.viewMode', ['grid', 'list'], 'grid'));
-const gridSize = ref(readStoredView('mediaSequencer.gridSize', ['small', 'medium', 'large'], 'medium'));
-const includeSubfolders = ref(readStoredBoolean('mediaSequencer.includeSubfolders', false));
+const viewMode = ref(readStored('mediaSequencer.viewMode', 'grid', s => ['grid', 'list'].includes(s) ? s : undefined));
+const gridSize = ref(readStored('mediaSequencer.gridSize', 'medium', s => ['small', 'medium', 'large'].includes(s) ? s : undefined));
+const includeSubfolders = ref(readStored('mediaSequencer.includeSubfolders', false, s => s === 'true'));
 
 watch([viewMode, gridSize, includeSubfolders], ([newViewMode, newGridSize, newIncludeSubfolders]) => {
   try {
@@ -684,7 +681,7 @@ const selectionStart = reactive({ x: 0, y: 0 });
 const selectionEnd = reactive({ x: 0, y: 0 });
 const initialSelection = new Set();
 let lastSelectedIndex = -1;
-let dragOrder = [];
+let dragOrder = new Set();
 
 // --- Computed Properties ---
 
@@ -721,13 +718,15 @@ const visibleSidebarFolders = computed(() => {
 // tagged with `subfolderPath` (the folder names crossed to reach them, relative
 // to wherever the walk started) so the UI can disambiguate same-named files
 // from different subfolders — files sitting directly in the starting level are
-// left as the original object, untagged.
-function flattenFiles(nodes) {
+// left as the original object, untagged. Pass { tag: false } to skip the
+// subfolderPath allocation entirely when the caller only needs the flat file
+// list (e.g. resolving paths) and doesn't care about origin folders.
+function flattenFiles(nodes, { tag = true } = {}) {
   const list = [];
   const walk = (items, folderChain) => {
     items.forEach(item => {
       if (item.type === 'file') {
-        list.push(folderChain.length ? { ...item, subfolderPath: folderChain.join(' / ') } : item);
+        list.push(tag && folderChain.length ? { ...item, subfolderPath: folderChain.join(' / ') } : item);
       } else if (item.children) {
         walk(item.children, [...folderChain, item.name]);
       }
@@ -737,11 +736,15 @@ function flattenFiles(nodes) {
   return list;
 }
 
+function byNameAsc(a, b) {
+  return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+}
+
 const filteredMediaList = computed(() => {
   let list = [];
   if (selectedFolderId.value === 'all') {
     list = flattenFiles(fullHierarchy.value);
-    list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+    list.sort(byNameAsc);
   } else {
     let found = null;
     const findFolder = (nodes) => {
@@ -754,7 +757,7 @@ const filteredMediaList = computed(() => {
     if (found && found.children) {
       if (includeSubfolders.value) {
         list = flattenFiles(found.children);
-        list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+        list.sort(byNameAsc);
       } else {
         list = found.children.filter(item => item.type === 'file');
       }
@@ -1006,7 +1009,7 @@ const handleClickOutside = (e) => {
 
 // --- Watchers & Lifecycle ---
 
-watch([selectedFolderId, searchQuery], () => {
+watch([selectedFolderId, searchQuery, includeSubfolders], () => {
   selectedItems.clear();
   lastSelectedIndex = -1;
 });
@@ -1078,7 +1081,7 @@ async function handleCreateLayers() {
 
   try {
     isCreating.value = true;
-    const allFilesFlat = flattenFiles(fullHierarchy.value);
+    const allFilesFlat = flattenFiles(fullHierarchy.value, { tag: false });
 
     const filesById = new Map(allFilesFlat.map(file => [file.id, file]));
     const selectedPaths = Array.from(selectedItems)
@@ -1173,7 +1176,7 @@ function startSelection(event) {
   if (!event.ctrlKey && !event.metaKey) selectedItems.clear();
   initialSelection.clear();
   selectedItems.forEach(id => initialSelection.add(id));
-  dragOrder = [];
+  dragOrder = new Set();
 }
 
 function updateSelection(event) {
@@ -1204,11 +1207,18 @@ function updateSelection(event) {
 
   // Cards not part of the pre-drag selection accumulate in sweep order —
   // added the first time the box covers them, dropped once it moves off —
-  // preserving the direction the box was dragged in.
-  dragOrder = dragOrder.filter(id => !initialSelection.has(id) && currentlyIntersecting.has(id));
-  currentlyIntersecting.forEach(id => {
-    if (!initialSelection.has(id) && !dragOrder.includes(id)) dragOrder.push(id);
+  // preserving the direction the box was dragged in. A Set preserves insertion
+  // order and re-adding an existing member is a no-op (doesn't move it), so
+  // this reproduces the old filter+includes-guarded-push behavior in O(1)
+  // per membership check instead of O(n).
+  const nextDragOrder = new Set();
+  dragOrder.forEach(id => {
+    if (!initialSelection.has(id) && currentlyIntersecting.has(id)) nextDragOrder.add(id);
   });
+  currentlyIntersecting.forEach(id => {
+    if (!initialSelection.has(id)) nextDragOrder.add(id);
+  });
+  dragOrder = nextDragOrder;
 
   selectedItems.clear();
   toggledPreExisting.forEach(id => selectedItems.add(id));
