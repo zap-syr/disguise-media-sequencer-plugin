@@ -93,8 +93,16 @@
         @disarm="armedMapping = null"
         :checked="planSelection.checked"
         :selected-ids="planSelection.selectedIds.value"
-        @row-click="planSelection.click"
-        @row-check="planSelection.toggle"
+        @row-click="onRowClick"
+        @row-check="onRowCheck"
+        :override-stats="plan.overrideStats.value"
+        :globals="planGlobals"
+        @set-plan="plan.setPlan"
+        @reset-all-overrides="plan.resetAllOverrides"
+        @set-group-ov="plan.setGroupOv"
+        @set-layer-ov="plan.setLayerOv"
+        @reset-group="plan.resetGroup"
+        @apply-to-all="plan.applyGroupValueToAll"
         @group-check="planSelection.toggleGroup"
         @drop-rows="onDropRows"
         @drop-files="onDropFiles"
@@ -321,13 +329,30 @@ function selectedClipPaths() {
 }
 
 const tagsOn = computed(() => layerOptions.addTimecodeTag || layerOptions.addCueTag || layerOptions.addMidiNote);
-const timingSettings = computed(() => ({
+const planGlobals = computed(() => ({ tagsOn: !!tagsOn.value, splitOn: !!layerOptions.splitSection }));
+// Simple settings shaped like Plan defaults, for the Simple footer estimate
+const simpleValues = computed(() => ({
+  timing: 'seq',
+  overlap: layerOptions.overlap,
   fit: layerOptions.fitToContent,
   movieDur: layerOptions.movieDuration,
-  stillDur: layerOptions.stillDuration,
-  overlap: layerOptions.overlap
+  stillDur: layerOptions.stillDuration
 }));
-const planLayout = computed(() => computePlanLayout(plan.state.groups, plan.state.entries, library.mediaDetails.value, timingSettings.value));
+const planLayout = computed(() => computePlanLayout(plan.state.groups, plan.state.entries, library.mediaDetails.value, plan.state.plan));
+
+/** A row click or check edits that row again, so its group leaves "Edit group instead". */
+function onRowClick(id, event) {
+  planSelection.click(id, event);
+  resetScope(id);
+}
+function onRowCheck(id) {
+  planSelection.toggle(id);
+  resetScope(id);
+}
+function resetScope(id) {
+  const group = plan.groupOf(id);
+  if (group && group.scope !== 'auto') plan.updateGroup(group.id, { scope: 'auto' });
+}
 
 const createCount = computed(() => (isAdvanced.value ? plan.layerCount.value : selection.selectedItems.size));
 const footerSummary = computed(() => {
@@ -349,7 +374,7 @@ const footerSummary = computed(() => {
   if (!n) return 'No media selected';
   const paths = selectedClipPaths();
   const entries = Object.fromEntries(paths.map((p, i) => [i, { mediaId: p }]));
-  const virtual = computePlanLayout([{ timing: 'seq', items: paths.map((p, i) => i) }], entries, library.mediaDetails.value, timingSettings.value);
+  const virtual = computePlanLayout([{ items: paths.map((p, i) => i) }], entries, library.mediaDetails.value, simpleValues.value);
   return `${n} layers, one after another, ≈${formatDuration(virtual.total) || '0s'}`;
 });
 
@@ -500,15 +525,19 @@ async function handleCreateLayers(requestOptions) {
 
 /* Files pane next to the layer plan (Split layout) */
 .files-side {
-  flex: 0 0 420px;
-  width: 420px;
+  /* Gives up width first in a narrow window, so the plan keeps its minimum */
+  flex: 0 1 420px;
+  width: auto;
+  min-width: 220px;
   border-right: 1px solid #2a2a2a;
 }
 /* Compact the narrow side pane: tighter paddings, flexible search, wrapping toolbar */
 .files-side :deep(.top-nav-bar) { padding: 0 12px; gap: 10px; }
 .files-side :deep(.breadcrumb) { min-width: 0; overflow: hidden; white-space: nowrap; }
-.files-side :deep(.top-nav-right) { flex: 1 1 auto; min-width: 0; justify-content: flex-end; }
-.files-side :deep(.search-bar) { width: auto; flex: 1 1 150px; min-width: 0; max-width: 220px; }
+.files-side :deep(.top-nav-right) { flex: 1 1 0; min-width: 0; justify-content: flex-end; }
+.files-side :deep(.search-bar) { width: auto; flex: 1 1 70px; min-width: 0; max-width: 220px; }
+.files-side :deep(.search-bar input) { min-width: 0; }
+.files-side :deep(.breadcrumb) { flex: 0 1 auto; }
 .files-side :deep(.action-toolbar) { flex-wrap: wrap; height: auto; min-height: 40px; padding: 6px 12px; row-gap: 6px; }
 .files-side :deep(.media-grid) { padding: 12px; }
 

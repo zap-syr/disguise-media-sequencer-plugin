@@ -9,7 +9,7 @@
     </div>
     <div class="mode-hint">
       {{ creationMode === 'advanced'
-        ? 'Advanced: groups of files with their own timing. Build the plan in the Layer plan pane.'
+        ? 'Advanced: groups of files with their own settings. Build the plan and set Plan defaults in the Layer plan pane.'
         : 'Simple: one mapping for all layers, created one after another.' }}
     </div>
 
@@ -18,10 +18,10 @@
       <!-- Advanced: per-layer mappings panel -->
       <slot name="mappings"></slot>
 
-      <!-- LAYER PROPERTIES -->
-      <div class="group-box">
+      <!-- LAYER PROPERTIES (Advanced: Plan defaults and group chips in the Layer plan) -->
+      <div v-if="creationMode === 'simple'" class="group-box">
         <div class="group-header">LAYER PROPERTIES</div>
-        <div v-if="creationMode === 'simple'" class="control">
+        <div class="control">
           <label>Mapping</label>
           <div class="searchable-select" ref="mappingRef">
             <input
@@ -97,7 +97,7 @@
       </div>
 
       <!-- CONTENT DURATION -->
-      <div class="group-box">
+      <div v-if="creationMode === 'simple'" class="group-box">
         <div class="group-header">LAYER DURATION</div>
 
         <div class="control">
@@ -234,7 +234,7 @@
           </div>
         </div>
 
-        <div class="control">
+        <div v-if="creationMode === 'simple'" class="control">
           <label>Overlap Layers</label>
           <div class="inline-row">
             <span class="label-text-secondary">Time</span>
@@ -254,6 +254,7 @@
             </div>
           </label>
         </div>
+        <div v-if="creationMode === 'advanced'" class="box-hint">Placement and overlap are set per group in the Layer plan.</div>
       </div>
 
       <!-- TAGS -->
@@ -340,6 +341,7 @@
             </div>
           </div>
         </div>
+        <div v-if="creationMode === 'advanced'" class="box-hint">Placement (each file / group start) is set per group.</div>
       </div>
     </div>
 
@@ -632,13 +634,14 @@ onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
 
 .settings-sidebar {
   width: 320px;
+  min-width: 260px;
   background: #1e1e1e;
   color: #dddddd;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #36373a;
   height: 100%;
-  flex-shrink: 0;
+  flex-shrink: 1;
   box-shadow: -5px 0 20px rgba(0,0,0,0.3);
 }
 
@@ -663,6 +666,8 @@ onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
   line-height: 1.4;
   padding: 0 20px 12px 20px;
 }
+
+.box-hint { font-size: 11px; color: #777777; line-height: 1.4; }
 
 .segmented-control.compact { display: inline-flex; width: auto; }
 .segmented-control.compact .segment { flex: none; padding: 5px 10px; }

@@ -5,8 +5,36 @@
       <span class="ph-sum">{{ summary }}</span>
       <div class="ph-spacer"></div>
       <slot name="header-extra"></slot>
+      <button
+        type="button"
+        class="ghost icon-text"
+        :class="{ active: showDefaults }"
+        ref="pdBtn"
+        :aria-pressed="showDefaults"
+        aria-haspopup="dialog"
+        title="Settings every group inherits"
+        @click="showDefaults = !showDefaults"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Plan defaults
+      </button>
       <button type="button" class="ghost" @click="$emit('add-group')">+ Group</button>
     </header>
+
+    <!-- Drops down over the groups instead of pushing them down -->
+    <div class="pd-anchor">
+      <PlanDefaults
+        v-if="showDefaults"
+        ref="pdRef"
+        class="pd-drop"
+        :plan="planState.plan"
+        :stats="overrideStats"
+        :globals="globals"
+        @patch="p => $emit('set-plan', p)"
+        @reset-all="$emit('reset-all-overrides')"
+        @close="showDefaults = false"
+      />
+    </div>
 
     <div v-if="planState.groups.length" class="gnav-wrap">
       <nav class="gnav" aria-label="Jump to group">
@@ -74,7 +102,12 @@
         @drop-files="d => $emit('drop-files', { ...d, gid: g.id })"
         @toggle="$emit('update-group', g.id, { open: !g.open })"
         @rename="name => $emit('update-group', g.id, { name })"
-        @set-timing="timing => $emit('update-group', g.id, { timing })"
+        :globals="globals"
+        @set-scope="scope => $emit('update-group', g.id, { scope })"
+        @set-group-ov="(patch, removeKeys) => $emit('set-group-ov', g.id, patch, removeKeys)"
+        @set-layer-ov="(ids, patch, keys) => $emit('set-layer-ov', ids, patch, keys)"
+        @reset-group="$emit('reset-group', g.id)"
+        @apply-to-all="keys => $emit('apply-to-all', g.id, keys)"
         @remove="$emit('remove-group', g.id)"
         @remove-entry="eid => $emit('remove-entry', g.id, eid)"
         @drop-folders="d => $emit('drop-folders', { ...d, gid: g.id })"
@@ -101,8 +134,9 @@
 </template>
 
 <script setup>
-import { computed, ref, nextTick } from 'vue';
+import { computed, ref, nextTick, watch, onBeforeUnmount } from 'vue';
 import PlanGroup from './PlanGroup.vue';
+import PlanDefaults from './PlanDefaults.vue';
 import { formatDuration } from '../../utils/format';
 import { mappingColor } from '../../utils/mappingColors';
 import { dragPayload, endDrag } from '../../composables/useDragPayload';
@@ -118,12 +152,41 @@ const props = defineProps({
   mappingsByPath: { type: Object, default: () => ({}) },
   armed: { type: String, default: null },
   checked: { type: Set, default: () => new Set() },  // usePlanSelection().checked
-  selectedIds: { type: Array, default: () => [] }    // selected ids in plan order
+  selectedIds: { type: Array, default: () => [] },   // selected ids in plan order
+  overrideStats: { type: Object, required: true },   // useLayerPlan().overrideStats
+  globals: { type: Object, default: () => ({ tagsOn: true, splitOn: true }) }
 });
 const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
   'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
-  'drop-folders', 'drop-folder-groups']);
+  'drop-folders', 'drop-folder-groups',
+  'set-plan', 'reset-all-overrides', 'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all']);
+
+const showDefaults = ref(false);
+const pdRef = ref(null);
+const pdBtn = ref(null);
+
+// Plan defaults close on a click outside them (not on the toggle button) and on Esc
+function onPdOutside(event) {
+  const el = pdRef.value?.$el;
+  if (el?.contains(event.target) || pdBtn.value?.contains(event.target)) return;
+  showDefaults.value = false;
+}
+function onPdEsc(event) {
+  if (event.key !== 'Escape') return;
+  event.stopPropagation();
+  showDefaults.value = false;
+  pdBtn.value?.focus();
+}
+watch(showDefaults, open => {
+  const fn = open ? 'addEventListener' : 'removeEventListener';
+  window[fn]('pointerdown', onPdOutside, true);
+  window[fn]('keydown', onPdEsc, true);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('pointerdown', onPdOutside, true);
+  window.removeEventListener('keydown', onPdEsc, true);
+});
 
 // Folders dragged from the tree: drop between groups creates groups there (docs §2.3.2)
 const draggingFolders = computed(() => dragPayload.kind === 'folders');
@@ -189,8 +252,8 @@ defineExpose({ jump });
 * { box-sizing: border-box; }
 
 .plan-pane {
-  flex: 1;
-  min-width: 0;
+  flex: 1 0 320px;
+  min-width: 320px;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -201,15 +264,24 @@ defineExpose({ jump });
 .ph {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
   min-height: 52px;
-  padding: 0 16px;
+  padding: 8px 16px;
   border-bottom: 1px solid #222222;
   flex-shrink: 0;
 }
 .ph-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #0a84ff; white-space: nowrap; }
 .ph-sum { font-size: 12px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .ph-spacer { flex: 1; }
+
+.pd-anchor { position: relative; height: 0; z-index: 20; }
+.pd-drop {
+  position: absolute; top: 0; left: 0; right: 0;
+  max-height: min(70vh, 560px); overflow-y: auto;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  border-color: #0a84ff;
+}
 
 .ghost {
   flex-shrink: 0;
@@ -226,6 +298,8 @@ defineExpose({ jump });
 .ghost:hover:not(:disabled) { border-color: #555555; color: #ffffff; background: #1f1f1f; }
 .ghost:disabled { opacity: 0.35; cursor: not-allowed; }
 .ghost.icon-only { padding: 6px 8px; display: flex; align-items: center; }
+.ghost.icon-text { display: flex; align-items: center; gap: 6px; }
+.ghost.active { border-color: #0a84ff; color: #ffffff; background: rgba(10, 132, 255, 0.15); }
 
 .plan-pane:focus { outline: none; }
 .ghost.danger:hover:not(:disabled) { border-color: #ef4444; color: #ef4444; }
