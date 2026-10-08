@@ -2,7 +2,7 @@
   <div class="group-box">
     <div class="box-head">
       <span class="group-header">MAPPINGS</span>
-      <span class="hint">drag onto layers, or click to arm</span>
+      <span class="hint">drag, or click to arm</span>
     </div>
 
     <div class="search-bar">
@@ -40,7 +40,7 @@
         <span class="mtag" :style="{ background: mappingColor(m.path) }"></span>
         <span class="mtext">
           <span class="mname">{{ m.name }}</span>
-          <span class="mtype">{{ m.typeLabel || m.type }} · {{ m.res }}</span>
+          <span class="mtype">{{ m.typeLabel || m.type }}, {{ m.res }}</span>
         </span>
         <span class="uses" :class="{ zero: !usage[m.path] }">{{ usage[m.path] ? `${usage[m.path]} ${usage[m.path] === 1 ? 'layer' : 'layers'}` : 'unused' }}</span>
       </button>
@@ -95,8 +95,8 @@ const visibleMappings = computed(() => {
   border: 1px solid #333333;
 }
 .box-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-.group-header { font-size: 11px; color: #0a84ff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-.hint { font-size: 11px; color: #777777; }
+.group-header { font-size: 11px; color: #0a84ff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
+.hint { font-size: 11px; color: #777777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 
 .search-bar { display: flex; align-items: center; background: #181818; border: 1px solid #3a3a3a; border-radius: 6px; padding: 6px 10px; transition: border-color 0.2s ease; }
 .search-bar:focus-within { border-color: #0a84ff; }
@@ -113,13 +113,13 @@ const visibleMappings = computed(() => {
 .chip.on { background: rgba(10, 132, 255, 0.2); border-color: #0a84ff; color: #ffffff; }
 .chip .cnt { color: #777777; font-weight: 500; }
 
-.maps { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; max-height: 300px; overflow-y: auto; padding-right: 2px; }
+.maps { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; max-height: 340px; overflow-y: auto; padding-right: 4px; }
 .maps::-webkit-scrollbar { width: 6px; }
 .maps::-webkit-scrollbar-thumb { background: #444444; border-radius: 3px; }
 
 .map {
   display: flex; align-items: center; gap: 8px;
-  width: 100%; height: 42px; padding: 0 10px 0 6px;
+  width: 100%; min-height: 50px; padding: 8px 10px 8px 6px;
   border: 1px solid #333333; background: #1e1e1e; border-radius: 6px;
   text-align: left; cursor: grab; transition: all 0.2s ease;
 }
@@ -128,10 +128,10 @@ const visibleMappings = computed(() => {
 .map:focus-visible { outline: none; border-color: #0a84ff; }
 .map.armed { border-color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
 .grip { color: #555555; flex-shrink: 0; }
-.mtag { width: 5px; align-self: stretch; margin: 8px 0; border-radius: 3px; flex-shrink: 0; }
-.mtext { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.mtag { width: 5px; align-self: stretch; border-radius: 3px; flex-shrink: 0; }
+.mtext { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; line-height: 1.3; }
 .mname { font-size: 12px; font-weight: 600; color: #dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mtype { font-size: 11px; color: #888888; font-variant-numeric: tabular-nums; }
+.mtype { font-size: 11px; color: #888888; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .uses { font-size: 11px; color: #cccccc; background: #333333; border-radius: 6px; padding: 1px 6px; flex-shrink: 0; }
 .uses.zero { color: #666666; background: transparent; }
 .empty { font-size: 11px; color: #777777; padding: 8px 2px; }
