@@ -11,8 +11,8 @@ transport_manager = guisystem.currentTransportManager
 current_track      = transport_manager.track
 play_mode          = transport_manager.play_mode
 timecode_transport = transport_manager.timecode           # TimecodeTransport
-local_transports   = transport_manager.local_transports   # [EventTransport] — local signals
-remote_transports  = transport_manager.remote_transports  # [EventTransport] — remote signals
+local_transports   = transport_manager.local_transports   # [EventTransport] - local signals
+remote_transports  = transport_manager.remote_transports  # [EventTransport] - remote signals
 ```
 
 ## Timecode transport
@@ -66,7 +66,7 @@ tm.addCommand(cmd)
 | Jump to cue `xx.yy.zz` | `TransportCommand.makeJumpToCue(source, tm, xx, yy, zz, cue_mode)` |
 | Jump to MIDI note | `TransportCommand.makeJumpToMidiNote(source, tm, search_channel_1, search_channel_2, note, cue_mode)` |
 
-`makeJumpToCue` and `makeJumpToMidiNote` return `None` if the cue/note isn't a valid trigger —
+`makeJumpToCue` and `makeJumpToMidiNote` return `None` if the cue/note isn't a valid trigger -
 always check before `addCommand`:
 
 ```python
@@ -81,11 +81,11 @@ return run()
 ```
 
 Enum arguments (from d3.pyi):
-- `makePlayMode(source, tm, mode: PlayMode)` — `PlayMode(m: int)`, where the int indexes
+- `makePlayMode(source, tm, mode: PlayMode)` - `PlayMode(m: int)`, where the int indexes
   `[Play, PlaySection, LoopSection, Stop, HoldSection, HoldEnd]` → e.g. `PlayMode(0)` = Play,
   `PlayMode(3)` = Stop.
 - `makeJumpToCue(..., cueMode: CueMode)` / `makeJumpToMidiNote(source, tm, iSearchChannel1,
-  iSearchChannel2, iNote, cueMode)` — `CueMode` has no class in the stubs; check the
+  iSearchChannel2, iNote, cueMode)` - `CueMode` has no class in the stubs; check the
   `TransportCommand` reference page before relying on values.
 
 ```python

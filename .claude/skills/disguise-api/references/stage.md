@@ -2,7 +2,7 @@
 
 Source: https://developer.disguise.one/python-api/guides/stage/
 
-`stage` is **not** a global — get it from state: `stage = state.stage`.
+`stage` is **not** a global - get it from state: `stage = state.stage`.
 
 ## Object class
 
@@ -35,7 +35,7 @@ from the stage is done by adding them to the **correct typed list** on `Stage`.
 | `stage.dmxScreens` | `List[DmxScreen]` |
 | `stage.dmxLights` | `List[FixtureGroup]` |
 | `stage.lights` | lights |
-| `stage.displays` | **All** displays (screens + projectors …) — a duplicate view of the typed lists; convenient for reading |
+| `stage.displays` | **All** displays (screens + projectors …) - a duplicate view of the typed lists; convenient for reading |
 | `stage.pucks` | Pucks (controlled by `stage.people`). Unnamed, `description` is always `"Puck"` → identify by index. In overviews mention only the count |
 | `stage.venue` | May be `None`. `stage.venue.props` = all props; some props are "null" transform groups |
 

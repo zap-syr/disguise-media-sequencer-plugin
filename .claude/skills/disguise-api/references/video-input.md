@@ -2,7 +2,7 @@
 
 Source: https://developer.disguise.one/python-api/guides/video-input/
 
-Live inputs appear as `VideoClip` resources with `isVideoIn == True` — relevant to this
+Live inputs appear as `VideoClip` resources with `isVideoIn == True` - relevant to this
 plugin's media grid (you may want to badge or filter them).
 
 ```python

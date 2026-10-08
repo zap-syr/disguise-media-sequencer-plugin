@@ -6,7 +6,7 @@ Source: https://developer.disguise.one/python-api/guides/d3net/
 Director = primary show controller; understudies = hot backups; actors = render machines.
 
 > This plugin talks to the **director** (`?director=` URL param). Changing roles from the
-> plugin affects the whole session — always confirm with the user first.
+> plugin affects the whole session - always confirm with the user first.
 
 ## Machines and roles
 

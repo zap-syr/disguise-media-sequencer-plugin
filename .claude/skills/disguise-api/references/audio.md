@@ -19,12 +19,12 @@ Source: https://developer.disguise.one/python-api/guides/audio/
 
 All audio tracks: `resourceManager.allResources(AudioTrack)`.
 
-`AudioLine` data is used from expressions: `audioline:my-audio.c[0]` (e.g. bass level) —
+`AudioLine` data is used from expressions: `audioline:my-audio.c[0]` (e.g. bass level) -
 see `references/expressions.md`.
 
 ## Volume
 
-Layer volume is a sequenced property (`"volume"` field) — same rules as any FieldSequence
+Layer volume is a sequenced property (`"volume"` field) - same rules as any FieldSequence
 (see SKILL.md): keyframe times are **track beats**.
 
 ```python
@@ -66,4 +66,4 @@ if logical_device:
 ```
 
 Replace `system.machines` with `d3NetManager.machines` and resolve `audioOut` through the
-`DeviceMapping` resource — verify in d3.pyi.
+`DeviceMapping` resource - verify in d3.pyi.

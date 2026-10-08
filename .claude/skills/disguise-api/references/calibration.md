@@ -17,7 +17,7 @@ Projectors on stage: `state.stage.projectors` (list; `stage` is not a global). L
 | System | Kind | Python entry point |
 |---|---|---|
 | **OmniCal** | Fully automated, camera-based | `Resource.opticalCalibrator` (`OpticalCalibrator`), plan = `OptiCalStagePlan` |
-| **QuickCal** | Semi-automated: align known 3D points to 2D projector pixels | `Resource.ManualAlignmentPlan` — core workflow is in the Designer UI |
+| **QuickCal** | Semi-automated: align known 3D points to 2D projector pixels | `Resource.ManualAlignmentPlan` - core workflow is in the Designer UI |
 | **Manual** | Edit intrinsics/extrinsics directly; can be combined with feed warping | `projector.calibration` (`ProjectorConfig`) |
 
 ## OmniCal

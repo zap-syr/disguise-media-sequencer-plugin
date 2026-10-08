@@ -25,7 +25,7 @@ Sources:
 
 Request:
 ```json
-{ "moduleName": "optional — omit or \"\" for one-off scripts", "script": "python 2.7 source" }
+{ "moduleName": "optional - omit or \"\" for one-off scripts", "script": "python 2.7 source" }
 ```
 
 Response:
@@ -56,7 +56,7 @@ Response is only `{ "status": {...} }`. **Compile errors are reported in `status
 
 ```python
 # contents of module "screen_utils"
-from d3 import *            # REQUIRED — modules do not get the auto import
+from d3 import *            # REQUIRED - modules do not get the auto import
 
 def createLEDScreen():
     screen = resourceManager.loadOrCreate('objects/ledscreen/ledscreen_1.apx', LedScreen)
@@ -76,7 +76,7 @@ are in scope without an import:
 
 | | `execute` script | registered module |
 |---|---|---|
-| `d3` auto-imported (`LedScreen`, `Vec`, `state`, `guisystem`, `resourceManager` …) | ✅ yes, on every call, with or without `moduleName` | ❌ no — must write `from d3 import *` at top |
+| `d3` auto-imported (`LedScreen`, `Vec`, `state`, `guisystem`, `resourceManager` …) | ✅ yes, on every call, with or without `moduleName` | ❌ no - must write `from d3 import *` at top |
 | `from x import *` allowed | ❌ no (function body) | ✅ yes (module level) |
 | `trackTime()`, `runningTime()` | ✅ only **without** `moduleName` | ❌ cannot be imported |
 

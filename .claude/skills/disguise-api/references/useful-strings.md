@@ -19,7 +19,7 @@ guisystem.track.splitSectionAtBeat(trackTime());
 ```
 
 Both use the execution-utility shorthand `trackTime()`. It is documented as seconds, while
-`addNewLayer` / `splitSectionAtBeat` take beats — for accuracy on tracks with BPM changes use
+`addNewLayer` / `splitSectionAtBeat` take beats - for accuracy on tracks with BPM changes use
 `guisystem.track.timeToBeat(trackTime())` or `guisystem.player.tCurrent` (beats).
 
 ## Add a projector and set it to 4K
@@ -129,7 +129,7 @@ makeSineWaveKeyFrame(layer_2, 41, -90, 0)
 
 Notes:
 - Field indices for `VariableVideoModule` from this snippet: `2` = mapping, `10` = video,
-  `20` = hue, `36` = size, `41` = rotation. Indices can change between Designer versions —
+  `20` = hue, `36` = size, `41` = rotation. Indices can change between Designer versions -
   prefer `layer.findSequence("name")` (as this project does).
 - The original snippet wraps the main block in `if __name__ == '__main__':`; inside the
   execute endpoint the script is already in a function, so just call the code directly.

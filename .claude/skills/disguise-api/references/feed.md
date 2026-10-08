@@ -9,7 +9,7 @@ Source: https://developer.disguise.one/python-api/guides/feed/
 >   per machine: `machine.feed`
 > - machines: `d3NetManager.machines`
 > - projections / meshes: `resourceManager.allResources(FeedProjection)` / `(Mesh)`
-> - match names with `.description` (resources) — see SKILL.md
+> - match names with `.description` (resources) - see SKILL.md
 >
 > Always grep `references/d3.pyi` before relying on a member from this page.
 
@@ -66,7 +66,7 @@ if feed_projection and feed_scene:
 ```
 
 Assigning it to a video layer: the guide writes `video_layer.projection = feed_projection`, but
-layers have no `projection` attribute in d3.pyi — use the `"mapping"` field sequence as this
+layers have no `projection` attribute in d3.pyi - use the `"mapping"` field sequence as this
 project does:
 
 ```python

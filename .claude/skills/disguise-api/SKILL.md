@@ -17,7 +17,7 @@ description: >
 # Disguise API Skill
 
 This project drives Disguise Designer entirely through a single REST endpoint that executes
-arbitrary Python. There is no static backend — every feature is a Python string built in JS
+arbitrary Python. There is no static backend - every feature is a Python string built in JS
 and POSTed to Designer.
 
 Official docs: https://developer.disguise.one/python-api/docs/ (type stubs: `/assets/d3.pyi`).
@@ -37,7 +37,7 @@ Official docs: https://developer.disguise.one/python-api/docs/ (type stubs: `/as
 | `references/video-input.md` | Live-input VideoClips (`isVideoIn`), formats, crop, VideoInSystem |
 | `references/d3net.md` | Machines, director / understudy / actor roles, dispatching remote commands |
 | `references/audio.md` | AudioTrack / AudioFile / AudioAnalyser, layer and master volume, output mapping |
-| `references/d3.pyi` | **Authoritative type stubs** (r34.1, ~58k lines). Never read whole — `Grep` for `^class Name\b` or `def member\(` to confirm a class, property or signature exists |
+| `references/d3.pyi` | **Authoritative type stubs** (r34.1, ~58k lines). Never read whole - `Grep` for `^class Name\b` or `def member\(` to confirm a class, property or signature exists |
 
 ### Docs vs stubs
 
@@ -57,7 +57,7 @@ Frontend (Vue) → builds Python string → POST /api/session/python/execute →
 ```
 
 The `executePython` helper in `src/services/disguiseService.js` handles the HTTP round-trip.
-All new API calls should go through it — don't re-implement the fetch logic.
+All new API calls should go through it - don't re-implement the fetch logic.
 
 ```js
 // src/services/disguiseService.js
@@ -95,7 +95,7 @@ Request body:
 ```json
 { "moduleName": "", "script": "<python 2.7 source>" }
 ```
-`moduleName` is optional — omit it (as this project does) for one-off scripts. A registered
+`moduleName` is optional - omit it (as this project does) for one-off scripts. A registered
 module (`/api/session/python/registermodule`, body `{ moduleName, contents }`) does **not**
 get the auto `d3` import or the execution utility functions.
 
@@ -109,19 +109,19 @@ Response body:
 }
 ```
 `executePython` only returns `returnValue`. When debugging, temporarily log `data.status`
-and `data.pythonLog` — Python exceptions and `print()` output show up there.
+and `data.pythonLog` - Python exceptions and `print()` output show up there.
 
 ### Runtime rules (important)
 
-- **Python 2.7.** No f-strings, no `print x` vs `print(x)` surprises — use `"{}".format(...)`
-  or `%` formatting. Integer division `/` truncates on ints — use `float()` or `/ 2.0`.
+- **Python 2.7.** No f-strings, no `print x` vs `print(x)` surprises - use `"{}".format(...)`
+  or `%` formatting. Integer division `/` truncates on ints - use `float()` or `/ 2.0`.
 - **The script is wrapped in a function** (`runner` / `userScript`). Consequences:
   - A top-level `return` works and becomes `returnValue`.
   - You **cannot create globals**, and `from x import *` is invalid. Use `import json`, `import math`.
   - **Error line numbers are offset by 10**: "line 12" in an error = line 2 of your script.
-- The whole `d3` package is auto-imported — every type (`Track`, `VideoClip`, `Vec2`, ...) is
+- The whole `d3` package is auto-imported - every type (`Track`, `VideoClip`, `Vec2`, ...) is
   already in scope. Registered modules **don't** get this, so they need `from d3 import *`.
-- Return values are serialised with Python's `json` — return dicts/lists of primitives. Convert
+- Return values are serialised with Python's `json` - return dicts/lists of primitives. Convert
   `Path`, `uid`, vectors etc. with `str(...)` before returning.
 - **Scripts run on Designer's main thread.** Long loops freeze the UI; if a script exceeds the
   `pythonApiExecutionTimeout` option (d3Manager), a `KeyboardInterrupt` is raised and the
@@ -178,7 +178,7 @@ Always wrap multi-step logic in `def run(): … return run()`. The outer `return
 Designer captures as `returnValue`. Forgetting it means the endpoint returns `null`.
 
 ### Returning data to JS
-Return a plain Python dict or list — Designer serialises it to JSON automatically.
+Return a plain Python dict or list - Designer serialises it to JSON automatically.
 If you need to return a string that is itself JSON (`json.dumps(...)`), the `executePython`
 helper will `JSON.parse` it on the JS side.
 
@@ -187,7 +187,7 @@ helper will `JSON.parse` it on the JS side.
 ## Global variables and functions
 
 Designer has two core systems: the **Resource system** (objects saved in the project, persistent)
-and the **State system** (transient runtime state — only valid at the moment you read it).
+and the **State system** (transient runtime state - only valid at the moment you read it).
 
 ### Global variables
 
@@ -195,7 +195,7 @@ and the **State system** (transient runtime state — only valid at the moment y
 |---|---|---|
 | `resourceManager` | `ResourceManager` | Load, create, remove, enumerate resources |
 | `guisystem` | `GuiSystem` | Current UI state (selected track, player, transport manager) |
-| `state` | `D3State` | Current project state — stage, devices, project, refresh rate |
+| `state` | `D3State` | Current project state - stage, devices, project, refresh rate |
 | `subsystems` | `SubsystemManager` | Access to Designer subsystems |
 | `d3NetManager` | `D3NetManager` | Session / network (director, actors, understudies) |
 | `alertNotificationSystem` | `AlertNotificationSystem` | Designer alerts/notifications |
@@ -213,7 +213,7 @@ Commonly used members:
 | `guisystem.currentTransportManager` | Active `TransportManager` (see `references/transports.md`) |
 | `state.globalRefreshRate` | Project refresh rate (use `.asDouble`) |
 | `state.devices` | Device Manager singleton (see `references/devices.md`) |
-| `state.stage` | The `Stage` — `state.stage.projectors`, `.surfaces`, ... (see `references/stage.md`). `stage` is **not** a global |
+| `state.stage` | The `Stage` - `state.stage.projectors`, `.surfaces`, ... (see `references/stage.md`). `stage` is **not** a global |
 | `state.feed` | Current `FeedScene` (see `references/feed.md`) |
 | `subsystems.getSystem(VideoInSystem)` | Get a subsystem instance (`maybeGetSystem` returns None if absent) |
 
@@ -243,9 +243,9 @@ Not globals despite appearing in some guides: `system`, `project`, `stage`.
 | Constructor | Use |
 |---|---|
 | `Vec2(x, y)` | 2D float vector (e.g. projector resolution `Vec2(3840, 2160)`) |
-| `Vec(x, y, z)` / `Vec3(...)` | 3D float vector — position, scale, offset |
+| `Vec(x, y, z)` / `Vec3(...)` | 3D float vector - position, scale, offset |
 | `float4(x, y, z, w)` | 4D float vector |
-| `Int2(w, h)` | 2D int vector — resolutions |
+| `Int2(w, h)` | 2D int vector - resolutions |
 | `Path("objects/type/name.apx")` | Resource path object |
 | `tc.t` | A `Timecode`'s time in seconds |
 | `ReflectionValue` | "Any" type |
@@ -266,7 +266,7 @@ Any class deriving from `Resource` (`VideoClip`, `Projection`, `Track`, `Project
 ```
 
 - **prefix**: `objects/` = user-visible/selectable; `internal/` = hidden; `internal/thumbnails/`.
-- **type**: the internal class name **lowercased** — never the user-facing `__username__`
+- **type**: the internal class name **lowercased** - never the user-facing `__username__`
   (`Screen2` is shown as "Surface" but its path is `objects/screen2/...`).
   Get it safely: `type(obj).__name__.lower()`.
 - **name**: filename-safe, **lowercase**. Disk-based files keep their extension and get `.apx`
@@ -274,7 +274,7 @@ Any class deriving from `Resource` (`VideoClip`, `Projection`, `Track`, `Project
 - **subfolders**: only for disk-loaded media or auto-created resources that might collide.
 - Forward slashes only. Use `r'...'` raw strings in Python when interpolating paths from JS.
 
-> Capitalisation gotcha: path elements must be lowercase — a capitalised path will not match.
+> Capitalisation gotcha: path elements must be lowercase - a capitalised path will not match.
 > (Some official snippets use `objects/OscDevice/...`; prefer lowercase for new code.)
 
 ### Resource management
@@ -283,13 +283,13 @@ Any class deriving from `Resource` (`VideoClip`, `Projection`, `Track`, `Project
 # Load an existing resource (returns None if not found)
 clip = resourceManager.load("objects/videoclip/folder/clip.mp4.apx", VideoClip)
 
-# Load or create — WARNING: a typo silently creates a new resource instead of failing
+# Load or create - WARNING: a typo silently creates a new resource instead of failing
 track = resourceManager.loadOrCreate("objects/track/mytrack.apx", Track)
 
 # All loaded resources of a type
 all_clips = resourceManager.allResources(VideoClip)
 
-# Delete — DESTRUCTIVE: removes from project AND deletes the file
+# Delete - DESTRUCTIVE: removes from project AND deletes the file
 resourceManager.remove(obj.path)
 
 # Duplicate to a new path
@@ -316,9 +316,9 @@ obj.saveOnDelete()
 ### Unnamed resources, markDirty and saving
 
 - A resource with `path == ""` is **unnamed** (layers, field sequences, cues, module configs).
-  Its lifecycle belongs to the nearest **named** ancestor — you must track that parent yourself;
+  Its lifecycle belongs to the nearest **named** ancestor - you must track that parent yourself;
   there is no reliable parent pointer.
-- Call `markDirty(x)` **before** changing `x`, on individual resources only — never on lists
+- Call `markDirty(x)` **before** changing `x`, on individual resources only - never on lists
   or containers.
 - Persist via the nearest named parent: `namedParent.saveOnDelete()`.
 
@@ -420,7 +420,7 @@ This correctly handles BPM changes on the track.
 | Walk all tags | `track.findBeatOfNextTag(b)`. Returns `1.79e308` after the last tag. **`track.tags` is NOT timeline tags**: it is `Resource.tags` (resource labels) |
 | Remove tags | `track.removeTagAtBeat(beat, type)`, `track.removeTags(fromBeat, nBeats)` |
 | Sections | `track.nSections()`, `track.sectionToBeat(i)`, `track.sectionAtBeat(beat)` (True on a section start). Compute lengths from consecutive `sectionToBeat`. **`sectionLengthBeats(i)` returned wrong values in tests** |
-| All cues (unnamed resources) | `track.cues` — prefer the track's section/tag/note methods |
+| All cues (unnamed resources) | `track.cues` - prefer the track's section/tag/note methods |
 | Split a section | `track.splitSectionAtBeat(beat)`. Splitting twice at the same beat is a no-op |
 
 > ⚠ **The track does not grow by itself** (verified). A layer that crosses `lengthInBeats` is
@@ -442,7 +442,7 @@ A `Layer` is an unnamed resource owned by its track. Name via `layer.name` (not 
 | Find by name | `next((l for l in track.layers if l.name == "My Layer"), None)` |
 | Module type | `layer.moduleType()` |
 | Remove | `track.removeLayer(layer)` |
-| Reorder in stack | `track.moveLayerToIndex(layer, new_index)` (guide says `moveLayer` — doesn't exist in d3.pyi); also `moveLayersUp/Down([layers])` |
+| Reorder in stack | `track.moveLayerToIndex(layer, new_index)` (guide says `moveLayer` - doesn't exist in d3.pyi); also `moveLayersUp/Down([layers])` |
 | Rename | `layer.name = "New Name"` |
 | Start / end / length (track beats) | `layer.tStart`, `layer.tEnd`, `layer.tLength` (`= tEnd - tStart`). `tStart` and `tLength` are settable; or use `layer.setExtents(start, end)` |
 | Enable / disable | `layer.enabled = True / False` |
@@ -515,10 +515,10 @@ if fseq:
 | All sequences | **`layer.fields`** (verified). `layer.sequences` does NOT exist despite the official guide. Also `layer.nSequences()` / `layer.sequence(i)` |
 | Sequence types | `type(fseq.sequence).__name__`: `FloatSequence` (keys `KeyFloat`, `.v`), `ResourceSequence` (keys `KeyResource`, `.r`; no `.v`) |
 | Sequence name | `fseq.name` |
-| Animate (multiple keys) | `fseq.disableSequencing = False` — only if the value really changes over time |
+| Animate (multiple keys) | `fseq.disableSequencing = False` - only if the value really changes over time |
 | Is sequenced? | `not fseq.disableSequencing` |
-| Evaluate at a beat | `fseq.eval(track_beat, ttl)` — stub signature is `eval(t: float, ttl: int) -> float` (the guide calls the 2nd arg a "default value") |
-| Expression | `fseq.setExpression("self * 0.5")` — see `references/expressions.md` |
+| Evaluate at a beat | `fseq.eval(track_beat, ttl)` - stub signature is `eval(t: float, ttl: int) -> float` (the guide calls the 2nd arg a "default value") |
+| Expression | `fseq.setExpression("self * 0.5")` - see `references/expressions.md` |
 
 ### KeySequence (`keyseq = fseq.sequence`)
 
@@ -638,12 +638,12 @@ return run()
 
 **Escaping pitfalls:**
 - Use `r'...'` raw strings in Python when embedding paths interpolated from JS.
-- Avoid single quotes inside Python string literals if the JS template uses single quotes —
+- Avoid single quotes inside Python string literals if the JS template uses single quotes:
   use double quotes inside Python or escape carefully. For arbitrary user text, embed
-  `JSON.stringify(value)` — a JSON string literal is a valid Python string literal.
-- Indentation inside the template literal is significant Python — keep it consistent.
+  `JSON.stringify(value)` - a JSON string literal is a valid Python string literal.
+- Indentation inside the template literal is significant Python - keep it consistent.
 - Variable names in the generated Python must not collide with Designer globals
-  (`track`, `clip`, `state`, `paths`, `os`, `subsystems`, etc. — prefix locals with `current_`).
+  (`track`, `clip`, `state`, `paths`, `os`, `subsystems`, etc. - prefix locals with `current_`).
 - Python 2.7: no f-strings, use `.format()`.
 
 ---
@@ -668,7 +668,7 @@ http://{director}/api/v1/thumbnail/{uid}
 
 ## Checklist when adding a new Disguise API feature
 
-1. Write the Python (2.7) logic first — test the raw script in Designer's Python console if possible.
+1. Write the Python (2.7) logic first - test the raw script in Designer's Python console if possible.
 2. Add a new exported function to `disguiseService.js` that calls `executePython`.
 3. Return a structured dict from Python (`{"status": "success", ...}`) so the JS side can
    detect errors reliably; stringify `Path`/`uid`/vector values.

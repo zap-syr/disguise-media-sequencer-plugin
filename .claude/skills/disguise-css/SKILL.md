@@ -7,28 +7,28 @@ description: >
   toggles/panels, or any question about "how should this look" or "what color should I
   use". Also use when the user wants to match existing plugin styles, fix visual
   inconsistencies, or review CSS for correctness against the project's design system.
-  This plugin uses a strict dark theme with hardcoded hex values — never CSS variables,
-  never Tailwind — so always consult this skill before writing any CSS.
+  This plugin uses a strict dark theme with hardcoded hex values - never CSS variables,
+  never Tailwind - so always consult this skill before writing any CSS.
 ---
 
 # Disguise CSS Style Guide
 
 This plugin runs inside Disguise Designer as a dark, professional media-server UI. The
-entire codebase uses hardcoded hex values — **no CSS custom properties, no Tailwind**.
+entire codebase uses hardcoded hex values - **no CSS custom properties, no Tailwind**.
 Every new component must match the existing palette exactly.
 
 ---
 
 ## Core rules
 
-1. **Use exact hex values** from the tables below — never invent new colors.
-2. **No CSS variables or `var(--...)`** — inline hex everywhere.
-3. **Scoped styles** — always `<style scoped>` in Vue SFCs.
+1. **Use exact hex values** from the tables below - never invent new colors.
+2. **No CSS variables or `var(--...)`** - inline hex everywhere.
+3. **Scoped styles** - always `<style scoped>` in Vue SFCs.
 4. **Border-radius is always `6px`** for all UI controls (inputs, buttons, cards, dropdowns).
 5. **Error/validation** always uses `#ef4444`.
 6. **Settings group headers** are always `11px / 700 weight / uppercase / #0a84ff`.
 7. **Every interactive element needs all four states:** default, hover, focus/active, disabled.
-8. **Transitions** — use `transition: all 0.2s ease` on interactive elements (some border/shadow transitions can use `0.3s`).
+8. **Transitions** - use `transition: all 0.2s ease` on interactive elements (some border/shadow transitions can use `0.3s`).
 
 ---
 
@@ -90,7 +90,7 @@ One primary accent color with opacity variants for overlays:
 
 | Hex | Purpose |
 |-----|---------|
-| `#ef4444` | All error and validation states — invalid input border, error messages |
+| `#ef4444` | All error and validation states - invalid input border, error messages |
 
 ---
 
@@ -171,7 +171,7 @@ One primary accent color with opacity variants for overlays:
 ### Dropdown
 
 ```css
-/* Trigger element — same as .input */
+/* Trigger element - same as .input */
 .dropdown-trigger {
   background: #181818;
   border: 1px solid #3a3a3a;
@@ -418,11 +418,11 @@ For any element that can be disabled, apply:
 }
 ```
 
-Some elements (like a toolbar button that's never `<button disabled>`) use opacity 0.3 instead — stay consistent with surrounding context.
+Some elements (like a toolbar button that's never `<button disabled>`) use opacity 0.3 instead - stay consistent with surrounding context.
 
 ---
 
-## Quick reference — what goes where
+## Quick reference - what goes where
 
 | You're building… | Background | Border | Text |
 |------------------|-----------|--------|------|

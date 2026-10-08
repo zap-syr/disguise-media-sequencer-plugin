@@ -62,7 +62,7 @@ if not osc.started:
 ```
 
 (The official snippet uses `objects/OscDevice/PluginMonitor.apx`; the resource guide requires
-lowercase paths — use lowercase for new code.)
+lowercase paths - use lowercase for new code.)
 
 ## Expression variables device
 

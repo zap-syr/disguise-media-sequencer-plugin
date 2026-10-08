@@ -12,7 +12,7 @@ fseq.setExpression("self * 0.5")        # FieldSequence.setExpression(expr: str)
 fseq.setExpression("self")              # reset to default (= keyframed value)
 ```
 
-> ⚠ The official guide builds expressions with **f-strings** — these are a SyntaxError in
+> ⚠ The official guide builds expressions with **f-strings** - these are a SyntaxError in
 > Designer's Python 2.7. Use `.format()`:
 > `seq.setExpression("module:{}.brightness".format(emitter_layer.name))`
 
@@ -40,7 +40,7 @@ fseq.setExpression("self")              # reset to default (= keyframed value)
 | `format(pattern, ...)` | `format("Current time: %.2fs", time)` |
 | `format::` prefix | `format::"%.2f":time` |
 
-Format specifiers: `%(flags)(width)(.precision)type` — `d` int, `f` float, `s` string, `x` hex.
+Format specifiers: `%(flags)(width)(.precision)type` - `d` int, `f` float, `s` string, `x` hex.
 
 ### Data types and operators
 
@@ -50,15 +50,15 @@ Operators: `+ - * /`, `== != < > <= >=`, `and or not`.
 
 ### Referencing resources
 
-- **By name**: `type:name` — `projector:"projector 1"` or `projector:projector_1`
+- **By name**: `type:name` - `projector:"projector 1"` or `projector:projector_1`
   (spaces/special chars → `_` when unquoted).
 - **By UID** (rename-safe): `getByUID(0x123875234)` (UI: resource editor title bar → right click → Copy UID).
 - **Fields** via `.`: `projector:projector_1.offset.x`. Common: `description`, `offset`, `rotation`, `scale`.
-- Accessing a field of an empty/None resource makes the expression fail — guard with `if(...)`.
+- Accessing a field of an empty/None resource makes the expression fail - guard with `if(...)`.
 
 ### Referencing other layers
 
-`module:<layer_name>.<property>` — e.g. `module:video.frameNumberDisplay`.
+`module:<layer_name>.<property>` - e.g. `module:video.frameNumberDisplay`.
 Spaces in layer names must be written as `_` (`"video effects"` → `video_effects`).
 
 ### External protocols
@@ -79,10 +79,10 @@ Spaces in layer names must be written as `_` (`"video effects"` → `video_effec
 
 ### Variables
 
-- **Inline assignment**: `myvar = sin(uptime / 20)` — visible only to layers *higher* in the
+- **Inline assignment**: `myvar = sin(uptime / 20)` - visible only to layers *higher* in the
   composition stack, and only while the defining layer is active.
-- **ExpressionVariable layers** — animated variables on the track.
-- **ExpressionVariable devices** — global variables not tied to the track.
+- **ExpressionVariable layers** - animated variables on the track.
+- **ExpressionVariable devices** - global variables not tied to the track.
 - **Function variables** with parameters, e.g. `maybe_override(value)` =
   `if(osc:show.override, value, self)`, then `maybe_override(osc:show.field1)` on a layer.
 
@@ -101,7 +101,7 @@ layer.findSequence("brightness").setExpression("if(time > 5, 1, 0)")
 # External kill switch via OSC
 layer.findSequence("brightness").setExpression("self * (1 - osc:video.emergency_cut_out)")
 
-# Link one layer's property to another (Python 2.7 — no f-strings)
+# Link one layer's property to another (Python 2.7 - no f-strings)
 receiver = guisystem.track.layers[1]
 receiver.findSequence("brightness").setExpression("module:{}.brightness".format(layer.name))
 
@@ -121,7 +121,7 @@ Read back: `fseq.expression` returns an `Expression` object; its text is `fseq.e
 ```python
 def run():
     # Guide uses "devices/<name>"; the resource guide's convention would be
-    # "objects/expressionvariablesdevice/<name>.apx" — pick one and stay consistent.
+    # "objects/expressionvariablesdevice/<name>.apx" - pick one and stay consistent.
     var_device = resourceManager.loadOrCreate("objects/expressionvariablesdevice/my_variables.apx",
                                               ExpressionVariablesDevice)
     device_manager = state.devices
