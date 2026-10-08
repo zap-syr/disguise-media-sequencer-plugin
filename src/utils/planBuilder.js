@@ -39,6 +39,27 @@ export function layerSettingsFromOptions(options) {
 }
 
 /**
+ * Advanced mode (Phase 4): one plan group per UI group. Layer settings and the mapping still
+ * come from the settings panel; per-group/per-layer values arrive in Phases 5 and 7.
+ * Splits at the group start, tags at every file (plan defaults, docs §4.2).
+ */
+export function buildAdvancedPlan(options, planState) {
+  const layer = layerSettingsFromOptions(options);
+  return {
+    ...buildPlanEnvelope(options),
+    groups: planState.groups
+      .filter(g => g.items.length)
+      .map(g => ({
+        timing: g.timing,
+        overlap: Number(options.overlap) || 0,
+        tagAt: 'file',
+        splitAt: 'group',
+        layers: g.items.map(id => ({ clipPath: planState.entries[id].mediaId, mappingPath: options.mappingPath, ...layer }))
+      }))
+  };
+}
+
+/**
  * Simple mode: every selected clip, in selection order, one after another, one mapping.
  * Tags and splits at every file — identical to createLayers 1.1.x.
  */
