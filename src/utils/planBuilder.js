@@ -3,6 +3,8 @@
  * Simple mode = a plan with one sequential group (docs/PLAN-ui-redesign.md §4.3).
  */
 
+import { effectiveGroup, effectiveLayer } from './planSchema';
+
 export const MODE_VALUES = { Locked: 0, Normal: 1 };
 export const END_VALUES = { Loop: 0, 'Ping-Pong': 1, Pause: 2 };
 
@@ -38,28 +40,47 @@ export function layerSettingsFromOptions(options) {
   };
 }
 
+/** Layer settings in the payload's units from effective plan values (utils/planSchema.js). */
+export function layerSettingsFromValues(v) {
+  return {
+    mode: MODE_VALUES[v.mode] ?? 1,
+    end: END_VALUES[v.end] ?? 0,
+    bright: !!v.bright,
+    brightT: Number(v.brightT) || 0,
+    fit: !!v.fit,
+    movieDur: Number(v.movieDur) || 0,
+    stillDur: Number(v.stillDur) || 0
+  };
+}
+
 /**
- * Advanced mode: one plan group per UI group, each layer with its own mapping (null = none:
- * plan_layers.py clears Designer's pre-filled mapping). Layer settings still come from the
- * settings panel until Phase 7. Splits at the group start, tags at every file (docs §4.2).
+ * Advanced mode: one plan group per UI group with its effective timing / overlap / tag and
+ * split placement, each layer with its effective settings and its own mapping (null = none:
+ * plan_layers.py clears Designer's pre-filled mapping). The insert location and the global
+ * tag / split switches come from the settings panel.
  */
 export function buildAdvancedPlan(options, planState) {
-  const layer = layerSettingsFromOptions(options);
   return {
     ...buildPlanEnvelope(options),
     groups: planState.groups
       .filter(g => g.items.length)
-      .map(g => ({
-        timing: g.timing,
-        overlap: Number(options.overlap) || 0,
-        tagAt: 'file',
-        splitAt: 'group',
-        layers: g.items.map(id => ({
-          clipPath: planState.entries[id].mediaId,
-          mappingPath: planState.entries[id].mappingPath || null,
-          ...layer
-        }))
-      }))
+      .map(g => {
+        const gv = effectiveGroup(planState.plan, g);
+        return {
+          timing: gv.timing,
+          overlap: Number(gv.overlap) || 0,
+          tagAt: gv.tag,
+          splitAt: gv.split,
+          layers: g.items.map(id => {
+            const entry = planState.entries[id];
+            return {
+              clipPath: entry.mediaId,
+              mappingPath: entry.mappingPath || null,
+              ...layerSettingsFromValues(effectiveLayer(gv, entry))
+            };
+          })
+        };
+      })
   };
 }
 

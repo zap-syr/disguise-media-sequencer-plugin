@@ -1,3 +1,5 @@
+import { effectiveGroup, effectiveLayer } from './planSchema';
+
 /**
  * Approximate time layout of the plan in SECONDS for the UI preview (docs §2.7).
  * Designer converts to track beats; with BPM changes the real result can differ slightly.
@@ -16,23 +18,28 @@ export function clipSeconds(details, settings) {
 }
 
 /**
- * @param groups   plan groups [{ id, timing, items }]
- * @param entries  { [entryId]: { mediaId } }
- * @param details  getMediaDetails() result keyed by clip path
- * @param settings { fit, movieDur, stillDur, overlap } (Phase 4: from the settings panel)
+ * @param groups    plan groups [{ id, ov, items }]
+ * @param entries   { [entryId]: { mediaId, ov } }
+ * @param details   getMediaDetails() result keyed by clip path
+ * @param defaults  Plan defaults (Advanced) or the Simple settings shaped like them
+ * Each group in the result: { id, start, end, rows: [{ id, start, duration }], starts, closing, values }
+ * where `closing` = where a closing split goes (seq: the cursor, same: the group end).
  */
-export function computePlanLayout(groups, entries, details, settings) {
+export function computePlanLayout(groups, entries, details, defaults) {
   let cursor = 0;
   let total = 0;
   const out = groups.map(g => {
+    const values = effectiveGroup(defaults, g);
+    const seq = values.timing !== 'same';
     const gStart = cursor;
     let t = gStart;
     let gEnd = gStart;
-    const overlap = g.timing === 'seq' ? Math.max(0, Number(settings.overlap) || 0) : 0;
+    const overlap = seq ? Math.max(0, Number(values.overlap) || 0) : 0;
     const rows = g.items.map(id => {
-      const d = clipSeconds(details[entries[id]?.mediaId], settings);
+      const entry = entries[id];
+      const d = clipSeconds(details[entry?.mediaId], effectiveLayer(values, entry));
       let start;
-      if (g.timing === 'seq') {
+      if (seq) {
         start = t;
         t = Math.max(gStart, t + d - overlap);
       } else {
@@ -44,7 +51,7 @@ export function computePlanLayout(groups, entries, details, settings) {
     const starts = [...new Set(rows.map(r => r.start))];
     cursor = gEnd;
     total = Math.max(total, gEnd);
-    return { id: g.id, start: gStart, end: gEnd, rows, starts };
+    return { id: g.id, start: gStart, end: gEnd, rows, starts, closing: seq ? t : gEnd, values };
   });
   return { groups: out, total };
 }

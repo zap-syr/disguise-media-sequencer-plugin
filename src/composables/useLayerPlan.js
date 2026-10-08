@@ -1,15 +1,21 @@
 import { reactive, computed } from 'vue';
+import { PLAN_DEFAULTS, coerce, effectiveGroup, pruneOverrides, hasOverrides } from '../utils/planSchema';
 
 /**
  * Advanced-mode layer plan: ordered groups of entries (one entry = one future layer).
  * An entry references a clip by path, so the same clip can appear several times.
- * Group settings beyond `timing` (inheritance, chips) arrive in Phase 7.
+ * Settings inherit Plan defaults -> group.ov -> entry.ov (utils/planSchema.js).
  */
 export function useLayerPlan() {
   const state = reactive({
-    groups: [],   // [{ id, name, open, timing: 'seq'|'same', items: [entryId] }]
-    entries: {}   // { [entryId]: { mediaId: clipPath, mappingPath: null, via: null, ov: {} } }
+    plan: { ...PLAN_DEFAULTS },
+    // [{ id, name, open, scope: 'auto'|'group', ov: {}, items: [entryId], sourceFolder }]
+    groups: [],
+    // { [entryId]: { mediaId: clipPath, mappingPath: null, via: null, ov: {} } }
+    entries: {}
   });
+
+  const newGroupFields = () => ({ open: true, scope: 'auto', ov: {} });
 
   let nextGroup = 1;
   let nextEntry = 1;
@@ -25,7 +31,7 @@ export function useLayerPlan() {
   }
 
   function addEmptyGroup(name) {
-    const group = { id: `g${nextGroup++}`, name: name || `Group ${state.groups.length + 1}`, open: true, timing: 'seq', items: [] };
+    const group = { id: `g${nextGroup++}`, name: name || `Group ${state.groups.length + 1}`, ...newGroupFields(), items: [] };
     state.groups.push(group);
     return group.id;
   }
@@ -39,8 +45,7 @@ export function useLayerPlan() {
     const created = defs.map(def => ({
       id: `g${nextGroup++}`,
       name: def.name,
-      open: true,
-      timing: 'seq',
+      ...newGroupFields(),
       items: makeEntries(def.paths),
       sourceFolder: def.sourceFolder || null
     }));
@@ -133,6 +138,79 @@ export function useLayerPlan() {
     state.groups.forEach(g => { g.open = open; });
   }
 
+  // --- Settings inheritance (Phase 7, docs §2.6) ---
+
+  function groupOf(entryId) {
+    return state.groups.find(g => g.items.includes(entryId));
+  }
+
+  /** Removes every override that equals its parent value (plan for groups, group for layers). */
+  function normalize() {
+    state.groups.forEach(g => {
+      pruneOverrides(g.ov, state.plan);
+      const eg = effectiveGroup(state.plan, g);
+      g.items.forEach(id => { if (state.entries[id]) pruneOverrides(state.entries[id].ov, eg); });
+    });
+  }
+
+  function applyPatch(target, patch) {
+    Object.entries(patch).forEach(([k, v]) => { target[k] = coerce(k, v); });
+  }
+
+  /** Changes Plan defaults; clearKeys are removed from every group's overrides ("Apply to all groups"). */
+  function setPlan(patch, clearKeys = []) {
+    applyPatch(state.plan, patch);
+    if (clearKeys.length) state.groups.forEach(g => clearKeys.forEach(k => delete g.ov[k]));
+    normalize();
+  }
+
+  /** Sets group overrides (patch) and/or removes some (removeKeys = back to Plan defaults). */
+  function setGroupOv(gid, patch = {}, removeKeys = []) {
+    const group = state.groups.find(g => g.id === gid);
+    if (!group) return;
+    applyPatch(group.ov, patch);
+    removeKeys.forEach(k => delete group.ov[k]);
+    normalize();
+  }
+
+  /** Sets layer overrides on entries, or with patch = null removes `keys` (back to the group value). */
+  function setLayerOv(entryIds, patch, keys = []) {
+    entryIds.forEach(id => {
+      const entry = state.entries[id];
+      if (!entry) return;
+      if (patch) applyPatch(entry.ov, patch);
+      else keys.forEach(k => delete entry.ov[k]);
+    });
+    normalize();
+  }
+
+  /** Group back to Plan defaults, including its layers' overrides. */
+  function resetGroup(gid) {
+    const group = state.groups.find(g => g.id === gid);
+    if (!group) return;
+    group.ov = {};
+    group.items.forEach(id => { if (state.entries[id]) state.entries[id].ov = {}; });
+  }
+
+  function resetAllOverrides() {
+    state.groups.forEach(g => { g.ov = {}; });
+    Object.values(state.entries).forEach(e => { e.ov = {}; });
+  }
+
+  /** "Apply to all groups": the group's value becomes the Plan default and other groups' overrides go. */
+  function applyGroupValueToAll(gid, keys) {
+    const group = state.groups.find(g => g.id === gid);
+    if (!group) return;
+    const eg = effectiveGroup(state.plan, group);
+    setPlan(Object.fromEntries(keys.map(k => [k, eg[k]])), keys);
+  }
+
+  /** { groupValues, layers } currently overriding the Plan defaults (for the defaults panel). */
+  const overrideStats = computed(() => ({
+    groupValues: state.groups.reduce((n, g) => n + Object.keys(g.ov).length, 0),
+    layers: state.groups.reduce((n, g) => n + g.items.filter(id => hasOverrides(state.entries[id])).length, 0)
+  }));
+
   // --- Mappings (Phase 5) ---
 
   /** via: null for manual assignment, 'name' | 'res' for auto-assign (Phase 8). */
@@ -189,6 +267,7 @@ export function useLayerPlan() {
     state, layerCount, groupLabelsByMedia, unmappedCount, mappingUsage,
     addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
     removeGroup, updateGroup, setAllOpen,
-    assign, assignGroup, clearMappings
+    assign, assignGroup, clearMappings,
+    overrideStats, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides, applyGroupValueToAll
   };
 }
