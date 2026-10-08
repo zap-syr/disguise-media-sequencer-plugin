@@ -50,6 +50,48 @@ export function useLayerPlan() {
     delete state.entries[entryId];
   }
 
+  /** Removes entries from whatever groups hold them; returns a restore() for the Undo toast. */
+  function removeEntries(entryIds) {
+    const set = new Set(entryIds);
+    const itemsBefore = state.groups.map(g => ({ id: g.id, items: [...g.items] }));
+    const saved = Object.fromEntries(entryIds.map(id => [id, state.entries[id]]));
+    state.groups.forEach(g => { g.items = g.items.filter(id => !set.has(id)); });
+    entryIds.forEach(id => delete state.entries[id]);
+    return () => {
+      Object.assign(state.entries, saved);
+      itemsBefore.forEach(({ id, items }) => {
+        const group = state.groups.find(g => g.id === id);
+        if (group) group.items = items.filter(x => state.entries[x]);
+      });
+    };
+  }
+
+  /** Puts ids into group `gid` before/after `targetId` (null = append). */
+  function insertIds(gid, ids, targetId, pos) {
+    const group = state.groups.find(g => g.id === gid);
+    if (!group) return;
+    const at = targetId ? group.items.indexOf(targetId) : -1;
+    if (at < 0) group.items.push(...ids);
+    else group.items.splice(pos === 'after' ? at + 1 : at, 0, ...ids);
+    group.open = true;
+  }
+
+  /**
+   * Moves entries (keeping their relative order) into group `gid` before/after `targetId`.
+   * Dropping a selection onto one of its own rows is a no-op.
+   */
+  function moveEntries(entryIds, gid, targetId, pos) {
+    if (targetId && entryIds.includes(targetId)) return;
+    const set = new Set(entryIds);
+    state.groups.forEach(g => { g.items = g.items.filter(id => !set.has(id)); });
+    insertIds(gid, entryIds, targetId, pos);
+  }
+
+  /** New entries for clip paths, inserted into group `gid` before/after `targetId` (null = append). */
+  function insertFiles(paths, gid, targetId, pos) {
+    insertIds(gid, makeEntries(paths), targetId, pos);
+  }
+
   /** Removes a group; returns a restore() for the Undo toast. */
   function removeGroup(gid) {
     const index = state.groups.findIndex(g => g.id === gid);
@@ -126,7 +168,8 @@ export function useLayerPlan() {
 
   return {
     state, layerCount, groupLabelsByMedia, unmappedCount, mappingUsage,
-    addEmptyGroup, newGroup, addToGroup, removeEntry, removeGroup, updateGroup, setAllOpen,
+    addEmptyGroup, newGroup, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
+    removeGroup, updateGroup, setAllOpen,
     assign, assignGroup, clearMappings
   };
 }
