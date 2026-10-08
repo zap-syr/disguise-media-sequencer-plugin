@@ -6,6 +6,30 @@
 // (tools/designer-probes/run.mjs src/services/python/<name>).
 import mediaDetailsScript from './python/media_details.py?raw';
 import mappingListScript from './python/mapping_list.py?raw';
+import planPrepareScript from './python/plan_prepare.py?raw';
+import planLayersScript from './python/plan_layers.py?raw';
+import planMarkersScript from './python/plan_markers.py?raw';
+
+/** Layers per execute call. Designer's ~1 s timeout and per-call undo cost make bigger calls unsafe (docs §12). */
+export const LAYER_CHUNK_SIZE = 100;
+
+/**
+ * Turns `args` into a Python unicode string literal holding JSON, for `json.loads(__ARGS__)`.
+ * JSON string escapes are valid in a Python u"" literal; non-ASCII is escaped so the
+ * Python 2.7 source stays ASCII.
+ */
+function pythonJsonLiteral(args) {
+  const literal = JSON.stringify(JSON.stringify(args))
+    .replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+  return 'u' + literal;
+}
+
+/** Runs a .py template that reads its input via `json.loads(__ARGS__)` (comments may mention the token too). */
+async function runScript(directorIp, template, args) {
+  const marker = 'json.loads(__ARGS__)';
+  if (!template.includes(marker)) throw new Error('Script template has no json.loads(__ARGS__)');
+  return executePython(directorIp, template.replace(marker, () => `json.loads(${pythonJsonLiteral(args)})`));
+}
 
 /**
  * Generic function to execute a Python script via the d3 API.
@@ -25,7 +49,17 @@ async function executePython(directorIp, script) {
     });
 
     if (!response.ok) {
-      throw new Error(`Python execution failed: ${response.statusText}`);
+      // Designer reports Python exceptions and TimeOutError in status.message
+      let detail = response.statusText;
+      try {
+        const body = await response.json();
+        const message = body?.status?.message || '';
+        const lastLine = message.trim().split('\n').filter(Boolean).pop();
+        if (lastLine) detail = lastLine.replace(/\.$/, '');
+      } catch (e) {
+        // not JSON — keep statusText
+      }
+      throw new Error(`Python execution failed: ${detail}`);
     }
     
     const data = await response.json();
@@ -187,206 +221,57 @@ function buildFileHierarchy(files) {
 }
 
 /**
- * Creates layers in Disguise by executing a Python script.
- * @param {string} directorIp - The IP address and port.
- * @param {Object} options - User settings from the sidebar.
- * @param {Array<string>} selectedPaths - Array of full paths to selected media.
+ * Creates the layers of a plan in Designer: prepare (read-only timing), layer chunks, markers.
+ * Nothing rolls back in Designer, so on failure the error says how many layers were created.
+ *
+ * @param {string} directorIp
+ * @param {Object} plan - see src/services/python/plan_prepare.py for the shape
+ * @param {(created: number, total: number) => void} [onProgress]
+ * @returns {Promise<{status: 'success', created: number, total: number, errors: Array}>}
  */
-export async function createLayers(directorIp, options, selectedPaths) {
-  // Map UI labels to Python values
-  const modeMap = { 'Locked': 0, 'Normal': 1 };
-  const endPointMap = { 'Loop': 0, 'Ping-Pong': 1, 'Pause': 2 };
-
-  const modeVal = modeMap[options.mode] ?? 1;
-  const endPointVal = endPointMap[options.atEndPoint] ?? 0;
-  const pathsList = JSON.stringify(selectedPaths);
-  
-  // Track logic
-  let trackInitCode = `
-    current_track = guisystem.track
-    current_playhead_beats = guisystem.player.tCurrent
-`;
-
-  if (options.insertMode === 'Specific location' && options.targetTrack && options.startTime) {
-    const timeParts = options.startTime.split(':').map(Number);
-    const hours = timeParts[0] || 0;
-    const minutes = timeParts[1] || 0;
-    const seconds = timeParts[2] || 0;
-    const frames = timeParts[3] || 0;
-
-    trackInitCode = `
-    target_track_path = r'${options.targetTrack}'
-    current_track = resourceManager.load(target_track_path, Track)
-    if not current_track:
-        return {"status": "error", "message": "Could not load target track"}
-
-    refresh_rate = state.globalRefreshRate.asDouble
-    fps = refresh_rate / 2.0 if refresh_rate > 30 else refresh_rate
-    start_time_seconds = (${hours} * 3600) + (${minutes} * 60) + ${seconds} + (${frames} / fps)
-    current_playhead_beats = current_track.timeToBeat(start_time_seconds)
-`;
+export async function createLayerPlan(directorIp, plan, onProgress) {
+  const prep = await runScript(directorIp, planPrepareScript, plan);
+  if (!prep || prep.status !== 'success') {
+    throw new Error(prep?.message || 'Failed to prepare the layer plan.');
   }
 
-  const script = `
-def run():
-${trackInitCode}
+  const total = prep.layers.length;
+  const errors = [...prep.errors];
+  let created = 0;
+  onProgress?.(0, total);
 
-    MODE = ${modeVal}
-    AT_END_POINT = ${endPointVal}
-    FIT_TO_CONTENTS = ${options.fitToContent ? 'True' : 'False'}
-    SPLIT_SECTION = ${options.splitSection ? 'True' : 'False'}
-    ADD_TIMECODE_TAG = ${options.addTimecodeTag ? 'True' : 'False'}
-    ADD_CUE_TAG = ${options.addCueTag ? 'True' : 'False'}
-    ADD_MIDI_NOTE = ${options.addMidiNote ? 'True' : 'False'}
-    ANIMATE_BRIGHTNESS = ${options.animateBrightness ? 'True' : 'False'}
+  for (let i = 0; i < total; i += LAYER_CHUNK_SIZE) {
+    const chunk = prep.layers.slice(i, i + LAYER_CHUNK_SIZE);
+    let res;
+    try {
+      res = await runScript(directorIp, planLayersScript, {
+        trackPath: prep.trackPath,
+        ensureLength: i === 0 ? prep.requiredLength : null,
+        layers: chunk
+      });
+    } catch (err) {
+      throw new Error(`${err.message} (created ${created} of ${total} layers before the failure)`);
+    }
+    if (!res || res.status !== 'success') {
+      throw new Error(`${res?.message || 'Layer creation failed'} (created ${created} of ${total} layers)`);
+    }
+    created += res.created;
+    errors.push(...res.errors);
+    onProgress?.(created, total);
+  }
 
-    mapping_path = r'${options.mappingPath}'
-    timecode_start = '${options.timecodeStart}'
-    timecode_increment = '${options.timecodeIncrement}'
-    cue_tag = '${options.cueValue}'
-    midi_note_value = '${options.midiNoteValue}'
+  if (prep.tags.length || prep.splits.length) {
+    const res = await runScript(directorIp, planMarkersScript, {
+      trackPath: prep.trackPath,
+      tags: prep.tags,
+      splits: prep.splits
+    });
+    if (!res || res.status !== 'success') {
+      throw new Error(`${res?.message || 'Placing tags/splits failed'} (all ${created} layers were created)`);
+    }
+  }
 
-    refresh_rate_val = state.globalRefreshRate.asDouble
-    tag_fps = int(refresh_rate_val / 2.0 if refresh_rate_val > 30 else refresh_rate_val)
-
-    still_duration_seconds = ${options.stillDuration}
-    movie_duration_seconds = ${options.movieDuration}
-    overlap_seconds = ${options.overlap}
-    brightness_duration_seconds = ${options.brightnessDuration}
-
-    overlap_beats = current_track.timeToBeat(current_track.beatToTime(current_playhead_beats) + overlap_seconds) - current_playhead_beats
-
-    created_layers_info = []
-    current_start_beats = current_playhead_beats
-
-    # Initial split section if enabled
-    if SPLIT_SECTION:
-      current_track.splitSectionAtBeat(current_start_beats)
-    
-    media_paths = ${pathsList}
-
-    for i, clip_path in enumerate(media_paths):
-        clip = resourceManager.load(clip_path, VideoClip)
-        if not clip:
-            continue
-
-        if clip.file and clip.file.nFrames > 1 and clip.fileFps > 1:
-            if FIT_TO_CONTENTS:
-                clip_duration_seconds = float(clip.file.nFrames) / clip.fileFps
-            else:
-                clip_duration_seconds = movie_duration_seconds
-        else:
-            clip_duration_seconds = still_duration_seconds
-
-        clip_end_time_in_seconds = current_track.beatToTime(current_start_beats) + clip_duration_seconds
-        clip_length_beats = current_track.timeToBeat(clip_end_time_in_seconds) - current_start_beats
-
-        layer_name = "Video Layer - {}".format(clip.description)
-        new_layer = current_track.addNewLayer(VariableVideoModule, current_start_beats, clip_length_beats, layer_name)
-
-        if new_layer:
-            # Mapping
-            mapping_fseq = new_layer.findSequence("mapping")
-            if mapping_fseq:
-                markDirty(mapping_fseq)
-                mapping_fseq.disableSequencing = True
-                mapping_resource = resourceManager.load(mapping_path, Projection)
-                mapping_fseq.sequence.setResource(current_start_beats, mapping_resource)
-                mapping_fseq.saveOnDelete()
-
-            # Video Clip
-            video_fseq = new_layer.findSequence("video")
-            if video_fseq:
-                markDirty(video_fseq)
-                video_fseq.disableSequencing = True
-                video_fseq.sequence.setResource(current_start_beats, clip)
-                video_fseq.saveOnDelete()
-
-            # Mode
-            mode_fseq = new_layer.findSequence("mode")
-            if mode_fseq:
-                markDirty(mode_fseq)
-                mode_fseq.disableSequencing = True
-                mode_fseq.sequence.setFloat(current_start_beats, MODE)
-                mode_fseq.saveOnDelete()
-
-            # End Behavior
-            end_fseq = new_layer.findSequence("At end point")
-            if end_fseq:
-                markDirty(end_fseq)
-                end_fseq.disableSequencing = True
-                end_fseq.sequence.setFloat(current_start_beats, AT_END_POINT)
-                end_fseq.saveOnDelete()
-
-            if ANIMATE_BRIGHTNESS:
-                brightness_fseq = new_layer.findSequence("Brightness")
-                if brightness_fseq:
-                    current_insert_beat = current_start_beats
-                    markDirty(brightness_fseq)
-                    brightness_fseq.disableSequencing = False
-                    brightness_fseq.sequence.setFloat(current_start_beats, 0)
-                    brightness_duration_beats = current_track.timeToBeat(current_track.beatToTime(current_start_beats) + brightness_duration_seconds) - current_start_beats
-                    brightness_fseq.sequence.setFloat(current_start_beats + brightness_duration_beats, 1)
-                    brightness_fseq.saveOnDelete()
-
-            created_layers_info.append({
-                "name": new_layer.name,
-                "uid": new_layer.uid
-            })
-
-            if ADD_TIMECODE_TAG:
-                tc_s = timecode_start.split(':')
-                tc_i = timecode_increment.split(':')
-                start_f = ((int(tc_s[0]) * 3600) + (int(tc_s[1]) * 60) + int(tc_s[2])) * tag_fps + int(tc_s[3])
-                inc_f = ((int(tc_i[0]) * 3600) + (int(tc_i[1]) * 60) + int(tc_i[2])) * tag_fps + int(tc_i[3])
-                total_f = start_f + i * inc_f
-                fr = total_f % tag_fps
-                sc = (total_f // tag_fps) % 60
-                mn = (total_f // tag_fps // 60) % 60
-                hr = total_f // tag_fps // 3600
-                tc_text = '{:02d}:{:02d}:{:02d}:{:02d}'.format(hr, mn, sc, fr)
-                tc_tag = Tag(0, tc_text)
-                current_track.setTagAtBeat(current_start_beats, tc_tag)
-
-            if ADD_CUE_TAG:
-                # Handle incrementing cue tag if it's numeric
-                tag_text = cue_tag
-                try:
-                    # Attempt to handle simple numeric increment for . format
-                    parts = cue_tag.split('.')
-                    last_num = int(parts[-1])
-                    parts[-1] = str(last_num + i)
-                    tag_text = '.'.join(parts)
-                except:
-                    pass
-                
-                tag = Tag(1, tag_text)
-                current_track.setTagAtBeat(current_start_beats, tag)
-
-            if ADD_MIDI_NOTE:
-                midi_text = midi_note_value
-                try:
-                    parts = midi_note_value.split('.')
-                    last_num = int(parts[-1])
-                    parts[-1] = str(last_num + i)
-                    midi_text = '.'.join(parts)
-                except:
-                    pass
-                midi_tag = Tag(2, midi_text)
-                current_track.setTagAtBeat(current_start_beats, midi_tag)
-
-            # Next iteration calculations
-            current_start_beats = current_start_beats + clip_length_beats - overlap_beats
-
-            if SPLIT_SECTION:
-                current_track.splitSectionAtBeat(current_start_beats)
-
-    return {"status": "success", "count": len(created_layers_info)}
-
-return run()
-`;
-
-  return await executePython(directorIp, script);
+  return { status: 'success', created, total, errors };
 }
 
 /**

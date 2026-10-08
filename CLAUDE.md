@@ -21,21 +21,27 @@ This is a **Vue 3 + Vite plugin** that integrates as a window panel inside Disgu
 ### Component / Service Breakdown
 
 - **`App.vue`** — Reads `?director=` from the URL and passes it as a prop. Entry point only.
-- **`src/components/MediaSequencer.vue`** — The entire application UI (~1900 lines). Three-column layout: collapsible/resizable folder tree sidebar | media card grid | settings panel. Manages all state using Vue 3 Composition API (`ref`, `reactive`, `computed`, `watch`). Planned to be split into components and composables; see `docs/PLAN-ui-redesign.md` §4.1.
-- **`src/components/MediaCard.vue`** — Individual media tile. Thumbnails are fetched from `http://{director}/api/v1/thumbnail/{uid}`.
-- **`src/services/disguiseService.js`** — All Designer API calls. Each function generates a Python script string and executes it via REST. Returns parsed JSON results. This is where `VideoClip`, `Projection`, and `Track` resources are fetched and where the layer-creation script is assembled.
-- **`src/api_scripts.py`** — Reference/template file for the Python API. Not imported at runtime; used as documentation for what Python calls are available.
+- **`src/components/MediaSequencer.vue`** — Shell: loads data, owns navigation/selection state, wires the panels, runs layer creation, shows toasts.
+- **`src/components/tree/FolderTree.vue`** — Collapsible/resizable folder tree with file counts.
+- **`src/components/files/FilesPane.vue`** + **`MediaCard.vue`** — Breadcrumb, search, refresh, selection toolbar, grid/list of cards with marquee selection. Cards show thumbnails (`http://{director}/api/v1/thumbnail/{uid}`), duration, type (VIDEO/IMAGE/LIVE), alpha/audio icons.
+- **`src/components/settings/SettingsPanel.vue`** — All layer/insert/tag options, validation, mapping/track pickers, create-track, Create button. Emits `create` with the options.
+- **`src/composables/`** — `useMediaLibrary` (load/refresh hierarchy, media details, mappings, tracks), `useFileSelection` (click/Ctrl/Shift/marquee), `usePersistedRef` (localStorage prefs), `useToast`.
+- **`src/utils/`** — `mediaTree` (tree helpers), `planBuilder` (UI options → createLayerPlan payload), `tagInputs` (cue/MIDI masks), `timecode`, `format`.
+- **`src/services/disguiseService.js`** — All Designer API calls via `executePython`. Non-trivial Python lives in **`src/services/python/*.py`**, imported with `?raw`; scripts read input through `json.loads(__ARGS__)` (filled by `runScript`). The same files run as probes: `node tools/designer-probes/run.mjs src/services/python/<name>` (args templates need `__ARGS__` substituted).
+- **`src/api_scripts.py`** — Old reference/template file for the Python API (pre-redesign). Not imported at runtime.
 
 ### Data Flow for Layer Creation
 
-1. User selects media cards (files from the media hierarchy)
-2. User configures settings (mapping, mode, end behavior, overlap, cue tags, etc.)
-3. On "Create Layers", `disguiseService.createLayers()` builds a multi-step Python script that:
-   - Loads each selected resource
-   - Calculates beat positions from the current playhead or a specified time
-   - Creates a layer per media item with `track.addNewLayer()`
-   - Optionally splits sections, adds cue tags, and animates brightness
-4. The script is POSTed to Designer's Python Execute endpoint
+1. User selects media cards and configures settings.
+2. `utils/planBuilder.buildSimplePlan()` turns options + selected clip paths into a **plan**
+   (insert location, global tags/split switches, groups → layers). Simple mode = one sequential group.
+3. `disguiseService.createLayerPlan()` runs three steps against Designer:
+   - `plan_prepare.py` (read-only): resolves the track, computes every layer's start/length in
+     track beats, tag texts/positions and split positions, and the required track length;
+   - `plan_layers.py` in chunks of ≤100 (`LAYER_CHUNK_SIZE`): extends the track first, then creates
+     layers and sets video/mapping/mode/end/brightness;
+   - `plan_markers.py`: tags and section splits.
+4. Progress is reported per chunk; partial creation is reported in the error (Designer never rolls back).
 
 ### Media Hierarchy
 
@@ -74,7 +80,7 @@ The settings panel binds to a `reactive` object with these key fields: `insertMo
   - touching `Action` objects or a failing `open()` raises errors that `try/except` cannot catch.
 - **Timeline gotchas** (verified):
   - the track is **not** extended automatically; layers past `lengthInBeats` end up truncated
-    or zero-length. Today's `createLayers` has this bug, and it is fixed in the redesign;
+    or zero-length. `plan_layers.py` extends the track before creating;
   - `addNewLayer` puts each new layer at the top of the stack;
   - Designer pre-fills a mapping on every new layer;
   - layer sequences are `layer.fields`, not `layer.sequences`.

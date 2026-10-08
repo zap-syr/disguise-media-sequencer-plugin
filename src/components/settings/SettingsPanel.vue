@@ -335,7 +335,7 @@
         :disabled="!isCreateLayersEnabled || isCreating"
         @click="handleCreate"
       >
-        {{ isCreating ? 'CREATING...' : 'CREATE LAYERS' }}
+        {{ createLabel }}
       </button>
     </div>
   </div>
@@ -352,7 +352,8 @@ const props = defineProps({
   mappings: { type: Array, required: true },
   tracks: { type: Array, required: true },
   selectionCount: { type: Number, default: 0 },
-  isCreating: { type: Boolean, default: false }
+  isCreating: { type: Boolean, default: false },
+  createProgress: { type: Object, default: null } // { created, total }
 });
 const emit = defineEmits(['create', 'track-created']);
 
@@ -441,6 +442,12 @@ const isCreateLayersEnabled = computed(() => {
   const validLocation = options.insertMode === 'At Playhead' || (selectedTrack.value && isStartTimeValid.value);
 
   return hasSelection && hasMapping && validCue && validMidi && validTimecode && validLocation;
+});
+
+const createLabel = computed(() => {
+  if (!props.isCreating) return 'CREATE LAYERS';
+  const p = props.createProgress;
+  return p && p.total > 0 ? `CREATING... ${p.created}/${p.total}` : 'CREATING...';
 });
 
 // --- Input masks ---

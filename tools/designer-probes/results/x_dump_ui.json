@@ -1,0 +1,87 @@
+{
+  "probe": "x_dump_ui",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 52,
+  "d3Log": "Python script took 2.8428ms\n",
+  "pythonLog": "",
+  "result": {
+    "objects/track/zz_ui_test.apx": {
+      "layers": [
+        {
+          "brightKeys": [
+            [
+              61.4,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/presentation_s05_c_center_5376x1680-.png.apx",
+          "name": "Video Layer - presentation_s05_c_center_5376x1680-.png",
+          "tStart": 61.4,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/spherical/7 (spherical).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              56.4,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/presentation_s05_c_center_5376x1680- (custom).png.apx",
+          "name": "Video Layer - presentation_s05_c_center_5376x1680- (custom).png",
+          "tStart": 56.4,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/spherical/7 (spherical).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              21.4,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/jacques_introduction_center 5376x1680.mov.apx",
+          "name": "Video Layer - jacques_introduction_center 5376x1680.mov",
+          "tStart": 21.4,
+          "tLength": 35,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/spherical/7 (spherical).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              0,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/center.mov.apx",
+          "name": "Video Layer - center.mov",
+          "tStart": 0,
+          "tLength": 21.4,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/spherical/7 (spherical).apx",
+          "mode": 1
+        }
+      ],
+      "length": 560,
+      "sections": [
+        0
+      ],
+      "tags": []
+    }
+  }
+}

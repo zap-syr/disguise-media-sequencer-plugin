@@ -1,0 +1,10 @@
+{
+  "probe": "x_prep",
+  "httpStatus": 500,
+  "status": {
+    "code": 5000,
+    "message": "Failed to run plugin: default_plugin\nError code: 0, Error message: class PythonException in 'C:\\blip\\dev\\d3python\\pythonobject.cpp' (line 32):\n\t\nTraceback (most recent call last):\n\n  File \"<string>\", line 179, in <module>\n\n  File \"<string>\", line 36, in userScript\n\nNameError: global name '__ARGS__' is not defined\n.\n",
+    "details": []
+  },
+  "roundTripMs": 58
+}

@@ -1,0 +1,468 @@
+{
+  "probe": "x_dump",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 49,
+  "d3Log": "Python script took 3.4626ms\n",
+  "pythonLog": "",
+  "result": {
+    "objects/track/zz_cmp_new.apx": {
+      "layers": [
+        {
+          "brightKeys": [
+            [
+              55.566667,
+              0
+            ],
+            [
+              56.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/videoin_1.mov.apx",
+          "name": "Video Layer - videoin_1.mov",
+          "tStart": 55.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              52.566667,
+              0
+            ],
+            [
+              53.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 52.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              38.533333,
+              0
+            ],
+            [
+              39.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 38.533333,
+          "tLength": 15.033333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              35.533333,
+              0
+            ],
+            [
+              36.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test patterns/d3_test_16-9.png.apx",
+          "name": "Video Layer - d3_test_16-9.png",
+          "tStart": 35.533333,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              15.133333,
+              0
+            ],
+            [
+              15.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/center.mov.apx",
+          "name": "Video Layer - center.mov",
+          "tStart": 15.133333,
+          "tLength": 21.4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              10,
+              0
+            ],
+            [
+              10.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 10,
+          "tLength": 6.133333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        }
+      ],
+      "length": 560,
+      "sections": [
+        0,
+        10,
+        15.133333,
+        35.533333,
+        38.533333,
+        52.566667,
+        55.566667,
+        58.566667
+      ],
+      "tags": [
+        [
+          10,
+          0,
+          "01:00:00:00"
+        ],
+        [
+          10,
+          1,
+          "1.5"
+        ],
+        [
+          10,
+          2,
+          "9.1"
+        ],
+        [
+          15.133333,
+          0,
+          "01:00:10:00"
+        ],
+        [
+          15.133333,
+          1,
+          "1.6"
+        ],
+        [
+          15.133333,
+          2,
+          "9.2"
+        ],
+        [
+          35.533333,
+          0,
+          "01:00:20:00"
+        ],
+        [
+          35.533333,
+          1,
+          "1.7"
+        ],
+        [
+          35.533333,
+          2,
+          "9.3"
+        ],
+        [
+          38.533333,
+          0,
+          "01:00:30:00"
+        ],
+        [
+          38.533333,
+          1,
+          "1.8"
+        ],
+        [
+          38.533333,
+          2,
+          "9.4"
+        ],
+        [
+          52.566667,
+          0,
+          "01:00:40:00"
+        ],
+        [
+          52.566667,
+          1,
+          "1.9"
+        ],
+        [
+          52.566667,
+          2,
+          "9.5"
+        ],
+        [
+          55.566667,
+          0,
+          "01:00:50:00"
+        ],
+        [
+          55.566667,
+          1,
+          "1.10"
+        ],
+        [
+          55.566667,
+          2,
+          "9.6"
+        ]
+      ]
+    },
+    "objects/track/zz_cmp_old.apx": {
+      "layers": [
+        {
+          "brightKeys": [
+            [
+              55.566667,
+              0
+            ],
+            [
+              56.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/videoin_1.mov.apx",
+          "name": "Video Layer - videoin_1.mov",
+          "tStart": 55.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              52.566667,
+              0
+            ],
+            [
+              53.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 52.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              38.533333,
+              0
+            ],
+            [
+              39.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 38.533333,
+          "tLength": 15.033333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              35.533333,
+              0
+            ],
+            [
+              36.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test patterns/d3_test_16-9.png.apx",
+          "name": "Video Layer - d3_test_16-9.png",
+          "tStart": 35.533333,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              15.133333,
+              0
+            ],
+            [
+              15.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/center.mov.apx",
+          "name": "Video Layer - center.mov",
+          "tStart": 15.133333,
+          "tLength": 21.4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              10,
+              0
+            ],
+            [
+              10.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 10,
+          "tLength": 6.133333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        }
+      ],
+      "length": 560,
+      "sections": [
+        0,
+        10,
+        15.133333,
+        35.533333,
+        38.533333,
+        52.566667,
+        55.566667,
+        58.566667
+      ],
+      "tags": [
+        [
+          10,
+          0,
+          "01:00:00:00"
+        ],
+        [
+          10,
+          1,
+          "1.5"
+        ],
+        [
+          10,
+          2,
+          "9.1"
+        ],
+        [
+          15.133333,
+          0,
+          "01:00:10:00"
+        ],
+        [
+          15.133333,
+          1,
+          "1.6"
+        ],
+        [
+          15.133333,
+          2,
+          "9.2"
+        ],
+        [
+          35.533333,
+          0,
+          "01:00:20:00"
+        ],
+        [
+          35.533333,
+          1,
+          "1.7"
+        ],
+        [
+          35.533333,
+          2,
+          "9.3"
+        ],
+        [
+          38.533333,
+          0,
+          "01:00:30:00"
+        ],
+        [
+          38.533333,
+          1,
+          "1.8"
+        ],
+        [
+          38.533333,
+          2,
+          "9.4"
+        ],
+        [
+          52.566667,
+          0,
+          "01:00:40:00"
+        ],
+        [
+          52.566667,
+          1,
+          "1.9"
+        ],
+        [
+          52.566667,
+          2,
+          "9.5"
+        ],
+        [
+          55.566667,
+          0,
+          "01:00:50:00"
+        ],
+        [
+          55.566667,
+          1,
+          "1.10"
+        ],
+        [
+          55.566667,
+          2,
+          "9.6"
+        ]
+      ]
+    }
+  }
+}

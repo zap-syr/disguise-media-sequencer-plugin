@@ -37,6 +37,7 @@
         :tracks="library.tracks.value"
         :selection-count="selection.selectedItems.size"
         :is-creating="isCreating"
+        :create-progress="createProgress"
         @create="handleCreateLayers"
         @track-created="library.addTrack"
       />
@@ -48,7 +49,8 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
-import { createLayers } from '../services/disguiseService';
+import { createLayerPlan } from '../services/disguiseService';
+import { buildSimplePlan } from '../utils/planBuilder';
 import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath } from '../utils/mediaTree';
 import { useMediaLibrary } from '../composables/useMediaLibrary';
 import { useFileSelection } from '../composables/useFileSelection';
@@ -67,6 +69,7 @@ const library = useMediaLibrary(props.directorEndpoint);
 const { toast, show: showToast, dismiss: dismissToast } = useToast();
 
 const isCreating = ref(false);
+const createProgress = ref(null); // { created, total } while createLayerPlan runs
 const searchQuery = ref('');
 
 // Per-viewer view preferences
@@ -125,19 +128,24 @@ async function handleCreateLayers(requestOptions) {
       .map(id => filesById.get(id)?.path)
       .filter(Boolean);
 
-    const result = await createLayers(props.directorEndpoint, requestOptions, selectedPaths);
+    const plan = buildSimplePlan(requestOptions, selectedPaths);
+    const result = await createLayerPlan(props.directorEndpoint, plan, (created, total) => {
+      createProgress.value = { created, total };
+    });
 
-    if (result && (result.status === 'success' || result.code === 0)) {
-      selection.clear();
-      showToast(`Successfully created ${result.count || selectedPaths.length} layers.`);
+    selection.clear();
+    if (result.errors.length) {
+      showToast(`Created ${result.created} of ${selectedPaths.length} layers — ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
+      console.warn('Layer creation issues:', result.errors);
     } else {
-      throw new Error(result.message || 'Unknown error during layer creation.');
+      showToast(`Successfully created ${result.created} layers.`);
     }
   } catch (err) {
     showToast(`Failed to create layers: ${err.message}`, 'error');
     console.error(err);
   } finally {
     isCreating.value = false;
+    createProgress.value = null;
   }
 }
 </script>

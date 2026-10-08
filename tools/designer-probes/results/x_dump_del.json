@@ -1,0 +1,5978 @@
+{
+  "probe": "x_dump_del",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 73,
+  "d3Log": "Python script took 12.4793ms\n",
+  "pythonLog": "",
+  "result": {
+    "objects/track/zz_cmp_big.apx": {
+      "layers": [
+        {
+          "brightKeys": [
+            [
+              2731.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2731.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2716.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2716.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2711.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2711.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2705.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2705.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2690.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2690.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2685.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2685.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2679.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2679.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2664.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2664.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2659.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2659.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2653.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2653.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2638.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2638.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2633.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2633.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2627.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2627.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2612.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2612.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2607.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2607.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2601,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2601,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2585.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2585.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2580.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2580.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2574.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2574.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2559.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2559.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2554.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2554.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2548.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2548.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2533.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2533.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2528.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2528.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2522.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2522.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2507.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2507.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2502.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2502.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2496.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2496.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2481.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2481.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2476.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2476.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2470.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2470.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2455.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2455.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2450.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2450.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2444,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2444,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2428.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2428.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2423.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2423.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2417.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2417.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2402.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2402.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2397.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2397.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2391.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2391.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2376.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2376.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2371.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2371.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2365.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2365.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2350.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2350.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2345.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2345.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2339.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2339.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2324.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2324.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2319.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2319.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2313.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2313.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2298.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2298.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2293.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2293.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2287,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2287,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2271.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2271.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2266.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2266.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2260.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2260.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2245.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2245.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2240.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2240.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2234.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2234.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2219.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2219.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2214.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2214.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2208.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2208.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2193.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2193.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2188.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2188.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2182.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2182.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2167.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2167.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2162.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2162.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2156.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2156.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2141.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2141.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2136.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2136.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2130,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2130,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2114.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2114.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2109.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2109.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2103.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2103.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2088.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2088.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2083.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2083.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2077.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2077.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2062.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2062.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2057.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2057.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2051.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2051.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2036.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2036.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2031.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2031.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2025.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 2025.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2010.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 2010.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              2005.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 2005.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1999.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1999.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1984.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1984.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1979.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1979.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1973,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1973,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1957.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1957.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1952.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1952.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1946.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1946.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1931.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1931.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1926.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1926.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1920.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1920.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1905.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1905.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1900.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1900.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1894.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1894.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1879.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1879.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1874.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1874.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1868.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1868.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1853.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1853.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1848.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1848.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1842.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1842.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1827.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1827.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1822.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1822.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1816,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1816,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1800.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1800.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1795.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1795.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1789.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1789.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1774.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1774.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1769.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1769.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1763.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1763.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1748.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1748.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1743.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1743.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1737.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1737.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1722.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1722.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1717.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1717.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1711.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1711.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1696.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1696.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1691.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1691.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1685.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1685.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1670.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1670.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1665.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1665.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1659,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1659,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1643.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1643.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1638.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1638.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1632.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1632.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1617.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1617.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1612.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1612.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1606.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1606.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1591.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1591.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1586.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1586.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1580.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1580.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1565.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1565.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1560.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1560.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1554.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1554.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1539.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1539.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1534.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1534.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1528.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1528.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1513.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1513.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1508.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1508.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1502,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1502,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1486.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1486.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1481.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1481.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1475.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1475.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1460.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1460.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1455.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1455.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1449.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1449.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1434.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1434.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1429.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1429.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1423.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1423.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1408.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1408.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1403.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1403.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1397.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1397.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1382.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1382.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1377.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1377.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1371.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1371.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1356.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1356.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1351.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1351.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1345,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1345,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1329.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1329.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1324.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1324.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1318.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1318.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1303.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1303.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1298.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1298.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1292.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1292.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1277.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1277.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1272.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1272.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1266.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1266.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1251.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1251.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1246.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1246.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1240.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1240.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1225.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1225.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1220.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1220.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1214.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1214.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1199.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1199.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1194.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1194.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1188,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1188,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1172.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1172.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1167.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1167.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1161.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1161.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1146.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1146.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1141.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1141.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1135.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1135.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1120.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1120.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1115.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1115.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1109.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1109.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1094.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1094.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1089.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1089.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1083.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1083.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1068.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1068.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1063.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1063.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1057.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1057.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1042.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1042.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1037.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1037.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1031,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1031,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1015.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 1015.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1010.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 1010.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              1004.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 1004.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              989.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 989.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              984.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 984.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              978.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 978.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              963.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 963.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              958.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 958.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              952.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 952.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              937.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 937.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              932.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 932.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              926.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 926.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              911.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 911.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              906.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 906.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              900.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 900.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              885.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 885.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              880.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 880.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              874,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 874,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              858.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 858.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              853.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 853.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              847.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 847.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              832.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 832.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              827.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 827.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              821.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 821.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              806.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 806.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              801.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 801.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              795.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 795.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              780.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 780.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              775.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 775.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              769.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 769.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              754.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 754.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              749.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 749.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              743.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 743.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              728.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 728.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              723.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 723.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              717,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 717,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              701.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 701.966667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              696.966667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 696.966667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              690.833333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 690.833333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              675.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 675.8,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              670.8,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 670.8,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              664.666667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 664.666667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              649.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 649.633333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              644.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 644.633333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              638.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 638.5,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              623.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 623.466667,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              618.466667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 618.466667,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              612.333333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 612.333333,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              597.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 597.3,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              592.3,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 592.3,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              586.166667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 586.166667,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              571.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 571.133333,
+          "tLength": 15.033333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              566.133333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 566.133333,
+          "tLength": 5,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        },
+        {
+          "brightKeys": [
+            [
+              560,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 560,
+          "tLength": 6.133333,
+          "end": 0,
+          "brightSequenced": false,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 1
+        }
+      ],
+      "length": 2737.966666666665,
+      "sections": [
+        560,
+        566.133333,
+        571.133333,
+        586.166667,
+        592.3,
+        597.3,
+        612.333333,
+        618.466667,
+        623.466667,
+        638.5,
+        644.633333,
+        649.633333,
+        664.666667,
+        670.8,
+        675.8,
+        690.833333,
+        696.966667,
+        701.966667,
+        717,
+        723.133333,
+        728.133333,
+        743.166667,
+        749.3,
+        754.3,
+        769.333333,
+        775.466667,
+        780.466667,
+        795.5,
+        801.633333,
+        806.633333,
+        821.666667,
+        827.8,
+        832.8,
+        847.833333,
+        853.966667,
+        858.966667,
+        874,
+        880.133333,
+        885.133333,
+        900.166667,
+        906.3,
+        911.3,
+        926.333333,
+        932.466667,
+        937.466667,
+        952.5,
+        958.633333,
+        963.633333,
+        978.666667,
+        984.8,
+        989.8,
+        1004.833333,
+        1010.966667,
+        1015.966667,
+        1031,
+        1037.133333,
+        1042.133333,
+        1057.166667,
+        1063.3,
+        1068.3,
+        1083.333333,
+        1089.466667,
+        1094.466667,
+        1109.5,
+        1115.633333,
+        1120.633333,
+        1135.666667,
+        1141.8,
+        1146.8,
+        1161.833333,
+        1167.966667,
+        1172.966667,
+        1188,
+        1194.133333,
+        1199.133333,
+        1214.166667,
+        1220.3,
+        1225.3,
+        1240.333333,
+        1246.466667,
+        1251.466667,
+        1266.5,
+        1272.633333,
+        1277.633333,
+        1292.666667,
+        1298.8,
+        1303.8,
+        1318.833333,
+        1324.966667,
+        1329.966667,
+        1345,
+        1351.133333,
+        1356.133333,
+        1371.166667,
+        1377.3,
+        1382.3,
+        1397.333333,
+        1403.466667,
+        1408.466667,
+        1423.5,
+        1429.633333,
+        1434.633333,
+        1449.666667,
+        1455.8,
+        1460.8,
+        1475.833333,
+        1481.966667,
+        1486.966667,
+        1502,
+        1508.133333,
+        1513.133333,
+        1528.166667,
+        1534.3,
+        1539.3,
+        1554.333333,
+        1560.466667,
+        1565.466667,
+        1580.5,
+        1586.633333,
+        1591.633333,
+        1606.666667,
+        1612.8,
+        1617.8,
+        1632.833333,
+        1638.966667,
+        1643.966667,
+        1659,
+        1665.133333,
+        1670.133333,
+        1685.166667,
+        1691.3,
+        1696.3,
+        1711.333333,
+        1717.466667,
+        1722.466667,
+        1737.5,
+        1743.633333,
+        1748.633333,
+        1763.666667,
+        1769.8,
+        1774.8,
+        1789.833333,
+        1795.966667,
+        1800.966667,
+        1816,
+        1822.133333,
+        1827.133333,
+        1842.166667,
+        1848.3,
+        1853.3,
+        1868.333333,
+        1874.466667,
+        1879.466667,
+        1894.5,
+        1900.633333,
+        1905.633333,
+        1920.666667,
+        1926.8,
+        1931.8,
+        1946.833333,
+        1952.966667,
+        1957.966667,
+        1973,
+        1979.133333,
+        1984.133333,
+        1999.166667,
+        2005.3,
+        2010.3,
+        2025.333333,
+        2031.466667,
+        2036.466667,
+        2051.5,
+        2057.633333,
+        2062.633333,
+        2077.666667,
+        2083.8,
+        2088.8,
+        2103.833333,
+        2109.966667,
+        2114.966667,
+        2130,
+        2136.133333,
+        2141.133333,
+        2156.166667,
+        2162.3,
+        2167.3,
+        2182.333333,
+        2188.466667,
+        2193.466667,
+        2208.5,
+        2214.633333,
+        2219.633333,
+        2234.666667,
+        2240.8,
+        2245.8,
+        2260.833333,
+        2266.966667,
+        2271.966667,
+        2287,
+        2293.133333,
+        2298.133333,
+        2313.166667,
+        2319.3,
+        2324.3,
+        2339.333333,
+        2345.466667,
+        2350.466667,
+        2365.5,
+        2371.633333,
+        2376.633333,
+        2391.666667,
+        2397.8,
+        2402.8,
+        2417.833333,
+        2423.966667,
+        2428.966667,
+        2444,
+        2450.133333,
+        2455.133333,
+        2470.166667,
+        2476.3,
+        2481.3,
+        2496.333333,
+        2502.466667,
+        2507.466667,
+        2522.5,
+        2528.633333,
+        2533.633333,
+        2548.666667,
+        2554.8,
+        2559.8,
+        2574.833333,
+        2580.966667,
+        2585.966667,
+        2601,
+        2607.133333,
+        2612.133333,
+        2627.166667,
+        2633.3,
+        2638.3,
+        2653.333333,
+        2659.466667,
+        2664.466667,
+        2679.5,
+        2685.633333,
+        2690.633333,
+        2705.666667,
+        2711.8,
+        2716.8,
+        2731.833333,
+        2737.966667
+      ],
+      "tags": [
+        [
+          560,
+          1,
+          "1"
+        ],
+        [
+          566.133333,
+          1,
+          "2"
+        ],
+        [
+          571.133333,
+          1,
+          "3"
+        ],
+        [
+          586.166667,
+          1,
+          "4"
+        ],
+        [
+          592.3,
+          1,
+          "5"
+        ],
+        [
+          597.3,
+          1,
+          "6"
+        ],
+        [
+          612.333333,
+          1,
+          "7"
+        ],
+        [
+          618.466667,
+          1,
+          "8"
+        ],
+        [
+          623.466667,
+          1,
+          "9"
+        ],
+        [
+          638.5,
+          1,
+          "10"
+        ],
+        [
+          644.633333,
+          1,
+          "11"
+        ],
+        [
+          649.633333,
+          1,
+          "12"
+        ],
+        [
+          664.666667,
+          1,
+          "13"
+        ],
+        [
+          670.8,
+          1,
+          "14"
+        ],
+        [
+          675.8,
+          1,
+          "15"
+        ],
+        [
+          690.833333,
+          1,
+          "16"
+        ],
+        [
+          696.966667,
+          1,
+          "17"
+        ],
+        [
+          701.966667,
+          1,
+          "18"
+        ],
+        [
+          717,
+          1,
+          "19"
+        ],
+        [
+          723.133333,
+          1,
+          "20"
+        ],
+        [
+          728.133333,
+          1,
+          "21"
+        ],
+        [
+          743.166667,
+          1,
+          "22"
+        ],
+        [
+          749.3,
+          1,
+          "23"
+        ],
+        [
+          754.3,
+          1,
+          "24"
+        ],
+        [
+          769.333333,
+          1,
+          "25"
+        ],
+        [
+          775.466667,
+          1,
+          "26"
+        ],
+        [
+          780.466667,
+          1,
+          "27"
+        ],
+        [
+          795.5,
+          1,
+          "28"
+        ],
+        [
+          801.633333,
+          1,
+          "29"
+        ],
+        [
+          806.633333,
+          1,
+          "30"
+        ],
+        [
+          821.666667,
+          1,
+          "31"
+        ],
+        [
+          827.8,
+          1,
+          "32"
+        ],
+        [
+          832.8,
+          1,
+          "33"
+        ],
+        [
+          847.833333,
+          1,
+          "34"
+        ],
+        [
+          853.966667,
+          1,
+          "35"
+        ],
+        [
+          858.966667,
+          1,
+          "36"
+        ],
+        [
+          874,
+          1,
+          "37"
+        ],
+        [
+          880.133333,
+          1,
+          "38"
+        ],
+        [
+          885.133333,
+          1,
+          "39"
+        ],
+        [
+          900.166667,
+          1,
+          "40"
+        ],
+        [
+          906.3,
+          1,
+          "41"
+        ],
+        [
+          911.3,
+          1,
+          "42"
+        ],
+        [
+          926.333333,
+          1,
+          "43"
+        ],
+        [
+          932.466667,
+          1,
+          "44"
+        ],
+        [
+          937.466667,
+          1,
+          "45"
+        ],
+        [
+          952.5,
+          1,
+          "46"
+        ],
+        [
+          958.633333,
+          1,
+          "47"
+        ],
+        [
+          963.633333,
+          1,
+          "48"
+        ],
+        [
+          978.666667,
+          1,
+          "49"
+        ],
+        [
+          984.8,
+          1,
+          "50"
+        ],
+        [
+          989.8,
+          1,
+          "51"
+        ],
+        [
+          1004.833333,
+          1,
+          "52"
+        ],
+        [
+          1010.966667,
+          1,
+          "53"
+        ],
+        [
+          1015.966667,
+          1,
+          "54"
+        ],
+        [
+          1031,
+          1,
+          "55"
+        ],
+        [
+          1037.133333,
+          1,
+          "56"
+        ],
+        [
+          1042.133333,
+          1,
+          "57"
+        ],
+        [
+          1057.166667,
+          1,
+          "58"
+        ],
+        [
+          1063.3,
+          1,
+          "59"
+        ],
+        [
+          1068.3,
+          1,
+          "60"
+        ],
+        [
+          1083.333333,
+          1,
+          "61"
+        ],
+        [
+          1089.466667,
+          1,
+          "62"
+        ],
+        [
+          1094.466667,
+          1,
+          "63"
+        ],
+        [
+          1109.5,
+          1,
+          "64"
+        ],
+        [
+          1115.633333,
+          1,
+          "65"
+        ],
+        [
+          1120.633333,
+          1,
+          "66"
+        ],
+        [
+          1135.666667,
+          1,
+          "67"
+        ],
+        [
+          1141.8,
+          1,
+          "68"
+        ],
+        [
+          1146.8,
+          1,
+          "69"
+        ],
+        [
+          1161.833333,
+          1,
+          "70"
+        ],
+        [
+          1167.966667,
+          1,
+          "71"
+        ],
+        [
+          1172.966667,
+          1,
+          "72"
+        ],
+        [
+          1188,
+          1,
+          "73"
+        ],
+        [
+          1194.133333,
+          1,
+          "74"
+        ],
+        [
+          1199.133333,
+          1,
+          "75"
+        ],
+        [
+          1214.166667,
+          1,
+          "76"
+        ],
+        [
+          1220.3,
+          1,
+          "77"
+        ],
+        [
+          1225.3,
+          1,
+          "78"
+        ],
+        [
+          1240.333333,
+          1,
+          "79"
+        ],
+        [
+          1246.466667,
+          1,
+          "80"
+        ],
+        [
+          1251.466667,
+          1,
+          "81"
+        ],
+        [
+          1266.5,
+          1,
+          "82"
+        ],
+        [
+          1272.633333,
+          1,
+          "83"
+        ],
+        [
+          1277.633333,
+          1,
+          "84"
+        ],
+        [
+          1292.666667,
+          1,
+          "85"
+        ],
+        [
+          1298.8,
+          1,
+          "86"
+        ],
+        [
+          1303.8,
+          1,
+          "87"
+        ],
+        [
+          1318.833333,
+          1,
+          "88"
+        ],
+        [
+          1324.966667,
+          1,
+          "89"
+        ],
+        [
+          1329.966667,
+          1,
+          "90"
+        ],
+        [
+          1345,
+          1,
+          "91"
+        ],
+        [
+          1351.133333,
+          1,
+          "92"
+        ],
+        [
+          1356.133333,
+          1,
+          "93"
+        ],
+        [
+          1371.166667,
+          1,
+          "94"
+        ],
+        [
+          1377.3,
+          1,
+          "95"
+        ],
+        [
+          1382.3,
+          1,
+          "96"
+        ],
+        [
+          1397.333333,
+          1,
+          "97"
+        ],
+        [
+          1403.466667,
+          1,
+          "98"
+        ],
+        [
+          1408.466667,
+          1,
+          "99"
+        ],
+        [
+          1423.5,
+          1,
+          "100"
+        ],
+        [
+          1429.633333,
+          1,
+          "101"
+        ],
+        [
+          1434.633333,
+          1,
+          "102"
+        ],
+        [
+          1449.666667,
+          1,
+          "103"
+        ],
+        [
+          1455.8,
+          1,
+          "104"
+        ],
+        [
+          1460.8,
+          1,
+          "105"
+        ],
+        [
+          1475.833333,
+          1,
+          "106"
+        ],
+        [
+          1481.966667,
+          1,
+          "107"
+        ],
+        [
+          1486.966667,
+          1,
+          "108"
+        ],
+        [
+          1502,
+          1,
+          "109"
+        ],
+        [
+          1508.133333,
+          1,
+          "110"
+        ],
+        [
+          1513.133333,
+          1,
+          "111"
+        ],
+        [
+          1528.166667,
+          1,
+          "112"
+        ],
+        [
+          1534.3,
+          1,
+          "113"
+        ],
+        [
+          1539.3,
+          1,
+          "114"
+        ],
+        [
+          1554.333333,
+          1,
+          "115"
+        ],
+        [
+          1560.466667,
+          1,
+          "116"
+        ],
+        [
+          1565.466667,
+          1,
+          "117"
+        ],
+        [
+          1580.5,
+          1,
+          "118"
+        ],
+        [
+          1586.633333,
+          1,
+          "119"
+        ],
+        [
+          1591.633333,
+          1,
+          "120"
+        ],
+        [
+          1606.666667,
+          1,
+          "121"
+        ],
+        [
+          1612.8,
+          1,
+          "122"
+        ],
+        [
+          1617.8,
+          1,
+          "123"
+        ],
+        [
+          1632.833333,
+          1,
+          "124"
+        ],
+        [
+          1638.966667,
+          1,
+          "125"
+        ],
+        [
+          1643.966667,
+          1,
+          "126"
+        ],
+        [
+          1659,
+          1,
+          "127"
+        ],
+        [
+          1665.133333,
+          1,
+          "128"
+        ],
+        [
+          1670.133333,
+          1,
+          "129"
+        ],
+        [
+          1685.166667,
+          1,
+          "130"
+        ],
+        [
+          1691.3,
+          1,
+          "131"
+        ],
+        [
+          1696.3,
+          1,
+          "132"
+        ],
+        [
+          1711.333333,
+          1,
+          "133"
+        ],
+        [
+          1717.466667,
+          1,
+          "134"
+        ],
+        [
+          1722.466667,
+          1,
+          "135"
+        ],
+        [
+          1737.5,
+          1,
+          "136"
+        ],
+        [
+          1743.633333,
+          1,
+          "137"
+        ],
+        [
+          1748.633333,
+          1,
+          "138"
+        ],
+        [
+          1763.666667,
+          1,
+          "139"
+        ],
+        [
+          1769.8,
+          1,
+          "140"
+        ],
+        [
+          1774.8,
+          1,
+          "141"
+        ],
+        [
+          1789.833333,
+          1,
+          "142"
+        ],
+        [
+          1795.966667,
+          1,
+          "143"
+        ],
+        [
+          1800.966667,
+          1,
+          "144"
+        ],
+        [
+          1816,
+          1,
+          "145"
+        ],
+        [
+          1822.133333,
+          1,
+          "146"
+        ],
+        [
+          1827.133333,
+          1,
+          "147"
+        ],
+        [
+          1842.166667,
+          1,
+          "148"
+        ],
+        [
+          1848.3,
+          1,
+          "149"
+        ],
+        [
+          1853.3,
+          1,
+          "150"
+        ],
+        [
+          1868.333333,
+          1,
+          "151"
+        ],
+        [
+          1874.466667,
+          1,
+          "152"
+        ],
+        [
+          1879.466667,
+          1,
+          "153"
+        ],
+        [
+          1894.5,
+          1,
+          "154"
+        ],
+        [
+          1900.633333,
+          1,
+          "155"
+        ],
+        [
+          1905.633333,
+          1,
+          "156"
+        ],
+        [
+          1920.666667,
+          1,
+          "157"
+        ],
+        [
+          1926.8,
+          1,
+          "158"
+        ],
+        [
+          1931.8,
+          1,
+          "159"
+        ],
+        [
+          1946.833333,
+          1,
+          "160"
+        ],
+        [
+          1952.966667,
+          1,
+          "161"
+        ],
+        [
+          1957.966667,
+          1,
+          "162"
+        ],
+        [
+          1973,
+          1,
+          "163"
+        ],
+        [
+          1979.133333,
+          1,
+          "164"
+        ],
+        [
+          1984.133333,
+          1,
+          "165"
+        ],
+        [
+          1999.166667,
+          1,
+          "166"
+        ],
+        [
+          2005.3,
+          1,
+          "167"
+        ],
+        [
+          2010.3,
+          1,
+          "168"
+        ],
+        [
+          2025.333333,
+          1,
+          "169"
+        ],
+        [
+          2031.466667,
+          1,
+          "170"
+        ],
+        [
+          2036.466667,
+          1,
+          "171"
+        ],
+        [
+          2051.5,
+          1,
+          "172"
+        ],
+        [
+          2057.633333,
+          1,
+          "173"
+        ],
+        [
+          2062.633333,
+          1,
+          "174"
+        ],
+        [
+          2077.666667,
+          1,
+          "175"
+        ],
+        [
+          2083.8,
+          1,
+          "176"
+        ],
+        [
+          2088.8,
+          1,
+          "177"
+        ],
+        [
+          2103.833333,
+          1,
+          "178"
+        ],
+        [
+          2109.966667,
+          1,
+          "179"
+        ],
+        [
+          2114.966667,
+          1,
+          "180"
+        ],
+        [
+          2130,
+          1,
+          "181"
+        ],
+        [
+          2136.133333,
+          1,
+          "182"
+        ],
+        [
+          2141.133333,
+          1,
+          "183"
+        ],
+        [
+          2156.166667,
+          1,
+          "184"
+        ],
+        [
+          2162.3,
+          1,
+          "185"
+        ],
+        [
+          2167.3,
+          1,
+          "186"
+        ],
+        [
+          2182.333333,
+          1,
+          "187"
+        ],
+        [
+          2188.466667,
+          1,
+          "188"
+        ],
+        [
+          2193.466667,
+          1,
+          "189"
+        ],
+        [
+          2208.5,
+          1,
+          "190"
+        ],
+        [
+          2214.633333,
+          1,
+          "191"
+        ],
+        [
+          2219.633333,
+          1,
+          "192"
+        ],
+        [
+          2234.666667,
+          1,
+          "193"
+        ],
+        [
+          2240.8,
+          1,
+          "194"
+        ],
+        [
+          2245.8,
+          1,
+          "195"
+        ],
+        [
+          2260.833333,
+          1,
+          "196"
+        ],
+        [
+          2266.966667,
+          1,
+          "197"
+        ],
+        [
+          2271.966667,
+          1,
+          "198"
+        ],
+        [
+          2287,
+          1,
+          "199"
+        ],
+        [
+          2293.133333,
+          1,
+          "200"
+        ],
+        [
+          2298.133333,
+          1,
+          "201"
+        ],
+        [
+          2313.166667,
+          1,
+          "202"
+        ],
+        [
+          2319.3,
+          1,
+          "203"
+        ],
+        [
+          2324.3,
+          1,
+          "204"
+        ],
+        [
+          2339.333333,
+          1,
+          "205"
+        ],
+        [
+          2345.466667,
+          1,
+          "206"
+        ],
+        [
+          2350.466667,
+          1,
+          "207"
+        ],
+        [
+          2365.5,
+          1,
+          "208"
+        ],
+        [
+          2371.633333,
+          1,
+          "209"
+        ],
+        [
+          2376.633333,
+          1,
+          "210"
+        ],
+        [
+          2391.666667,
+          1,
+          "211"
+        ],
+        [
+          2397.8,
+          1,
+          "212"
+        ],
+        [
+          2402.8,
+          1,
+          "213"
+        ],
+        [
+          2417.833333,
+          1,
+          "214"
+        ],
+        [
+          2423.966667,
+          1,
+          "215"
+        ],
+        [
+          2428.966667,
+          1,
+          "216"
+        ],
+        [
+          2444,
+          1,
+          "217"
+        ],
+        [
+          2450.133333,
+          1,
+          "218"
+        ],
+        [
+          2455.133333,
+          1,
+          "219"
+        ],
+        [
+          2470.166667,
+          1,
+          "220"
+        ],
+        [
+          2476.3,
+          1,
+          "221"
+        ],
+        [
+          2481.3,
+          1,
+          "222"
+        ],
+        [
+          2496.333333,
+          1,
+          "223"
+        ],
+        [
+          2502.466667,
+          1,
+          "224"
+        ],
+        [
+          2507.466667,
+          1,
+          "225"
+        ],
+        [
+          2522.5,
+          1,
+          "226"
+        ],
+        [
+          2528.633333,
+          1,
+          "227"
+        ],
+        [
+          2533.633333,
+          1,
+          "228"
+        ],
+        [
+          2548.666667,
+          1,
+          "229"
+        ],
+        [
+          2554.8,
+          1,
+          "230"
+        ],
+        [
+          2559.8,
+          1,
+          "231"
+        ],
+        [
+          2574.833333,
+          1,
+          "232"
+        ],
+        [
+          2580.966667,
+          1,
+          "233"
+        ],
+        [
+          2585.966667,
+          1,
+          "234"
+        ],
+        [
+          2601,
+          1,
+          "235"
+        ],
+        [
+          2607.133333,
+          1,
+          "236"
+        ],
+        [
+          2612.133333,
+          1,
+          "237"
+        ],
+        [
+          2627.166667,
+          1,
+          "238"
+        ],
+        [
+          2633.3,
+          1,
+          "239"
+        ],
+        [
+          2638.3,
+          1,
+          "240"
+        ],
+        [
+          2653.333333,
+          1,
+          "241"
+        ],
+        [
+          2659.466667,
+          1,
+          "242"
+        ],
+        [
+          2664.466667,
+          1,
+          "243"
+        ],
+        [
+          2679.5,
+          1,
+          "244"
+        ],
+        [
+          2685.633333,
+          1,
+          "245"
+        ],
+        [
+          2690.633333,
+          1,
+          "246"
+        ],
+        [
+          2705.666667,
+          1,
+          "247"
+        ],
+        [
+          2711.8,
+          1,
+          "248"
+        ],
+        [
+          2716.8,
+          1,
+          "249"
+        ],
+        [
+          2731.833333,
+          1,
+          "250"
+        ]
+      ]
+    },
+    "objects/track/zz_cmp_new.apx": {
+      "layers": [
+        {
+          "brightKeys": [
+            [
+              55.566667,
+              0
+            ],
+            [
+              56.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/videoin_1.mov.apx",
+          "name": "Video Layer - videoin_1.mov",
+          "tStart": 55.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              52.566667,
+              0
+            ],
+            [
+              53.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 52.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              38.533333,
+              0
+            ],
+            [
+              39.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 38.533333,
+          "tLength": 15.033333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              35.533333,
+              0
+            ],
+            [
+              36.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test patterns/d3_test_16-9.png.apx",
+          "name": "Video Layer - d3_test_16-9.png",
+          "tStart": 35.533333,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              15.133333,
+              0
+            ],
+            [
+              15.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/center.mov.apx",
+          "name": "Video Layer - center.mov",
+          "tStart": 15.133333,
+          "tLength": 21.4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              10,
+              0
+            ],
+            [
+              10.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 10,
+          "tLength": 6.133333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        }
+      ],
+      "length": 560,
+      "sections": [
+        0,
+        10,
+        15.133333,
+        35.533333,
+        38.533333,
+        52.566667,
+        55.566667,
+        58.566667
+      ],
+      "tags": [
+        [
+          10,
+          0,
+          "01:00:00:00"
+        ],
+        [
+          10,
+          1,
+          "1.5"
+        ],
+        [
+          10,
+          2,
+          "9.1"
+        ],
+        [
+          15.133333,
+          0,
+          "01:00:10:00"
+        ],
+        [
+          15.133333,
+          1,
+          "1.6"
+        ],
+        [
+          15.133333,
+          2,
+          "9.2"
+        ],
+        [
+          35.533333,
+          0,
+          "01:00:20:00"
+        ],
+        [
+          35.533333,
+          1,
+          "1.7"
+        ],
+        [
+          35.533333,
+          2,
+          "9.3"
+        ],
+        [
+          38.533333,
+          0,
+          "01:00:30:00"
+        ],
+        [
+          38.533333,
+          1,
+          "1.8"
+        ],
+        [
+          38.533333,
+          2,
+          "9.4"
+        ],
+        [
+          52.566667,
+          0,
+          "01:00:40:00"
+        ],
+        [
+          52.566667,
+          1,
+          "1.9"
+        ],
+        [
+          52.566667,
+          2,
+          "9.5"
+        ],
+        [
+          55.566667,
+          0,
+          "01:00:50:00"
+        ],
+        [
+          55.566667,
+          1,
+          "1.10"
+        ],
+        [
+          55.566667,
+          2,
+          "9.6"
+        ]
+      ]
+    },
+    "objects/track/zz_cmp_old.apx": {
+      "layers": [
+        {
+          "brightKeys": [
+            [
+              55.566667,
+              0
+            ],
+            [
+              56.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/videoin_1.mov.apx",
+          "name": "Video Layer - videoin_1.mov",
+          "tStart": 55.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              52.566667,
+              0
+            ],
+            [
+              53.066667,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/sample/ada.jpg.apx",
+          "name": "Video Layer - ada.jpg",
+          "tStart": 52.566667,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              38.533333,
+              0
+            ],
+            [
+              39.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+          "name": "Video Layer - yamato_am.mov",
+          "tStart": 38.533333,
+          "tLength": 15.033333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              35.533333,
+              0
+            ],
+            [
+              36.033333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test patterns/d3_test_16-9.png.apx",
+          "name": "Video Layer - d3_test_16-9.png",
+          "tStart": 35.533333,
+          "tLength": 4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              15.133333,
+              0
+            ],
+            [
+              15.633333,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/test 2/center.mov.apx",
+          "name": "Video Layer - center.mov",
+          "tStart": 15.133333,
+          "tLength": 21.4,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        },
+        {
+          "brightKeys": [
+            [
+              10,
+              0
+            ],
+            [
+              10.5,
+              1
+            ]
+          ],
+          "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+          "name": "Video Layer - blood_vortex.mov",
+          "tStart": 10,
+          "tLength": 6.133333,
+          "end": 1,
+          "brightSequenced": true,
+          "mapping": "objects/perspectiveprojection/5 (Perspective).apx",
+          "mode": 0
+        }
+      ],
+      "length": 560,
+      "sections": [
+        0,
+        10,
+        15.133333,
+        35.533333,
+        38.533333,
+        52.566667,
+        55.566667,
+        58.566667
+      ],
+      "tags": [
+        [
+          10,
+          0,
+          "01:00:00:00"
+        ],
+        [
+          10,
+          1,
+          "1.5"
+        ],
+        [
+          10,
+          2,
+          "9.1"
+        ],
+        [
+          15.133333,
+          0,
+          "01:00:10:00"
+        ],
+        [
+          15.133333,
+          1,
+          "1.6"
+        ],
+        [
+          15.133333,
+          2,
+          "9.2"
+        ],
+        [
+          35.533333,
+          0,
+          "01:00:20:00"
+        ],
+        [
+          35.533333,
+          1,
+          "1.7"
+        ],
+        [
+          35.533333,
+          2,
+          "9.3"
+        ],
+        [
+          38.533333,
+          0,
+          "01:00:30:00"
+        ],
+        [
+          38.533333,
+          1,
+          "1.8"
+        ],
+        [
+          38.533333,
+          2,
+          "9.4"
+        ],
+        [
+          52.566667,
+          0,
+          "01:00:40:00"
+        ],
+        [
+          52.566667,
+          1,
+          "1.9"
+        ],
+        [
+          52.566667,
+          2,
+          "9.5"
+        ],
+        [
+          55.566667,
+          0,
+          "01:00:50:00"
+        ],
+        [
+          55.566667,
+          1,
+          "1.10"
+        ],
+        [
+          55.566667,
+          2,
+          "9.6"
+        ]
+      ]
+    }
+  }
+}

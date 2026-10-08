@@ -858,7 +858,8 @@ framework, so acceptance is manual in Designer against checklists.
 | 0 — API discovery | ✅ done (§12) |
 | 1 — Refactor, no behaviour change | ✅ done; browser-verified against Designer (§9.1) |
 | 2 — Clip and mapping metadata | ✅ done. The Python lives in `src/services/python/*.py` and is imported with `?raw`, so the same files run as probes |
-| 3 … 9 | pending |
+| 3 — Unified creation engine | ✅ done. `createLayerPlan` = prepare / layer chunks (≤100) / markers. **Verified identical** to 1.1.x `createLayers` on 6 mixed clips: layers, stack order, sequences, 18 tags and 8 sections all match. 250 layers in 3 chunks take 0.9 s; the track is extended past its old end with no truncated layers. Old `createLayers` removed |
+| 4 … 9 | pending |
 
 ### Phase 0 — API discovery (no UI changes)
 - Run queries Q-A…Q-D (§5.1). Record mapping type names, the source of mapping and clip
