@@ -10,7 +10,7 @@ export function byNameAsc(a, b) {
 // Flattens a folder subtree into its files. Files below the starting point are
 // tagged with `subfolderPath` (the folder names crossed to reach them, relative
 // to wherever the walk started) so the UI can disambiguate same-named files
-// from different subfolders — files sitting directly in the starting level are
+// from different subfolders - files sitting directly in the starting level are
 // left as the original object, untagged. Pass { tag: false } to skip the
 // subfolderPath allocation entirely when the caller only needs the flat file
 // list (e.g. resolving paths) and doesn't care about origin folders.

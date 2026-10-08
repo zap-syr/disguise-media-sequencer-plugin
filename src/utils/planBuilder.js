@@ -65,7 +65,7 @@ export function buildAdvancedPlan(options, planState) {
 
 /**
  * Simple mode: every selected clip, in selection order, one after another, one mapping.
- * Tags and splits at every file — identical to createLayers 1.1.x.
+ * Tags and splits at every file, identical to createLayers 1.1.x.
  */
 export function buildSimplePlan(options, clipPaths) {
   const layer = layerSettingsFromOptions(options);

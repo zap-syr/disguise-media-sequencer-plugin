@@ -121,8 +121,8 @@ export function useFileSelection(itemsRef) {
     // off restores them. Recomputed fresh every tick, not cumulative.
     const toggledPreExisting = Array.from(initialSelection).filter(id => !currentlyIntersecting.has(id));
 
-    // Cards not part of the pre-drag selection accumulate in sweep order —
-    // added the first time the box covers them, dropped once it moves off —
+    // Cards not part of the pre-drag selection accumulate in sweep order -
+    // added the first time the box covers them, dropped once it moves off -
     // preserving the direction the box was dragged in. A Set preserves insertion
     // order and re-adding an existing member is a no-op (doesn't move it), so
     // this reproduces the old filter+includes-guarded-push behavior in O(1)

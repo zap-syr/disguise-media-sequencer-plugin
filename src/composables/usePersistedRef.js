@@ -22,7 +22,7 @@ export function usePersistedRef(key, fallback, parse) {
     try {
       localStorage.setItem(key, newValue);
     } catch (e) {
-      // localStorage unavailable in this context — ignore
+      // localStorage unavailable in this context, ignore
     }
   });
   return value;

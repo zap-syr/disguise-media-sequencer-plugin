@@ -57,7 +57,7 @@ async function executePython(directorIp, script) {
         const lastLine = message.trim().split('\n').filter(Boolean).pop();
         if (lastLine) detail = lastLine.replace(/\.$/, '');
       } catch (e) {
-        // not JSON — keep statusText
+        // not JSON, keep statusText
       }
       throw new Error(`Python execution failed: ${detail}`);
     }

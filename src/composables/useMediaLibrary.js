@@ -4,7 +4,7 @@ import { getMediaList, getMediaDetails, getMappingList, getTrackList } from '../
 /** Media hierarchy, per-clip details, mappings and tracks loaded from Designer, with initial load and refresh. */
 export function useMediaLibrary(directorEndpoint) {
   const fullHierarchy = ref([]);
-  // { [clipPath]: { kind, duration, res, hasAlpha, hasAudio, ... } } — optional enrichment:
+  // { [clipPath]: { kind, duration, res, hasAlpha, hasAudio, ... } }. Optional enrichment:
   // a failure here must not block the plugin, cards fall back to extension-based types.
   const mediaDetails = ref({});
   const mappings = ref([]);
