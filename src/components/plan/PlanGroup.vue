@@ -1,0 +1,201 @@
+<template>
+  <section class="group" :class="{ 'is-flash': flash }" :id="`plan-group-${group.id}`">
+    <header class="g-head">
+      <button type="button" class="chev" :class="{ 'is-open': group.open }" :aria-expanded="group.open" :aria-label="(group.open ? 'Collapse ' : 'Expand ') + label" @click="$emit('toggle')">
+        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L8 5 L3 8.5 Z" fill="currentColor"/></svg>
+      </button>
+      <span class="g-label">{{ label }}</span>
+      <input class="g-name" type="text" :value="group.name" aria-label="Group name" @change="$emit('rename', $event.target.value)" />
+      <div class="g-span" title="Group position on the plan timeline">
+        <span class="span" :style="spanStyle"></span>
+        <span v-for="(p, i) in splitMarks" :key="'s' + i" class="mk-split" :style="{ left: p + '%' }"></span>
+        <span v-for="(p, i) in tagMarks" :key="'t' + i" class="mk-tag" :style="{ left: p + '%' }"></span>
+      </div>
+      <span class="g-meta">{{ meta }}</span>
+      <button type="button" class="icon-btn" title="Delete group" aria-label="Delete group" @click="$emit('remove')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+      </button>
+    </header>
+
+    <template v-if="group.open">
+      <div class="g-set">
+        <span class="g-set-label">Layers start</span>
+        <div class="seg" role="group" aria-label="Layers start">
+          <button type="button" :class="{ on: group.timing === 'seq' }" @click="$emit('set-timing', 'seq')">One after another</button>
+          <button type="button" :class="{ on: group.timing === 'same' }" @click="$emit('set-timing', 'same')">All at once</button>
+        </div>
+      </div>
+
+      <div v-if="rows.length" class="rows">
+        <div v-for="row in rows" :key="row.id" class="row">
+          <span class="ord">{{ row.index }}</span>
+          <span class="thumb">
+            <img v-if="row.thumbUrl && !brokenThumbs[row.id]" :src="row.thumbUrl" alt="" @error="brokenThumbs[row.id] = true" />
+          </span>
+          <div class="pname">
+            <div class="pname-txt" :title="row.name">{{ row.name }}</div>
+            <div class="pname-sub">{{ row.sub }}</div>
+          </div>
+          <button type="button" class="icon-btn" :aria-label="`Remove ${row.name} from ${label}`" title="Remove from group" @click="$emit('remove-entry', row.id)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div v-else class="g-empty">Empty group — select files and use “Add to group…”.</div>
+    </template>
+  </section>
+</template>
+
+<script setup>
+import { computed, reactive } from 'vue';
+import { formatClock, formatDuration } from '../../utils/format';
+
+const props = defineProps({
+  group: { type: Object, required: true },
+  index: { type: Number, required: true },
+  layout: { type: Object, required: true },       // { start, end, rows: [{ id, start, duration }], starts }
+  total: { type: Number, required: true },        // plan length in seconds
+  rowOffset: { type: Number, default: 0 },        // global layer number before this group
+  entries: { type: Object, required: true },
+  filesByPath: { type: Object, required: true },  // clip path -> file node { name, uid }
+  details: { type: Object, required: true },
+  thumbBase: { type: String, default: '' },       // http://director/api/v1/thumbnail/
+  showSplits: { type: Boolean, default: false },
+  showTags: { type: Boolean, default: false },
+  flash: { type: Boolean, default: false }
+});
+defineEmits(['toggle', 'rename', 'remove', 'remove-entry', 'set-timing']);
+
+const brokenThumbs = reactive({});
+
+const label = computed(() => `G${props.index + 1}`);
+const pct = x => (props.total > 0 ? (x / props.total) * 100 : 0);
+
+const spanStyle = computed(() => ({
+  left: pct(props.layout.start) + '%',
+  width: Math.max(0.8, pct(props.layout.end - props.layout.start)) + '%'
+}));
+const hasRows = computed(() => props.layout.rows.length > 0);
+// Phase 4 plan defaults: splits at the group start, tags at every file (docs §4.2)
+const splitMarks = computed(() => (props.showSplits && hasRows.value ? [pct(props.layout.start)] : []));
+const tagMarks = computed(() => (props.showTags && hasRows.value ? props.layout.starts.map(pct) : []));
+
+const meta = computed(() => {
+  const n = props.group.items.length;
+  return `${n} ${n === 1 ? 'file' : 'files'} · ${formatDuration(props.layout.end - props.layout.start) || '0s'}`;
+});
+
+const rows = computed(() => props.layout.rows.map((r, i) => {
+  const mediaId = props.entries[r.id]?.mediaId;
+  const file = props.filesByPath[mediaId];
+  const det = props.details[mediaId];
+  const name = file?.name || (mediaId || '').split('/').pop();
+  const sub = [formatClock(r.start), formatDuration(r.duration), det?.res].filter(Boolean).join(' · ');
+  return {
+    id: r.id,
+    index: props.rowOffset + i + 1,
+    name,
+    sub,
+    thumbUrl: file?.uid && props.thumbBase ? props.thumbBase + file.uid : null
+  };
+}));
+</script>
+
+<style scoped>
+* { box-sizing: border-box; }
+
+.group {
+  border: 1px solid #333333;
+  border-radius: 6px;
+  background: #1e1e1e;
+  margin: 10px 14px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.group.is-flash { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
+
+.g-head {
+  display: grid;
+  grid-template-columns: 22px 34px minmax(120px, 1fr) minmax(60px, 140px) auto 26px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #242424;
+  border-radius: 6px;
+}
+.group:has(.g-set) .g-head { border-radius: 6px 6px 0 0; }
+
+.chev {
+  width: 22px; height: 22px;
+  border: none; background: transparent; color: #aaaaaa;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px; cursor: pointer; padding: 0;
+}
+.chev svg { transition: transform 0.18s ease; }
+.chev.is-open svg { transform: rotate(90deg); }
+.chev:hover { color: #ffffff; }
+
+.g-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  height: 22px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  background: #0a84ff; color: #ffffff;
+}
+
+.g-name {
+  min-width: 0; height: 28px;
+  background: transparent; border: 1px solid transparent; border-radius: 6px;
+  color: #dddddd; font: inherit; font-size: 13px; font-weight: 600;
+  padding: 0 6px; outline: none; transition: border-color 0.2s ease;
+}
+.g-name:hover { border-color: #3a3a3a; }
+.g-name:focus { border-color: #0a84ff; background: #181818; }
+
+.g-span { position: relative; height: 14px; background: #151515; border-radius: 3px; min-width: 0; }
+.g-span .span { position: absolute; top: 3px; bottom: 3px; background: #3a3a3a; border-radius: 2px; }
+.mk-split { position: absolute; top: 0; bottom: 0; width: 2px; background: #dddddd; transform: translateX(-1px); }
+.mk-tag { position: absolute; top: 3px; width: 7px; height: 7px; background: #0a84ff; transform: translateX(-50%) rotate(45deg); }
+
+.g-meta { font-size: 11px; color: #888888; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.icon-btn {
+  width: 24px; height: 24px; border: none; border-radius: 4px;
+  background: transparent; color: #888888;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; padding: 0; transition: all 0.2s ease;
+}
+.icon-btn:hover { background: #333333; color: #ffffff; }
+
+.g-set {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-top: 1px solid #2a2a2a; background: #1e1e1e;
+}
+.g-set-label { font-size: 11px; color: #888888; font-weight: 600; }
+.seg { display: inline-flex; background: #181818; border: 1px solid #3a3a3a; border-radius: 6px; padding: 2px; }
+.seg button {
+  border: none; background: transparent; color: #888888;
+  padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.seg button:hover { color: #cccccc; }
+.seg button.on { background: #3a3a3a; color: #ffffff; }
+
+.rows { border-top: 1px solid #2a2a2a; }
+.row {
+  display: grid;
+  grid-template-columns: 26px 40px minmax(0, 1fr) 26px;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 10px;
+  border-bottom: 1px solid #222222;
+}
+.row:last-child { border-bottom: none; }
+.row:hover { background: #242424; }
+.ord { font-size: 11px; color: #888888; text-align: center; font-variant-numeric: tabular-nums; }
+.thumb { width: 40px; height: 26px; border-radius: 4px; background: #151515; overflow: hidden; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pname { min-width: 0; }
+.pname-txt { font-size: 12px; color: #cccccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pname-sub { font-size: 11px; color: #666666; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.g-empty { padding: 14px; text-align: center; color: #666666; font-size: 12px; border-top: 1px solid #2a2a2a; }
+</style>
