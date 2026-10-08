@@ -64,6 +64,14 @@
         :thumb-base="thumbBase"
         :show-splits="layerOptions.splitSection"
         :show-tags="tagsOn"
+        :mappings-by-path="mappingsByPath"
+        :armed="armedMapping"
+        @assign="plan.assign"
+        @clear-entries="plan.clearMappings"
+        @assign-group="plan.assignGroup"
+        @clear-group="plan.clearMappings"
+        @clear-all-mappings="plan.clearMappings('all')"
+        @disarm="armedMapping = null"
         @add-group="onAddEmptyGroup"
         @update-group="plan.updateGroup"
         @remove-group="onRemoveGroup"
@@ -84,11 +92,20 @@
         :options="layerOptions"
         :layer-count="createCount"
         :summary="footerSummary"
+        :unmapped-count="isAdvanced ? plan.unmappedCount.value : 0"
         :is-creating="isCreating"
         :create-progress="createProgress"
         @create="handleCreateLayers"
         @track-created="library.addTrack"
-      />
+      >
+        <template v-if="isAdvanced" #mappings>
+          <MappingsPanel
+            v-model:armed="armedMapping"
+            :mappings="library.mappings.value"
+            :usage="plan.mappingUsage.value"
+          />
+        </template>
+      </SettingsPanel>
     </div>
 
     <Toast :toast="toast" @dismiss="dismissToast" />
@@ -96,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
 import { createLayerPlan } from '../services/disguiseService';
 import { buildSimplePlan, buildAdvancedPlan } from '../utils/planBuilder';
 import { computePlanLayout } from '../utils/planLayout';
@@ -113,6 +130,7 @@ import FilesPane from './files/FilesPane.vue';
 import SettingsPanel from './settings/SettingsPanel.vue';
 import LayerPlan from './plan/LayerPlan.vue';
 import WorkspaceSwitch from './common/WorkspaceSwitch.vue';
+import MappingsPanel from './settings/MappingsPanel.vue';
 import Toast from './common/Toast.vue';
 
 const props = defineProps({
@@ -157,6 +175,15 @@ watch(effectiveWorkspace, ws => { treeCollapsed.value = ws !== 'files'; }, { imm
 const plan = useLayerPlan();
 const layerPlanRef = ref(null);
 
+// Mapping armed for click-to-assign (keyboard alternative to drag & drop); Esc disarms
+const armedMapping = ref(null);
+watch(isAdvanced, adv => { if (!adv) armedMapping.value = null; });
+function onKeydown(event) {
+  if (event.key === 'Escape' && armedMapping.value) armedMapping.value = null;
+}
+onMounted(() => window.addEventListener('keydown', onKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onKeydown));
+
 // Navigation state
 const selectedFolderId = ref('all');
 const expandedFolders = ref(new Set(['Root']));
@@ -169,6 +196,8 @@ const filteredMediaList = computed(() => folderFiles(library.fullHierarchy.value
 }));
 
 const selection = useFileSelection(filteredMediaList);
+
+const mappingsByPath = computed(() => Object.fromEntries(library.mappings.value.map(m => [m.path, m])));
 
 const filesByPath = computed(() => Object.fromEntries(
   flattenFiles(library.fullHierarchy.value, { tag: false }).map(f => [f.path, f])
@@ -198,7 +227,11 @@ const footerSummary = computed(() => {
   if (isAdvanced.value) {
     const g = plan.state.groups.length;
     if (!plan.layerCount.value) return 'Layer plan is empty';
-    return `${g} ${g === 1 ? 'group' : 'groups'} · ${plan.layerCount.value} layers · ≈${formatDuration(planLayout.value.total) || '0s'}`;
+    const maps = Object.keys(plan.mappingUsage.value).length;
+    const unmapped = plan.unmappedCount.value;
+    return `${g} ${g === 1 ? 'group' : 'groups'} · ${plan.layerCount.value} layers · ${maps} ${maps === 1 ? 'mapping' : 'mappings'}`
+      + (unmapped ? ` · ${unmapped} without mapping` : '')
+      + ` · ≈${formatDuration(planLayout.value.total) || '0s'}`;
   }
   const n = selection.selectedItems.size;
   if (!n) return 'No media selected';

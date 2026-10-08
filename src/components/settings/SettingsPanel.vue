@@ -15,10 +15,13 @@
 
     <div class="settings-sidebar-content">
 
+      <!-- Advanced: per-layer mappings panel -->
+      <slot name="mappings"></slot>
+
       <!-- LAYER PROPERTIES -->
       <div class="group-box">
         <div class="group-header">LAYER PROPERTIES</div>
-        <div class="control">
+        <div v-if="creationMode === 'simple'" class="control">
           <label>Mapping</label>
           <div class="searchable-select" ref="mappingRef">
             <input
@@ -342,7 +345,14 @@
 
     <div class="settings-footer">
       <div v-if="summary" class="footer-summary">{{ summary }}</div>
-      <button
+      <div v-if="confirmUnmapped" class="confirm-strip" role="alert">
+        <span>{{ unmappedCount }} {{ unmappedCount === 1 ? 'layer has' : 'layers have' }} no mapping and will be created without one.</span>
+        <div class="confirm-actions">
+          <button type="button" class="create-track-cancel-btn" @click="confirmUnmapped = false">Cancel</button>
+          <button type="button" class="create-track-confirm-btn" @click="confirmCreate">Create anyway</button>
+        </div>
+      </div>
+      <button v-if="!confirmUnmapped"
         class="create-btn"
         :disabled="!isCreateLayersEnabled || isCreating"
         @click="handleCreate"
@@ -368,6 +378,8 @@ const props = defineProps({
   // layers the Create button would make: selected files (Simple) or plan entries (Advanced)
   layerCount: { type: Number, default: 0 },
   summary: { type: String, default: '' },
+  // Advanced: plan layers without a mapping (docs §11 Q1: warn, confirm, create with mapping cleared)
+  unmappedCount: { type: Number, default: 0 },
   isCreating: { type: Boolean, default: false },
   createProgress: { type: Object, default: null } // { created, total }
 });
@@ -432,7 +444,8 @@ const newTrackNameError = computed(() => {
 
 const isCreateLayersEnabled = computed(() => {
   const hasSelection = props.layerCount > 0;
-  const hasMapping = !!selectedMapping.value;
+  // Advanced assigns mappings per layer in the plan
+  const hasMapping = creationMode.value === 'advanced' || !!selectedMapping.value;
   const validCue = isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true);
   const validMidi = isMidiNoteValid.value && (options.addMidiNote ? options.midiNoteValue !== '' : true);
   const validTimecode = isTimecodeStartValid.value && isTimecodeIncrementValid.value;
@@ -574,11 +587,27 @@ const handleClickOutside = (e) => {
 
 // --- Create ---
 
+const confirmUnmapped = ref(false);
+watch([() => props.unmappedCount, creationMode], () => { confirmUnmapped.value = false; });
+
 function handleCreate() {
   if (!isCreateLayersEnabled.value || props.isCreating) return;
+  if (creationMode.value === 'advanced' && props.unmappedCount > 0) {
+    confirmUnmapped.value = true;
+    return;
+  }
+  emitCreate();
+}
+
+function confirmCreate() {
+  confirmUnmapped.value = false;
+  emitCreate();
+}
+
+function emitCreate() {
   emit('create', {
     ...options,
-    mappingPath: selectedMapping.value.path,
+    mappingPath: creationMode.value === 'simple' ? selectedMapping.value?.path : null,
     targetTrack: options.insertMode === 'Specific location' ? selectedTrack.value?.path : null
   });
 }
@@ -637,6 +666,20 @@ onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
 
 .segmented-control.compact { display: inline-flex; width: auto; }
 .segmented-control.compact .segment { flex: none; padding: 5px 10px; }
+
+.confirm-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  background: #1a1a1a;
+  font-size: 12px;
+  color: #dddddd;
+  line-height: 1.4;
+}
+.confirm-actions { display: flex; gap: 8px; }
 
 .footer-summary {
   font-size: 11px;

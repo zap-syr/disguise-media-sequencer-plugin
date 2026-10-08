@@ -39,9 +39,9 @@ export function layerSettingsFromOptions(options) {
 }
 
 /**
- * Advanced mode (Phase 4): one plan group per UI group. Layer settings and the mapping still
- * come from the settings panel; per-group/per-layer values arrive in Phases 5 and 7.
- * Splits at the group start, tags at every file (plan defaults, docs §4.2).
+ * Advanced mode: one plan group per UI group, each layer with its own mapping (null = none:
+ * plan_layers.py clears Designer's pre-filled mapping). Layer settings still come from the
+ * settings panel until Phase 7. Splits at the group start, tags at every file (docs §4.2).
  */
 export function buildAdvancedPlan(options, planState) {
   const layer = layerSettingsFromOptions(options);
@@ -54,7 +54,11 @@ export function buildAdvancedPlan(options, planState) {
         overlap: Number(options.overlap) || 0,
         tagAt: 'file',
         splitAt: 'group',
-        layers: g.items.map(id => ({ clipPath: planState.entries[id].mediaId, mappingPath: options.mappingPath, ...layer }))
+        layers: g.items.map(id => ({
+          clipPath: planState.entries[id].mediaId,
+          mappingPath: planState.entries[id].mappingPath || null,
+          ...layer
+        }))
       }))
   };
 }
