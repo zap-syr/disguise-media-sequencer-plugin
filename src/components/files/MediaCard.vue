@@ -238,6 +238,14 @@ const listMeta = computed(() => {
   min-width: 0;
 }
 .media-card.is-list.is-card-selected .card-footer { background: transparent; }
+/* Narrow list rows (Split pane in a small window): keep the name readable, drop secondary meta */
+.media-card.is-list .card-footer { container-type: inline-size; }
+@container (max-width: 300px) {
+  .file-type { display: none; }
+}
+@container (max-width: 220px) {
+  .list-meta, .group-pill { display: none; }
+}
 .media-card.is-list .file-name { flex: 1; min-width: 0; }
 .media-card.is-list .file-type { flex-shrink: 0; }
 
