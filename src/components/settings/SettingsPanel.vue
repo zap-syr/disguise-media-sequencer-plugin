@@ -9,8 +9,8 @@
     </div>
     <div class="mode-hint">
       {{ creationMode === 'advanced'
-        ? 'Advanced — groups of files with their own timing. Build the plan in the Layer plan pane.'
-        : 'Simple — one mapping for all layers, created one after another.' }}
+        ? 'Advanced: groups of files with their own timing. Build the plan in the Layer plan pane.'
+        : 'Simple: one mapping for all layers, created one after another.' }}
     </div>
 
     <div class="settings-sidebar-content">
@@ -959,7 +959,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 .create-btn:hover:not(:disabled) { background: #0060d1; }
 .create-btn:disabled { background: #3a3a3a; color: #777; cursor: not-allowed; }
 
-/* Create New Track — dropdown entry */
+/* Create New Track -dropdown entry */
 .dropdown-create-item {
   padding: 8px 12px;
   font-size: 12px;
@@ -971,7 +971,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 }
 .dropdown-create-item:hover { background: rgba(10, 132, 255, 0.15); }
 
-/* Create New Track — full-width panel */
+/* Create New Track -full-width panel */
 .create-track-panel {
   display: flex;
   flex-direction: column;

@@ -30,6 +30,7 @@
         :director-endpoint="props.directorEndpoint"
         :media-details="library.mediaDetails.value"
         :group-labels="isAdvanced ? plan.groupLabelsByMedia.value : {}"
+        :drag-enabled="showPlan"
         :selection="selection"
         @select-folder="selectFolder"
         @refresh="library.refresh"
@@ -47,7 +48,7 @@
               @change="onAddToGroup"
             >
               <option value="">Add to group…</option>
-              <option v-for="(g, gi) in plan.state.groups" :key="g.id" :value="g.id">G{{ gi + 1 }} · {{ g.name }} ({{ g.items.length }})</option>
+              <option v-for="(g, gi) in plan.state.groups" :key="g.id" :value="g.id">G{{ gi + 1 }}: {{ g.name }} ({{ g.items.length }})</option>
             </select>
             <button type="button" class="primary-sm" :disabled="!selection.selectedItems.size" @click="onNewGroup">+ New group</button>
           </div>
@@ -72,6 +73,15 @@
         @clear-group="plan.clearMappings"
         @clear-all-mappings="plan.clearMappings('all')"
         @disarm="armedMapping = null"
+        :checked="planSelection.checked"
+        :selected-ids="planSelection.selectedIds.value"
+        @row-click="planSelection.click"
+        @row-check="planSelection.toggle"
+        @group-check="planSelection.toggleGroup"
+        @drop-rows="onDropRows"
+        @drop-files="onDropFiles"
+        @remove-selected="onRemoveSelected"
+        @deselect="planSelection.clear"
         @add-group="onAddEmptyGroup"
         @update-group="plan.updateGroup"
         @remove-group="onRemoveGroup"
@@ -118,6 +128,7 @@ import { createLayerPlan } from '../services/disguiseService';
 import { buildSimplePlan, buildAdvancedPlan } from '../utils/planBuilder';
 import { computePlanLayout } from '../utils/planLayout';
 import { formatDuration } from '../utils/format';
+import { setMappingPalette } from '../utils/mappingColors';
 import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath } from '../utils/mediaTree';
 import { useMediaLibrary } from '../composables/useMediaLibrary';
 import { useFileSelection } from '../composables/useFileSelection';
@@ -125,6 +136,7 @@ import { usePersistedRef } from '../composables/usePersistedRef';
 import { useToast } from '../composables/useToast';
 import { useLayerOptions } from '../composables/useLayerOptions';
 import { useLayerPlan } from '../composables/useLayerPlan';
+import { usePlanSelection } from '../composables/usePlanSelection';
 import FolderTree from './tree/FolderTree.vue';
 import FilesPane from './files/FilesPane.vue';
 import SettingsPanel from './settings/SettingsPanel.vue';
@@ -175,11 +187,16 @@ watch(effectiveWorkspace, ws => { treeCollapsed.value = ws !== 'files'; }, { imm
 const plan = useLayerPlan();
 const layerPlanRef = ref(null);
 
-// Mapping armed for click-to-assign (keyboard alternative to drag & drop); Esc disarms
+const planSelection = usePlanSelection(plan.state);
+
+// Mapping armed for click-to-assign (keyboard alternative to drag & drop).
+// Esc first disarms the mapping, then clears the plan row selection.
 const armedMapping = ref(null);
 watch(isAdvanced, adv => { if (!adv) armedMapping.value = null; });
 function onKeydown(event) {
-  if (event.key === 'Escape' && armedMapping.value) armedMapping.value = null;
+  if (event.key !== 'Escape') return;
+  if (armedMapping.value) armedMapping.value = null;
+  else planSelection.clear();
 }
 onMounted(() => window.addEventListener('keydown', onKeydown));
 onUnmounted(() => window.removeEventListener('keydown', onKeydown));
@@ -198,6 +215,8 @@ const filteredMediaList = computed(() => folderFiles(library.fullHierarchy.value
 const selection = useFileSelection(filteredMediaList);
 
 const mappingsByPath = computed(() => Object.fromEntries(library.mappings.value.map(m => [m.path, m])));
+// Distinct colour per mapping, in list order (updates after Refresh)
+watch(() => library.mappings.value, list => setMappingPalette(list), { immediate: true });
 
 const filesByPath = computed(() => Object.fromEntries(
   flattenFiles(library.fullHierarchy.value, { tag: false }).map(f => [f.path, f])
@@ -229,16 +248,21 @@ const footerSummary = computed(() => {
     if (!plan.layerCount.value) return 'Layer plan is empty';
     const maps = Object.keys(plan.mappingUsage.value).length;
     const unmapped = plan.unmappedCount.value;
-    return `${g} ${g === 1 ? 'group' : 'groups'} · ${plan.layerCount.value} layers · ${maps} ${maps === 1 ? 'mapping' : 'mappings'}`
-      + (unmapped ? ` · ${unmapped} without mapping` : '')
-      + ` · ≈${formatDuration(planLayout.value.total) || '0s'}`;
+    const parts = [
+      `${g} ${g === 1 ? 'group' : 'groups'}`,
+      `${plan.layerCount.value} layers`,
+      `${maps} ${maps === 1 ? 'mapping' : 'mappings'}`,
+      unmapped ? `${unmapped} without mapping` : null,
+      `≈${formatDuration(planLayout.value.total) || '0s'}`
+    ];
+    return parts.filter(Boolean).join(', ');
   }
   const n = selection.selectedItems.size;
   if (!n) return 'No media selected';
   const paths = selectedClipPaths();
   const entries = Object.fromEntries(paths.map((p, i) => [i, { mediaId: p }]));
   const virtual = computePlanLayout([{ timing: 'seq', items: paths.map((p, i) => i) }], entries, library.mediaDetails.value, timingSettings.value);
-  return `${n} layers · one after another · ≈${formatDuration(virtual.total) || '0s'}`;
+  return `${n} layers, one after another, ≈${formatDuration(virtual.total) || '0s'}`;
 });
 
 // --- Plan actions ---
@@ -267,6 +291,25 @@ function onAddToGroup(event) {
   const gi = plan.state.groups.findIndex(g => g.id === gid);
   showToast(`${paths.length} ${paths.length === 1 ? 'file' : 'files'} added to G${gi + 1}`);
   revealGroup(gid);
+}
+
+function onDropRows({ ids, gid, targetId, pos }) {
+  plan.moveEntries(ids, gid, targetId, pos);
+}
+
+function onDropFiles({ paths, gid, targetId, pos }) {
+  plan.insertFiles(paths, gid, targetId, pos);
+  selection.clear();
+  const gi = plan.state.groups.findIndex(g => g.id === gid);
+  showToast(`${paths.length} ${paths.length === 1 ? 'file' : 'files'} added to G${gi + 1}`);
+}
+
+function onRemoveSelected() {
+  const ids = [...planSelection.selectedIds.value];
+  if (!ids.length) return;
+  const restore = plan.removeEntries(ids);
+  planSelection.clear();
+  showToast(`${ids.length} ${ids.length === 1 ? 'layer' : 'layers'} removed from the plan`, 'info', { label: 'Undo', fn: restore });
 }
 
 function onAddEmptyGroup() {
@@ -325,7 +368,7 @@ async function handleCreateLayers(requestOptions) {
     // Simple consumes the selection; Advanced keeps the plan so it can be tweaked and re-created
     if (!advanced) selection.clear();
     if (result.errors.length) {
-      showToast(`Created ${result.created} of ${expected} layers — ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
+      showToast(`Created ${result.created} of ${expected} layers, ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
       console.warn('Layer creation issues:', result.errors);
     } else {
       showToast(advanced

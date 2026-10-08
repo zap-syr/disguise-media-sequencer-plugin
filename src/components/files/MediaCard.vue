@@ -19,13 +19,13 @@
       <span v-if="showOrder && selected && viewMode === 'list'" class="order-pill">{{ selectionOrder }}</span>
       <span class="file-name" :title="item.subfolderPath ? `${item.name}  (in ${item.subfolderPath})` : item.name">
         {{ item.name }}
-        <span v-if="item.subfolderPath" class="file-subfolder">· {{ item.subfolderPath }}</span>
+        <span v-if="item.subfolderPath" class="file-subfolder">in {{ item.subfolderPath }}</span>
       </span>
       <span v-if="viewMode === 'list' && groupLabel" class="group-pill" :title="`In plan groups ${groupLabel}`">{{ groupLabel }}</span>
       <span v-if="viewMode === 'list' && listMeta" class="list-meta">{{ listMeta }}</span>
       <span class="file-meta">
-        <span v-if="compact && gridResolution" class="file-type file-res" :title="`${typeLabel} · ${gridResolution}`">{{ gridResolution }}</span>
-        <span v-else class="file-type" :class="{ 'is-live': kind === 'live' }" :title="gridResolution ? `${typeLabel} · ${gridResolution}` : null">{{ typeLabel }}<span v-if="gridResolution" class="file-res"> · {{ gridResolution }}</span></span>
+        <span v-if="compact && gridResolution" class="file-type file-res" :title="`${typeLabel}, ${gridResolution}`">{{ gridResolution }}</span>
+        <span v-else class="file-type" :class="{ 'is-live': kind === 'live' }" :title="gridResolution ? `${typeLabel}, ${gridResolution}` : null">{{ typeLabel }}<span v-if="gridResolution" class="file-res">, {{ gridResolution }}</span></span>
         <span v-if="details?.hasAlpha || details?.hasAudio" class="flags">
           <svg v-if="details.hasAlpha" class="flag" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" role="img" aria-label="Alpha channel"><title>Alpha channel</title><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" fill="none" stroke="currentColor"/><rect x="1" y="1" width="5" height="5" fill="currentColor"/><rect x="6" y="6" width="5" height="5" fill="currentColor"/></svg>
           <svg v-if="details.hasAudio" class="flag" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Audio"><title>Audio</title><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
@@ -64,7 +64,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  // "G1 · G3" when the clip is already in the Advanced plan
+  // "G1,G3" when the clip is already in the Advanced plan
   groupLabel: {
     type: String,
     default: ''
@@ -74,7 +74,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  // Entry of getMediaDetails(): { kind, duration, res, hasAlpha, hasAudio, ... } — may be missing
+  // Entry of getMediaDetails(): { kind, duration, res, hasAlpha, hasAudio, ... } -may be missing
   details: {
     type: Object,
     default: null
@@ -124,7 +124,7 @@ const listMeta = computed(() => {
   if (!props.details) return '';
   const parts = [props.details.res];
   if (kind.value === 'video') parts.push(formatDuration(props.details.duration));
-  return parts.filter(Boolean).join(' · ');
+  return parts.filter(Boolean).join(', ');
 });
 </script>
 
@@ -141,6 +141,10 @@ const listMeta = computed(() => {
   height: 100%; /* Sized by the grid's grid-auto-rows */
 }
 .media-card:hover { border-color: #555555; }
+/* Shift/Ctrl-click selects cards, not text */
+.media-card { user-select: none; }
+.media-card[draggable="true"] { cursor: grab; }
+.media-card[draggable="true"]:active { cursor: grabbing; }
 .media-card.no-transition { transition: none; }
 .media-card.is-card-selected {
   border: 1px solid #0a84ff;
@@ -163,7 +167,7 @@ const listMeta = computed(() => {
   border-style: solid;
   border-width: 0 0 0 3px;
   border-color: #0a84ff;
-  /* Same shadow shape as the grid-selected glow, just fully transparent —
+  /* Same shadow shape as the grid-selected glow, just fully transparent -
      keeps the box-shadow layer count matched so it fades instead of
      popping when switching between grid and list view. */
   box-shadow: 0 0 0 1px rgba(10, 132, 255, 0), 0 0 15px rgba(10, 132, 255, 0);

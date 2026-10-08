@@ -107,10 +107,13 @@
         :show-order="selection.selectedItems.size > 1"
         :details="mediaDetails[item.path]"
         :compact="viewMode === 'grid' && gridSize === 'small'"
-        :group-label="(groupLabels[item.path] || []).join(' · ')"
+        :group-label="(groupLabels[item.path] || []).join(', ')"
         :class="['media-card-item', { 'no-transition': isViewSwitching }]"
         :data-id="item.id"
+        :draggable="dragEnabled ? 'true' : null"
         @click.stop="selection.handleSelection(item, index, $event)"
+        @dragstart="onFileDragStart($event, item)"
+        @dragend="endDrag"
       />
       <div v-if="selection.isSelecting.value" class="selection-marquee" :style="selection.selectionFrameStyle.value"></div>
     </div>
@@ -120,8 +123,9 @@
 <script setup>
 import { ref, watch, nextTick } from 'vue';
 import MediaCard from './MediaCard.vue';
+import { startDrag, endDrag } from '../../composables/useDragPayload';
 
-defineProps({
+const props = defineProps({
   items: { type: Array, required: true },
   breadcrumb: { type: Array, required: true },
   selectedFolderId: { type: String, required: true },
@@ -131,6 +135,8 @@ defineProps({
   mediaDetails: { type: Object, default: () => ({}) },
   // clip path -> ['G1', 'G3'] (Advanced plan membership)
   groupLabels: { type: Object, default: () => ({}) },
+  // Advanced with the plan visible: files can be dragged into plan groups
+  dragEnabled: { type: Boolean, default: false },
   // return value of useFileSelection()
   selection: { type: Object, required: true }
 });
@@ -143,8 +149,20 @@ const includeSubfolders = defineModel('includeSubfolders', { type: Boolean, defa
 
 const gridRef = ref(null);
 
+/** Dragging a selected file drags the whole selection (in selection order), otherwise just this file. */
+function onFileDragStart(event, item) {
+  if (!props.dragEnabled) return;
+  const selected = props.selection.selectedItems;
+  let paths = [item.path];
+  if (selected.has(item.id)) {
+    const byId = new Map(props.items.map(i => [i.id, i.path]));
+    paths = Array.from(selected).map(id => byId.get(id)).filter(Boolean);
+  }
+  startDrag(event, 'files', paths);
+}
+
 // Switching view mode changes a card's border/box-shadow/background via CSS
-// classes while its size snaps instantly (size isn't transitioned) — without
+// classes while its size snaps instantly (size isn't transitioned) - without
 // this, the color/glow transition keeps animating for 200ms around the
 // already-reshaped card, which reads as a flash. Suppress transitions for the
 // one frame the class change lands, then restore them for hover/click feedback.
