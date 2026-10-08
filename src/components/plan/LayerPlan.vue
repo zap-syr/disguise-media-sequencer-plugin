@@ -36,9 +36,16 @@
     </div>
 
     <div v-if="planState.groups.length" ref="listRef" class="plan" @dragover="autoScroll">
+      <template v-for="(g, gi) in planState.groups" :key="g.id">
+      <div
+        v-if="draggingFolders"
+        class="gap-drop"
+        :class="{ over: gapOver === gi }"
+        @dragover.prevent="gapOver = gi"
+        @dragleave="gapOver = null"
+        @drop.prevent="onGapDrop(gi)"
+      >Drop to create groups here</div>
       <PlanGroup
-        v-for="(g, gi) in planState.groups"
-        :key="g.id"
         :group="g"
         :index="gi"
         :layout="layout.groups[gi]"
@@ -70,9 +77,26 @@
         @set-timing="timing => $emit('update-group', g.id, { timing })"
         @remove="$emit('remove-group', g.id)"
         @remove-entry="eid => $emit('remove-entry', g.id, eid)"
+        @drop-folders="d => $emit('drop-folders', { ...d, gid: g.id })"
       />
+      </template>
+      <div
+        v-if="draggingFolders"
+        class="gap-drop"
+        :class="{ over: gapOver === planState.groups.length }"
+        @dragover.prevent="gapOver = planState.groups.length"
+        @dragleave="gapOver = null"
+        @drop.prevent="onGapDrop(planState.groups.length)"
+      >Drop to create groups at the end</div>
     </div>
-    <div v-else class="empty">Select files and press “New group”. Repeat to build Group 2, Group 3…</div>
+    <div
+      v-else
+      class="empty"
+      :class="{ 'is-drop': draggingFolders && gapOver === 0 }"
+      @dragover="draggingFolders && ($event.preventDefault(), gapOver = 0)"
+      @dragleave="gapOver = null"
+      @drop.prevent="draggingFolders && onGapDrop(0)"
+    >Select files and press "New group", or select folders in the tree. Repeat to build Group 2, Group 3 and so on.</div>
   </section>
 </template>
 
@@ -81,6 +105,7 @@ import { computed, ref, nextTick } from 'vue';
 import PlanGroup from './PlanGroup.vue';
 import { formatDuration } from '../../utils/format';
 import { mappingColor } from '../../utils/mappingColors';
+import { dragPayload, endDrag } from '../../composables/useDragPayload';
 
 const props = defineProps({
   planState: { type: Object, required: true },   // useLayerPlan().state
@@ -97,7 +122,17 @@ const props = defineProps({
 });
 const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
   'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm',
-  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect']);
+  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
+  'drop-folders', 'drop-folder-groups']);
+
+// Folders dragged from the tree: drop between groups creates groups there (docs §2.3.2)
+const draggingFolders = computed(() => dragPayload.kind === 'folders');
+const gapOver = ref(null);
+function onGapDrop(index) {
+  emit('drop-folder-groups', { folderIds: [...dragPayload.ids], index });
+  gapOver.value = null;
+  endDrag();
+}
 
 /** Delete / Backspace removes the selected rows (not while typing in an input). */
 function onKeydown(event) {
@@ -254,8 +289,19 @@ defineExpose({ jump });
 .chip-count { color: #888888; font-weight: 500; }
 
 .plan { flex: 1; overflow-y: auto; padding-bottom: 24px; }
-.plan::-webkit-scrollbar { width: 8px; }
-.plan::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
 
-.empty { padding: 40px 18px; text-align: center; color: #555555; font-size: 13px; }
+.empty { padding: 40px 18px; text-align: center; color: #555555; font-size: 13px; border: 1px dashed transparent; margin: 10px 14px; border-radius: 6px; }
+.empty.is-drop { border-color: #0a84ff; color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
+
+.gap-drop {
+  margin: 6px 14px;
+  padding: 8px;
+  border: 1px dashed #3a3a3a;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 11px;
+  color: #777777;
+  transition: all 0.2s ease;
+}
+.gap-drop.over { border-color: #0a84ff; border-style: solid; color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
 </style>

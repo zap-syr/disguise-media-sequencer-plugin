@@ -38,16 +38,10 @@
 
     <template v-if="group.open">
       <div class="g-set">
-        <span class="g-set-label">Layers start</span>
-        <div class="seg" role="group" aria-label="Layers start">
-          <button type="button" :class="{ on: group.timing === 'seq' }" @click="$emit('set-timing', 'seq')">One after another</button>
-          <button type="button" :class="{ on: group.timing === 'same' }" @click="$emit('set-timing', 'same')">All at once</button>
-        </div>
-      </div>
-
-      <div v-if="rows.length" class="rows" :class="{ 'has-sel': anySelected }">
-        <div class="g-cols">
+        <!-- Select-all sits above the row checkboxes, so the group needs no column header row -->
+        <span class="selall-cell">
           <button
+            v-if="rows.length"
             type="button"
             class="cb selall"
             :class="{ on: allChecked, part: someChecked && !allChecked }"
@@ -59,11 +53,15 @@
             <svg v-if="allChecked" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
             <svg v-else-if="someChecked" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 12h12"/></svg>
           </button>
-          <span></span>
-          <span>Media, start, length</span>
-          <span>Mapping</span>
-          <span></span>
+        </span>
+        <span class="g-set-label">Layers start</span>
+        <div class="seg" role="group" aria-label="Layers start">
+          <button type="button" :class="{ on: group.timing === 'seq' }" @click="$emit('set-timing', 'seq')">One after another</button>
+          <button type="button" :class="{ on: group.timing === 'same' }" @click="$emit('set-timing', 'same')">All at once</button>
         </div>
+      </div>
+
+      <div v-if="rows.length" class="rows" :class="{ 'has-sel': anySelected }">
         <div
           v-for="row in rows"
           :key="row.id"
@@ -163,7 +161,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['toggle', 'rename', 'remove', 'remove-entry', 'set-timing',
   'assign', 'clear-entries', 'assign-group', 'clear-group',
-  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files']);
+  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'drop-folders']);
 
 const allChecked = computed(() => props.group.items.length > 0 && props.group.items.every(id => props.checked.has(id)));
 const someChecked = computed(() => props.group.items.some(id => props.checked.has(id)));
@@ -177,7 +175,7 @@ function targetsFor(rowId) {
 const rowOver = ref(null);   // { id, pos: 'before' | 'after' }
 const groupOver = ref(false);
 const draggingRows = computed(() => dragPayload.kind === 'rows');
-const draggingMovable = computed(() => dragPayload.kind === 'rows' || dragPayload.kind === 'files');
+const draggingMovable = computed(() => ['rows', 'files', 'folders'].includes(dragPayload.kind));
 
 function onRowDragStart(event, row) {
   event.stopPropagation();
@@ -224,6 +222,7 @@ function onGroupDrop(event) {
 function emitDrop(targetId, pos) {
   const ids = [...dragPayload.ids];
   if (dragPayload.kind === 'rows') emit('drop-rows', { ids, targetId, pos });
+  else if (dragPayload.kind === 'folders') emit('drop-folders', { folderIds: ids, targetId, pos });
   else emit('drop-files', { paths: ids, targetId, pos });
   rowOver.value = null;
   groupOver.value = false;
@@ -393,8 +392,10 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 
 .g-set {
   display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px; border-top: 1px solid #2a2a2a; background: #1e1e1e;
+  /* left padding matches .row so the select-all lines up with the row checkboxes */
+  padding: 8px 12px 8px 10px; border-top: 1px solid #2a2a2a; background: #1e1e1e;
 }
+.selall-cell { width: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 .g-set-label { font-size: 11px; color: #888888; font-weight: 600; }
 .seg { display: inline-flex; background: #181818; border: 1px solid #3a3a3a; border-radius: 6px; padding: 2px; }
 .seg button {
@@ -424,21 +425,6 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .row.drop-before { box-shadow: inset 0 2px 0 #0a84ff; }
 .row.drop-after { box-shadow: inset 0 -2px 0 #0a84ff; }
 
-.g-cols {
-  display: grid;
-  grid-template-columns: 26px 40px minmax(0, 1fr) minmax(140px, 200px) 26px;
-  align-items: center;
-  gap: 10px;
-  height: 26px;
-  padding: 0 10px;
-  border-bottom: 1px solid #222222;
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: #777777;
-  background: #1a1a1a;
-}
-
 .ord-cell { width: 26px; height: 22px; display: flex; align-items: center; justify-content: center; }
 .ord { font-size: 11px; color: #888888; text-align: center; font-variant-numeric: tabular-nums; }
 .cb {
@@ -450,7 +436,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .cb:hover { border-color: #cccccc; }
 .cb.on, .cb.part { background: #0a84ff; border-color: #0a84ff; color: #ffffff; }
 .cb:focus-visible { box-shadow: 0 0 0 2px #0a84ff; }
-.cb.selall { display: flex; justify-self: center; }
+.cb.selall { display: flex; }
 /* Checkbox replaces the row number on hover, and everywhere while the plan has a selection */
 .row:hover .cb, .rows.has-sel .cb, .cb:focus-visible { display: flex; }
 .row:hover .ord, .rows.has-sel .ord { display: none; }
