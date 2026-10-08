@@ -1,6 +1,13 @@
 <template>
   <section class="group" :class="{ 'is-flash': flash }" :id="`plan-group-${group.id}`">
-    <header class="g-head">
+    <header
+      class="g-head"
+      :class="{ 'map-over': headOver }"
+      title="Drop a mapping here to assign it to every layer in this group"
+      @dragover="onHeadOver"
+      @dragleave="onHeadLeave"
+      @drop="onHeadDrop"
+    >
       <button type="button" class="chev" :class="{ 'is-open': group.open }" :aria-expanded="group.open" :aria-label="(group.open ? 'Collapse ' : 'Expand ') + label" @click="$emit('toggle')">
         <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L8 5 L3 8.5 Z" fill="currentColor"/></svg>
       </button>
@@ -11,10 +18,15 @@
         <span v-for="(p, i) in splitMarks" :key="'s' + i" class="mk-split" :style="{ left: p + '%' }"></span>
         <span v-for="(p, i) in tagMarks" :key="'t' + i" class="mk-tag" :style="{ left: p + '%' }"></span>
       </div>
-      <span class="g-meta">{{ meta }}</span>
-      <button type="button" class="icon-btn" title="Delete group" aria-label="Delete group" @click="$emit('remove')">
+      <span class="g-meta" :class="{ 'is-drop': headOver }">{{ headOver ? `Assign to all ${group.items.length}` : meta }}</span>
+      <div class="g-actions">
+        <button type="button" class="icon-btn" title="Clear mappings in this group" aria-label="Clear mappings in this group" :disabled="!hasMappings" @click="$emit('clear-group')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H9L4 15l10-10 7 7-6 6"/><path d="m9 10 6 6"/></svg>
+        </button>
+        <button type="button" class="icon-btn" title="Delete group" aria-label="Delete group" @click="$emit('remove')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
-      </button>
+        </button>
+      </div>
     </header>
 
     <template v-if="group.open">
@@ -36,6 +48,28 @@
             <div class="pname-txt" :title="row.name">{{ row.name }}</div>
             <div class="pname-sub">{{ row.sub }}</div>
           </div>
+          <div
+            class="slot"
+            :class="{ assigned: !!row.mappingPath, ready: slotsReady, over: overSlot === row.id, missing: row.mappingMissing }"
+            role="button"
+            tabindex="0"
+            :title="slotTitle(row)"
+            :aria-label="slotTitle(row)"
+            @click="onSlotClick(row)"
+            @keydown.enter.prevent="onSlotClick(row)"
+            @dragover="onSlotOver($event, row)"
+            @dragleave="onSlotLeave(row)"
+            @drop="onSlotDrop($event, row)"
+          >
+            <span class="dot" :style="{ background: row.color }"></span>
+            <template v-if="row.mappingPath">
+              <span class="sname">{{ row.mappingName }}</span>
+              <button type="button" class="slot-x" :aria-label="`Clear mapping of ${row.name}`" title="Clear mapping" @click.stop="$emit('clear-entries', [row.id])">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </template>
+            <span v-else class="sname empty-slot">{{ armed ? 'Click to assign' : 'Drop mapping here' }}</span>
+          </div>
           <button type="button" class="icon-btn" :aria-label="`Remove ${row.name} from ${label}`" title="Remove from group" @click="$emit('remove-entry', row.id)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
@@ -47,8 +81,10 @@
 </template>
 
 <script setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { formatClock, formatDuration } from '../../utils/format';
+import { mappingColor } from '../../utils/mappingColors';
+import { dragPayload, endDrag } from '../../composables/useDragPayload';
 
 const props = defineProps({
   group: { type: Object, required: true },
@@ -62,11 +98,63 @@ const props = defineProps({
   thumbBase: { type: String, default: '' },       // http://director/api/v1/thumbnail/
   showSplits: { type: Boolean, default: false },
   showTags: { type: Boolean, default: false },
-  flash: { type: Boolean, default: false }
+  flash: { type: Boolean, default: false },
+  mappingsByPath: { type: Object, default: () => ({}) }, // mapping path -> mapping
+  armed: { type: String, default: null }                  // armed mapping path (click-to-assign)
 });
-defineEmits(['toggle', 'rename', 'remove', 'remove-entry', 'set-timing']);
+const emit = defineEmits(['toggle', 'rename', 'remove', 'remove-entry', 'set-timing',
+  'assign', 'clear-entries', 'assign-group', 'clear-group']);
 
 const brokenThumbs = reactive({});
+
+// --- Mapping drop targets ---
+const overSlot = ref(null);
+const headOver = ref(false);
+const draggingMapping = computed(() => dragPayload.kind === 'mapping');
+const slotsReady = computed(() => draggingMapping.value || !!props.armed);
+const hasMappings = computed(() => props.group.items.some(id => props.entries[id]?.mappingPath));
+
+function slotTitle(row) {
+  if (row.mappingMissing) return `Mapping not found in the project: ${row.mappingPath}`;
+  if (row.mappingPath) return `Mapping: ${row.mappingName}`;
+  return props.armed ? 'Click to assign the armed mapping' : 'Drop a mapping here';
+}
+function onSlotClick(row) {
+  if (props.armed) emit('assign', [row.id], props.armed);
+}
+function onSlotOver(event, row) {
+  if (!draggingMapping.value) return;
+  event.preventDefault();
+  event.stopPropagation();
+  overSlot.value = row.id;
+}
+function onSlotLeave(row) {
+  if (overSlot.value === row.id) overSlot.value = null;
+}
+function onSlotDrop(event, row) {
+  if (!draggingMapping.value) return;
+  event.preventDefault();
+  event.stopPropagation();
+  emit('assign', [row.id], dragPayload.ids[0]);
+  overSlot.value = null;
+  endDrag();
+}
+function onHeadOver(event) {
+  if (!draggingMapping.value) return;
+  event.preventDefault();
+  headOver.value = true;
+}
+function onHeadLeave(event) {
+  if (event.relatedTarget && event.currentTarget.contains(event.relatedTarget)) return;
+  headOver.value = false;
+}
+function onHeadDrop(event) {
+  if (!draggingMapping.value) return;
+  event.preventDefault();
+  emit('assign-group', dragPayload.ids[0]);
+  headOver.value = false;
+  endDrag();
+}
 
 const label = computed(() => `G${props.index + 1}`);
 const pct = x => (props.total > 0 ? (x / props.total) * 100 : 0);
@@ -91,7 +179,13 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   const det = props.details[mediaId];
   const name = file?.name || (mediaId || '').split('/').pop();
   const sub = [formatClock(r.start), formatDuration(r.duration), det?.res].filter(Boolean).join(' · ');
+  const mappingPath = props.entries[r.id]?.mappingPath || null;
+  const mapping = mappingPath ? props.mappingsByPath[mappingPath] : null;
   return {
+    mappingPath,
+    mappingName: mapping?.name || (mappingPath || '').split('/').pop().replace(/\.apx$/i, ''),
+    mappingMissing: !!mappingPath && !mapping,
+    color: mappingColor(mappingPath),
     id: r.id,
     index: props.rowOffset + i + 1,
     name,
@@ -115,7 +209,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 
 .g-head {
   display: grid;
-  grid-template-columns: 22px 34px minmax(120px, 1fr) minmax(60px, 140px) auto 26px;
+  grid-template-columns: 22px 34px minmax(120px, 1fr) minmax(60px, 140px) auto auto;
   align-items: center;
   gap: 8px;
   padding: 8px 10px;
@@ -156,6 +250,10 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .mk-tag { position: absolute; top: 3px; width: 7px; height: 7px; background: #0a84ff; transform: translateX(-50%) rotate(45deg); }
 
 .g-meta { font-size: 11px; color: #888888; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.g-meta.is-drop { color: #0a84ff; font-weight: 600; }
+.g-head.map-over { box-shadow: inset 0 0 0 1px #0a84ff; background: rgba(10, 132, 255, 0.15); }
+.g-actions { display: flex; gap: 2px; }
+.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; background: transparent; color: #888888; }
 
 .icon-btn {
   width: 24px; height: 24px; border: none; border-radius: 4px;
@@ -182,7 +280,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .rows { border-top: 1px solid #2a2a2a; }
 .row {
   display: grid;
-  grid-template-columns: 26px 40px minmax(0, 1fr) 26px;
+  grid-template-columns: 26px 40px minmax(0, 1fr) minmax(140px, 200px) 26px;
   align-items: center;
   gap: 10px;
   height: 44px;
@@ -197,5 +295,26 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .pname { min-width: 0; }
 .pname-txt { font-size: 12px; color: #cccccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pname-sub { font-size: 11px; color: #666666; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot {
+  display: flex; align-items: center; gap: 8px;
+  height: 30px; padding: 0 4px 0 10px; min-width: 0;
+  border: 1px dashed #3a3a3a; border-radius: 6px; background: #181818;
+  font-size: 12px; cursor: default; outline: none; transition: all 0.2s ease;
+}
+.slot.assigned { border-style: solid; background: #242424; }
+.slot.ready { border-color: #0a84ff; cursor: pointer; }
+.slot.over { border-style: solid; border-color: #0a84ff; background: rgba(10, 132, 255, 0.2); }
+.slot.missing { border-color: #ef4444; }
+.slot:focus-visible { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
+.dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.sname { flex: 1; min-width: 0; color: #dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sname.empty-slot { color: #666666; font-style: italic; }
+.slot-x {
+  width: 20px; height: 20px; flex-shrink: 0; border: none; border-radius: 4px;
+  background: transparent; color: #888888; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.slot-x:hover { background: #3a3a3a; color: #ffffff; }
+
 .g-empty { padding: 14px; text-align: center; color: #666666; font-size: 12px; border-top: 1px solid #2a2a2a; }
 </style>

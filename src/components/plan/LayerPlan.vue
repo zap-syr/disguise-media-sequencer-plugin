@@ -14,7 +14,17 @@
           <span class="chip-label">G{{ gi + 1 }}</span> {{ g.name }} <span class="chip-count">{{ g.items.length }}</span>
         </button>
       </nav>
+      <button type="button" class="ghost icon-only" title="Clear mappings in all groups" aria-label="Clear mappings in all groups" :disabled="!hasAnyMapping" @click="$emit('clear-all-mappings')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H9L4 15l10-10 7 7-6 6"/><path d="m9 10 6 6"/></svg>
+      </button>
       <button type="button" class="ghost" @click="$emit('set-all-open', !anyOpen)">{{ anyOpen ? 'Collapse all' : 'Expand all' }}</button>
+    </div>
+
+    <div v-if="armedMapping" class="armed-strip" role="status">
+      <span class="armed-dot" :style="{ background: armedColor }"></span>
+      <span>Assigning <strong>{{ armedMapping.name }}</strong> — click layer slots. Esc to cancel.</span>
+      <div class="ph-spacer"></div>
+      <button type="button" class="ghost" @click="$emit('disarm')">Done</button>
     </div>
 
     <div v-if="planState.groups.length" ref="listRef" class="plan">
@@ -33,6 +43,12 @@
         :show-splits="showSplits"
         :show-tags="showTags"
         :flash="flashId === g.id"
+        :mappings-by-path="mappingsByPath"
+        :armed="armed"
+        @assign="(ids, path) => $emit('assign', ids, path)"
+        @clear-entries="ids => $emit('clear-entries', ids)"
+        @assign-group="path => $emit('assign-group', g.id, path)"
+        @clear-group="$emit('clear-group', g.id)"
         @toggle="$emit('update-group', g.id, { open: !g.open })"
         @rename="name => $emit('update-group', g.id, { name })"
         @set-timing="timing => $emit('update-group', g.id, { timing })"
@@ -48,6 +64,7 @@
 import { computed, ref, nextTick } from 'vue';
 import PlanGroup from './PlanGroup.vue';
 import { formatDuration } from '../../utils/format';
+import { mappingColor } from '../../utils/mappingColors';
 
 const props = defineProps({
   planState: { type: Object, required: true },   // useLayerPlan().state
@@ -56,9 +73,16 @@ const props = defineProps({
   filesByPath: { type: Object, required: true },
   thumbBase: { type: String, default: '' },
   showSplits: { type: Boolean, default: false },
-  showTags: { type: Boolean, default: false }
+  showTags: { type: Boolean, default: false },
+  mappingsByPath: { type: Object, default: () => ({}) },
+  armed: { type: String, default: null }
 });
-defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open']);
+defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
+  'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm']);
+
+const hasAnyMapping = computed(() => Object.values(props.planState.entries).some(e => e.mappingPath));
+const armedMapping = computed(() => (props.armed ? props.mappingsByPath[props.armed] : null));
+const armedColor = computed(() => mappingColor(props.armed));
 
 const listRef = ref(null);
 const flashId = ref(null);
@@ -126,7 +150,23 @@ defineExpose({ jump });
   white-space: nowrap;
   transition: all 0.2s ease;
 }
-.ghost:hover { border-color: #555555; color: #ffffff; background: #1f1f1f; }
+.ghost:hover:not(:disabled) { border-color: #555555; color: #ffffff; background: #1f1f1f; }
+.ghost:disabled { opacity: 0.35; cursor: not-allowed; }
+.ghost.icon-only { padding: 6px 8px; display: flex; align-items: center; }
+
+.armed-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: rgba(10, 132, 255, 0.15);
+  border-bottom: 1px solid #0a84ff;
+  font-size: 12px;
+  color: #dddddd;
+  flex-shrink: 0;
+}
+.armed-strip strong { color: #ffffff; }
+.armed-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 
 .gnav-wrap {
   display: flex;
