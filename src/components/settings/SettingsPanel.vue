@@ -1,6 +1,17 @@
 <template>
   <div class="settings-sidebar" @click.stop>
-    <div class="settings-header-title">SETTINGS</div>
+    <div class="settings-header">
+      <span class="settings-header-title">SETTINGS</span>
+      <div class="segmented-control compact" role="group" aria-label="Creation mode">
+        <button type="button" class="segment" :class="{ active: creationMode === 'simple' }" @click="creationMode = 'simple'">Simple</button>
+        <button type="button" class="segment" :class="{ active: creationMode === 'advanced' }" @click="creationMode = 'advanced'">Advanced</button>
+      </div>
+    </div>
+    <div class="mode-hint">
+      {{ creationMode === 'advanced'
+        ? 'Advanced — groups of files with their own timing. Build the plan in the Layer plan pane.'
+        : 'Simple — one mapping for all layers, created one after another.' }}
+    </div>
 
     <div class="settings-sidebar-content">
 
@@ -330,6 +341,7 @@
     </div>
 
     <div class="settings-footer">
+      <div v-if="summary" class="footer-summary">{{ summary }}</div>
       <button
         class="create-btn"
         :disabled="!isCreateLayersEnabled || isCreating"
@@ -342,7 +354,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { createTrack } from '../../services/disguiseService';
 import { TIMECODE_RE } from '../../utils/timecode';
 import { maskCueValue, isCueValueValid, maskMidiValue, isMidiValueValid } from '../../utils/tagInputs';
@@ -351,33 +363,18 @@ const props = defineProps({
   directorEndpoint: { type: String, required: true },
   mappings: { type: Array, required: true },
   tracks: { type: Array, required: true },
-  selectionCount: { type: Number, default: 0 },
+  // reactive object from useLayerOptions(); fields are edited in place
+  options: { type: Object, required: true },
+  // layers the Create button would make: selected files (Simple) or plan entries (Advanced)
+  layerCount: { type: Number, default: 0 },
+  summary: { type: String, default: '' },
   isCreating: { type: Boolean, default: false },
   createProgress: { type: Object, default: null } // { created, total }
 });
 const emit = defineEmits(['create', 'track-created']);
+const creationMode = defineModel('creationMode', { type: String, default: 'simple' });
+const options = props.options;
 
-// Options state
-const options = reactive({
-  insertMode: 'At Playhead',
-  startTime: '00:00:00:00',
-  mode: 'Normal',
-  atEndPoint: 'Loop',
-  stillDuration: 5,
-  fitToContent: true,
-  movieDuration: 30,
-  overlap: 0,
-  splitSection: false,
-  addTimecodeTag: false,
-  timecodeStart: '00:00:00:00',
-  timecodeIncrement: '00:00:00:00',
-  addCueTag: false,
-  cueValue: '',
-  addMidiNote: false,
-  midiNoteValue: '',
-  animateBrightness: false,
-  brightnessDuration: 1
-});
 
 const selectedMapping = ref(null);
 const selectedTrack = ref(null);
@@ -434,7 +431,7 @@ const newTrackNameError = computed(() => {
 });
 
 const isCreateLayersEnabled = computed(() => {
-  const hasSelection = props.selectionCount > 0;
+  const hasSelection = props.layerCount > 0;
   const hasMapping = !!selectedMapping.value;
   const validCue = isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true);
   const validMidi = isMidiNoteValid.value && (options.addMidiNote ? options.midiNoteValue !== '' : true);
@@ -445,7 +442,7 @@ const isCreateLayersEnabled = computed(() => {
 });
 
 const createLabel = computed(() => {
-  if (!props.isCreating) return 'CREATE LAYERS';
+  if (!props.isCreating) return props.layerCount > 0 ? `CREATE ${props.layerCount} LAYERS` : 'CREATE LAYERS';
   const p = props.createProgress;
   return p && p.total > 0 ? `CREATING... ${p.created}/${p.total}` : 'CREATING...';
 });
@@ -595,12 +592,6 @@ watch(isCreatingTrack, async (val) => {
   }
 });
 
-// Input Validations
-watch(() => options.overlap, (newVal) => { if (newVal < 0) options.overlap = 0; });
-watch(() => options.stillDuration, (newVal) => { if (newVal < 0) options.stillDuration = 0; });
-watch(() => options.movieDuration, (newVal) => { if (newVal < 0) options.movieDuration = 0; });
-watch(() => options.brightnessDuration, (newVal) => { if (newVal < 0) options.brightnessDuration = 0; });
-
 onMounted(() => window.addEventListener('mousedown', handleClickOutside));
 onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
 </script>
@@ -622,12 +613,36 @@ onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
   box-shadow: -5px 0 20px rgba(0,0,0,0.3);
 }
 
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px 6px 20px;
+}
+
 .settings-header-title {
   font-weight: 700;
   color: #888;
   font-size: 14px;
   letter-spacing: 0.5px;
-  padding: 20px 20px 10px 20px;
+}
+
+.mode-hint {
+  font-size: 11px;
+  color: #777777;
+  line-height: 1.4;
+  padding: 0 20px 12px 20px;
+}
+
+.segmented-control.compact { display: inline-flex; width: auto; }
+.segmented-control.compact .segment { flex: none; padding: 5px 10px; }
+
+.footer-summary {
+  font-size: 11px;
+  color: #888888;
+  margin-bottom: 10px;
+  line-height: 1.4;
 }
 
 .settings-sidebar-content {

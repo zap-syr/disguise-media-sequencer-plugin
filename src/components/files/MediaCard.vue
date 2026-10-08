@@ -12,6 +12,7 @@
 
       <div v-if="selected" class="selected-overlay"></div>
       <div v-if="showOrder && selected && viewMode !== 'list'" class="order-badge">{{ selectionOrder }}</div>
+      <span v-if="viewMode !== 'list' && groupLabel" class="group-badge" :title="`In plan groups ${groupLabel}`">{{ groupLabel }}</span>
       <span v-if="viewMode !== 'list' && durationLabel" class="dur-chip" :class="{ 'is-live': kind === 'live' }">{{ durationLabel }}</span>
     </div>
     <div class="card-footer">
@@ -20,6 +21,7 @@
         {{ item.name }}
         <span v-if="item.subfolderPath" class="file-subfolder">· {{ item.subfolderPath }}</span>
       </span>
+      <span v-if="viewMode === 'list' && groupLabel" class="group-pill" :title="`In plan groups ${groupLabel}`">{{ groupLabel }}</span>
       <span v-if="viewMode === 'list' && listMeta" class="list-meta">{{ listMeta }}</span>
       <span class="file-meta">
         <span v-if="compact && gridResolution" class="file-type file-res" :title="`${typeLabel} · ${gridResolution}`">{{ gridResolution }}</span>
@@ -61,6 +63,11 @@ const props = defineProps({
   showOrder: {
     type: Boolean,
     default: false
+  },
+  // "G1 · G3" when the clip is already in the Advanced plan
+  groupLabel: {
+    type: String,
+    default: ''
   },
   // Small grid tiles: the duration chip already tells video/still/live, so the footer shows only the resolution
   compact: {
@@ -307,6 +314,28 @@ const listMeta = computed(() => {
   pointer-events: none;
 }
 .dur-chip.is-live { color: #0a84ff; }
+
+.group-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #dddddd;
+  font-size: 10px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.group-pill {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #333333;
+  color: #cccccc;
+  font-size: 10px;
+  font-weight: 600;
+}
 
 .order-badge {
   position: absolute;

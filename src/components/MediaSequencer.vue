@@ -6,6 +6,8 @@
     <div v-else class="main-layout">
       <!-- 1. Left Tree Sidebar -->
       <FolderTree
+        v-if="showFiles"
+        v-model:collapsed="treeCollapsed"
         :folders="sidebarFolders"
         :selected-folder-id="selectedFolderId"
         :expanded-folders="expandedFolders"
@@ -13,10 +15,12 @@
         @toggle="toggleFolder"
       />
 
-      <!-- 2. Center Content Area -->
+      <!-- 2. Center: files and/or layer plan -->
       <FilesPane
+        v-if="showFiles"
+        :class="{ 'files-side': showPlan }"
         v-model:search-query="searchQuery"
-        v-model:view-mode="viewMode"
+        v-model:view-mode="effectiveViewMode"
         v-model:grid-size="gridSize"
         v-model:include-subfolders="includeSubfolders"
         :items="filteredMediaList"
@@ -25,17 +29,61 @@
         :is-refreshing="library.isRefreshing.value"
         :director-endpoint="props.directorEndpoint"
         :media-details="library.mediaDetails.value"
+        :group-labels="isAdvanced ? plan.groupLabelsByMedia.value : {}"
         :selection="selection"
         @select-folder="selectFolder"
         @refresh="library.refresh"
-      />
+      >
+        <!-- Next to the plan the switch lives in the plan header; the side pane is narrow -->
+        <template v-if="isAdvanced && !showPlan" #nav-extra>
+          <WorkspaceSwitch v-model="workspace" />
+        </template>
+        <template v-if="isAdvanced" #selection-actions>
+          <div class="plan-actions" @click.stop>
+            <select
+              class="add-sel"
+              aria-label="Add selected files to a group"
+              :disabled="!selection.selectedItems.size || !plan.state.groups.length"
+              @change="onAddToGroup"
+            >
+              <option value="">Add to group…</option>
+              <option v-for="(g, gi) in plan.state.groups" :key="g.id" :value="g.id">G{{ gi + 1 }} · {{ g.name }} ({{ g.items.length }})</option>
+            </select>
+            <button type="button" class="primary-sm" :disabled="!selection.selectedItems.size" @click="onNewGroup">+ New group</button>
+          </div>
+        </template>
+      </FilesPane>
+
+      <LayerPlan
+        v-if="showPlan"
+        ref="layerPlanRef"
+        :plan-state="plan.state"
+        :layout="planLayout"
+        :details="library.mediaDetails.value"
+        :files-by-path="filesByPath"
+        :thumb-base="thumbBase"
+        :show-splits="layerOptions.splitSection"
+        :show-tags="tagsOn"
+        @add-group="onAddEmptyGroup"
+        @update-group="plan.updateGroup"
+        @remove-group="onRemoveGroup"
+        @remove-entry="plan.removeEntry"
+        @set-all-open="plan.setAllOpen"
+      >
+        <template #header-extra>
+          <WorkspaceSwitch v-model="workspace" />
+        </template>
+      </LayerPlan>
 
       <!-- 3. Settings Sidebar (Right) -->
       <SettingsPanel
+        v-model:creation-mode="creationMode"
         :director-endpoint="props.directorEndpoint"
         :mappings="library.mappings.value"
         :tracks="library.tracks.value"
-        :selection-count="selection.selectedItems.size"
+        :options="layerOptions"
+        :layer-count="createCount"
+        :summary="footerSummary"
         :is-creating="isCreating"
         :create-progress="createProgress"
         @create="handleCreateLayers"
@@ -48,17 +96,23 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
 import { createLayerPlan } from '../services/disguiseService';
-import { buildSimplePlan } from '../utils/planBuilder';
+import { buildSimplePlan, buildAdvancedPlan } from '../utils/planBuilder';
+import { computePlanLayout } from '../utils/planLayout';
+import { formatDuration } from '../utils/format';
 import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath } from '../utils/mediaTree';
 import { useMediaLibrary } from '../composables/useMediaLibrary';
 import { useFileSelection } from '../composables/useFileSelection';
 import { usePersistedRef } from '../composables/usePersistedRef';
 import { useToast } from '../composables/useToast';
+import { useLayerOptions } from '../composables/useLayerOptions';
+import { useLayerPlan } from '../composables/useLayerPlan';
 import FolderTree from './tree/FolderTree.vue';
 import FilesPane from './files/FilesPane.vue';
 import SettingsPanel from './settings/SettingsPanel.vue';
+import LayerPlan from './plan/LayerPlan.vue';
+import WorkspaceSwitch from './common/WorkspaceSwitch.vue';
 import Toast from './common/Toast.vue';
 
 const props = defineProps({
@@ -68,6 +122,7 @@ const props = defineProps({
 const library = useMediaLibrary(props.directorEndpoint);
 const { toast, show: showToast, dismiss: dismissToast } = useToast();
 
+const layerOptions = useLayerOptions();
 const isCreating = ref(false);
 const createProgress = ref(null); // { created, total } while createLayerPlan runs
 const searchQuery = ref('');
@@ -76,6 +131,31 @@ const searchQuery = ref('');
 const viewMode = usePersistedRef('mediaSequencer.viewMode', 'grid', s => ['grid', 'list'].includes(s) ? s : undefined);
 const gridSize = usePersistedRef('mediaSequencer.gridSize', 'medium', s => ['small', 'medium', 'large'].includes(s) ? s : undefined);
 const includeSubfolders = usePersistedRef('mediaSequencer.includeSubfolders', false, s => s === 'true');
+
+// Creation mode and workspace layout (Advanced only). Default Simple (docs §11 Q8).
+const creationMode = usePersistedRef('mediaSequencer.creationMode', 'simple', s => ['simple', 'advanced'].includes(s) ? s : undefined);
+const workspace = usePersistedRef('mediaSequencer.workspace', 'split', s => ['files', 'split', 'plan'].includes(s) ? s : undefined);
+// Split defaults to the compact list; the Files layout keeps the user's own grid/list choice (docs §0.1)
+const splitViewMode = usePersistedRef('mediaSequencer.splitViewMode', 'list', s => ['grid', 'list'].includes(s) ? s : undefined);
+
+const isAdvanced = computed(() => creationMode.value === 'advanced');
+const effectiveWorkspace = computed(() => (isAdvanced.value ? workspace.value : 'files'));
+const showFiles = computed(() => effectiveWorkspace.value !== 'plan');
+const showPlan = computed(() => effectiveWorkspace.value !== 'files');
+const effectiveViewMode = computed({
+  get: () => (effectiveWorkspace.value === 'split' ? splitViewMode.value : viewMode.value),
+  set: v => {
+    if (effectiveWorkspace.value === 'split') splitViewMode.value = v;
+    else viewMode.value = v;
+  }
+});
+
+// The tree is collapsed next to the plan and open in the Files layout (mockup behaviour)
+const treeCollapsed = ref(false);
+watch(effectiveWorkspace, ws => { treeCollapsed.value = ws !== 'files'; }, { immediate: true });
+
+const plan = useLayerPlan();
+const layerPlanRef = ref(null);
 
 // Navigation state
 const selectedFolderId = ref('all');
@@ -89,6 +169,84 @@ const filteredMediaList = computed(() => folderFiles(library.fullHierarchy.value
 }));
 
 const selection = useFileSelection(filteredMediaList);
+
+const filesByPath = computed(() => Object.fromEntries(
+  flattenFiles(library.fullHierarchy.value, { tag: false }).map(f => [f.path, f])
+));
+const thumbBase = computed(() => {
+  const ep = props.directorEndpoint;
+  return `${ep.startsWith('http') ? ep : 'http://' + ep}/api/v1/thumbnail/`;
+});
+
+/** Clip paths of the selected files, in selection order. */
+function selectedClipPaths() {
+  const filesById = new Map(flattenFiles(library.fullHierarchy.value, { tag: false }).map(f => [f.id, f]));
+  return Array.from(selection.selectedItems).map(id => filesById.get(id)?.path).filter(Boolean);
+}
+
+const tagsOn = computed(() => layerOptions.addTimecodeTag || layerOptions.addCueTag || layerOptions.addMidiNote);
+const timingSettings = computed(() => ({
+  fit: layerOptions.fitToContent,
+  movieDur: layerOptions.movieDuration,
+  stillDur: layerOptions.stillDuration,
+  overlap: layerOptions.overlap
+}));
+const planLayout = computed(() => computePlanLayout(plan.state.groups, plan.state.entries, library.mediaDetails.value, timingSettings.value));
+
+const createCount = computed(() => (isAdvanced.value ? plan.layerCount.value : selection.selectedItems.size));
+const footerSummary = computed(() => {
+  if (isAdvanced.value) {
+    const g = plan.state.groups.length;
+    if (!plan.layerCount.value) return 'Layer plan is empty';
+    return `${g} ${g === 1 ? 'group' : 'groups'} · ${plan.layerCount.value} layers · ≈${formatDuration(planLayout.value.total) || '0s'}`;
+  }
+  const n = selection.selectedItems.size;
+  if (!n) return 'No media selected';
+  const paths = selectedClipPaths();
+  const entries = Object.fromEntries(paths.map((p, i) => [i, { mediaId: p }]));
+  const virtual = computePlanLayout([{ timing: 'seq', items: paths.map((p, i) => i) }], entries, library.mediaDetails.value, timingSettings.value);
+  return `${n} layers · one after another · ≈${formatDuration(virtual.total) || '0s'}`;
+});
+
+// --- Plan actions ---
+
+async function revealGroup(gid) {
+  if (workspace.value === 'files') workspace.value = 'split';
+  await nextTick();
+  layerPlanRef.value?.jump(gid);
+}
+
+function onNewGroup() {
+  const paths = selectedClipPaths();
+  if (!paths.length) return;
+  const gid = plan.newGroup(paths);
+  selection.clear();
+  revealGroup(gid);
+}
+
+function onAddToGroup(event) {
+  const gid = event.target.value;
+  event.target.value = '';
+  const paths = selectedClipPaths();
+  if (!gid || !paths.length) return;
+  plan.addToGroup(gid, paths);
+  selection.clear();
+  const gi = plan.state.groups.findIndex(g => g.id === gid);
+  showToast(`${paths.length} ${paths.length === 1 ? 'file' : 'files'} added to G${gi + 1}`);
+  revealGroup(gid);
+}
+
+function onAddEmptyGroup() {
+  revealGroup(plan.addEmptyGroup());
+}
+
+function onRemoveGroup(gid) {
+  const gi = plan.state.groups.findIndex(g => g.id === gid);
+  const group = plan.state.groups[gi];
+  const hadItems = !!group && group.items.length > 0;
+  const restore = plan.removeGroup(gid);
+  if (hadItems) showToast(`G${gi + 1} “${group.name}” deleted`, 'info', { label: 'Undo', fn: restore });
+}
 
 const toggleFolder = (id) => {
   if (id === 'all') return;
@@ -121,24 +279,25 @@ async function handleCreateLayers(requestOptions) {
 
   try {
     isCreating.value = true;
-    const allFilesFlat = flattenFiles(library.fullHierarchy.value, { tag: false });
+    const advanced = isAdvanced.value;
+    const payload = advanced
+      ? buildAdvancedPlan(requestOptions, plan.state)
+      : buildSimplePlan(requestOptions, selectedClipPaths());
+    const expected = payload.groups.reduce((n, g) => n + g.layers.length, 0);
 
-    const filesById = new Map(allFilesFlat.map(file => [file.id, file]));
-    const selectedPaths = Array.from(selection.selectedItems)
-      .map(id => filesById.get(id)?.path)
-      .filter(Boolean);
-
-    const plan = buildSimplePlan(requestOptions, selectedPaths);
-    const result = await createLayerPlan(props.directorEndpoint, plan, (created, total) => {
+    const result = await createLayerPlan(props.directorEndpoint, payload, (created, total) => {
       createProgress.value = { created, total };
     });
 
-    selection.clear();
+    // Simple consumes the selection; Advanced keeps the plan so it can be tweaked and re-created
+    if (!advanced) selection.clear();
     if (result.errors.length) {
-      showToast(`Created ${result.created} of ${selectedPaths.length} layers — ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
+      showToast(`Created ${result.created} of ${expected} layers — ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
       console.warn('Layer creation issues:', result.errors);
     } else {
-      showToast(`Successfully created ${result.created} layers.`);
+      showToast(advanced
+        ? `Created ${result.created} layers in ${payload.groups.length} ${payload.groups.length === 1 ? 'group' : 'groups'}.`
+        : `Successfully created ${result.created} layers.`);
     }
   } catch (err) {
     showToast(`Failed to create layers: ${err.message}`, 'error');
@@ -174,6 +333,51 @@ async function handleCreateLayers(requestOptions) {
   flex: 1;
   overflow: hidden;
 }
+
+/* Files pane next to the layer plan (Split layout) */
+.files-side {
+  flex: 0 0 420px;
+  width: 420px;
+  border-right: 1px solid #2a2a2a;
+}
+/* Compact the narrow side pane: tighter paddings, flexible search, wrapping toolbar */
+.files-side :deep(.top-nav-bar) { padding: 0 12px; gap: 10px; }
+.files-side :deep(.breadcrumb) { min-width: 0; overflow: hidden; white-space: nowrap; }
+.files-side :deep(.top-nav-right) { flex: 1 1 auto; min-width: 0; justify-content: flex-end; }
+.files-side :deep(.search-bar) { width: auto; flex: 1 1 150px; min-width: 0; max-width: 220px; }
+.files-side :deep(.action-toolbar) { flex-wrap: wrap; height: auto; min-height: 40px; padding: 6px 12px; row-gap: 6px; }
+.files-side :deep(.media-grid) { padding: 12px; }
+
+.plan-actions { display: flex; align-items: center; gap: 8px; }
+.add-sel {
+  height: 28px;
+  max-width: 180px;
+  background: #181818;
+  border: 1px solid #3a3a3a;
+  color: #eeeeee;
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 0 8px;
+  cursor: pointer;
+  outline: none;
+}
+.add-sel:focus { border-color: #0a84ff; }
+.add-sel:disabled { opacity: 0.4; cursor: not-allowed; }
+.primary-sm {
+  height: 28px;
+  background: #0a84ff;
+  border: none;
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+.primary-sm:hover:not(:disabled) { background: #0060d1; }
+.primary-sm:disabled { background: #3a3a3a; color: #777777; cursor: not-allowed; }
 
 .loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
 </style>

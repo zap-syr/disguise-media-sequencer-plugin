@@ -50,7 +50,8 @@ defineProps({
 });
 defineEmits(['select', 'toggle']);
 
-const isSidebarCollapsed = ref(false);
+// Controlled by the shell so layouts can collapse it (Split / Plan workspaces)
+const isSidebarCollapsed = defineModel('collapsed', { type: Boolean, default: false });
 const sidebarWidth = ref(260);
 const isResizing = ref(false);
 

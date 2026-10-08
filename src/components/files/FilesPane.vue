@@ -9,6 +9,7 @@
       </div>
 
       <div class="top-nav-right">
+        <slot name="nav-extra"></slot>
         <div class="search-bar">
           <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input type="text" v-model="searchQuery" :placeholder="selectedFolderId === 'all' ? 'Search all files...' : 'Search current folder...'" />
@@ -48,6 +49,8 @@
           </template>
         </span>
       </div>
+
+      <slot name="selection-actions"></slot>
 
       <div class="view-controls">
         <div class="segmented-control compact grid-size-control" v-if="viewMode === 'grid'">
@@ -104,6 +107,7 @@
         :show-order="selection.selectedItems.size > 1"
         :details="mediaDetails[item.path]"
         :compact="viewMode === 'grid' && gridSize === 'small'"
+        :group-label="(groupLabels[item.path] || []).join(' · ')"
         :class="['media-card-item', { 'no-transition': isViewSwitching }]"
         :data-id="item.id"
         @click.stop="selection.handleSelection(item, index, $event)"
@@ -125,6 +129,8 @@ defineProps({
   directorEndpoint: { type: String, required: true },
   // getMediaDetails() result keyed by clip path
   mediaDetails: { type: Object, default: () => ({}) },
+  // clip path -> ['G1', 'G3'] (Advanced plan membership)
+  groupLabels: { type: Object, default: () => ({}) },
   // return value of useFileSelection()
   selection: { type: Object, required: true }
 });
@@ -220,6 +226,7 @@ watch(viewMode, () => {
   flex-shrink: 0;
 }
 .selection-group { display: flex; align-items: center; gap: 12px; }
+.action-toolbar { gap: 12px; }
 .master-checkbox-btn { background: transparent; border: none; color: #777777; padding: 4px; margin-left: -4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
 .master-checkbox-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
 .master-checkbox-btn:disabled { opacity: 0.3; cursor: not-allowed; }
