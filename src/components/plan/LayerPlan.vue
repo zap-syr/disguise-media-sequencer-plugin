@@ -1,5 +1,5 @@
 <template>
-  <section class="plan-pane" aria-label="Layer plan" @click.stop>
+  <section class="plan-pane" aria-label="Layer plan" tabindex="-1" @click.stop @keydown="onKeydown">
     <header class="ph">
       <span class="ph-title">LAYER PLAN</span>
       <span class="ph-sum">{{ summary }}</span>
@@ -20,14 +20,22 @@
       <button type="button" class="ghost" @click="$emit('set-all-open', !anyOpen)">{{ anyOpen ? 'Collapse all' : 'Expand all' }}</button>
     </div>
 
+    <div v-if="selectedIds.length" class="sel-strip" role="status">
+      <span><strong>{{ selectedIds.length }}</strong> {{ selectedIds.length === 1 ? 'layer' : 'layers' }} selected. Drag to move, drop a mapping on one to assign all.</span>
+      <div class="ph-spacer"></div>
+      <button type="button" class="ghost" @click="$emit('clear-entries', selectedIds)">Clear mappings</button>
+      <button type="button" class="ghost danger" @click="$emit('remove-selected')">Remove</button>
+      <button type="button" class="ghost" @click="$emit('deselect')">Deselect</button>
+    </div>
+
     <div v-if="armedMapping" class="armed-strip" role="status">
       <span class="armed-dot" :style="{ background: armedColor }"></span>
-      <span>Assigning <strong>{{ armedMapping.name }}</strong> — click layer slots. Esc to cancel.</span>
+      <span>Assigning <strong>{{ armedMapping.name }}</strong>: click layer slots. Esc to cancel.</span>
       <div class="ph-spacer"></div>
       <button type="button" class="ghost" @click="$emit('disarm')">Done</button>
     </div>
 
-    <div v-if="planState.groups.length" ref="listRef" class="plan">
+    <div v-if="planState.groups.length" ref="listRef" class="plan" @dragover="autoScroll">
       <PlanGroup
         v-for="(g, gi) in planState.groups"
         :key="g.id"
@@ -49,6 +57,14 @@
         @clear-entries="ids => $emit('clear-entries', ids)"
         @assign-group="path => $emit('assign-group', g.id, path)"
         @clear-group="$emit('clear-group', g.id)"
+        :checked="checked"
+        :selected-ids="selectedIds"
+        :any-selected="selectedIds.length > 0"
+        @row-click="(id, ev) => $emit('row-click', id, ev)"
+        @row-check="id => $emit('row-check', id)"
+        @group-check="$emit('group-check', g)"
+        @drop-rows="d => $emit('drop-rows', { ...d, gid: g.id })"
+        @drop-files="d => $emit('drop-files', { ...d, gid: g.id })"
         @toggle="$emit('update-group', g.id, { open: !g.open })"
         @rename="name => $emit('update-group', g.id, { name })"
         @set-timing="timing => $emit('update-group', g.id, { timing })"
@@ -75,10 +91,31 @@ const props = defineProps({
   showSplits: { type: Boolean, default: false },
   showTags: { type: Boolean, default: false },
   mappingsByPath: { type: Object, default: () => ({}) },
-  armed: { type: String, default: null }
+  armed: { type: String, default: null },
+  checked: { type: Set, default: () => new Set() },  // usePlanSelection().checked
+  selectedIds: { type: Array, default: () => [] }    // selected ids in plan order
 });
-defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
-  'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm']);
+const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
+  'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm',
+  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect']);
+
+/** Delete / Backspace removes the selected rows (not while typing in an input). */
+function onKeydown(event) {
+  if (!['Delete', 'Backspace'].includes(event.key) || !props.selectedIds.length) return;
+  if (event.target.closest('input, textarea, select')) return;
+  event.preventDefault();
+  emit('remove-selected');
+}
+
+/** Scrolls the plan list while dragging near its top / bottom edge. */
+function autoScroll(event) {
+  const el = listRef.value;
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const edge = 40;
+  if (event.clientY < rect.top + edge) el.scrollTop -= 12;
+  else if (event.clientY > rect.bottom - edge) el.scrollTop += 12;
+}
 
 const hasAnyMapping = computed(() => Object.values(props.planState.entries).some(e => e.mappingPath));
 const armedMapping = computed(() => (props.armed ? props.mappingsByPath[props.armed] : null));
@@ -97,7 +134,8 @@ const rowOffsets = computed(() => {
 const summary = computed(() => {
   const g = props.planState.groups.length;
   if (!g) return 'empty';
-  return `${g} ${g === 1 ? 'group' : 'groups'} · ${layerCount.value} layers · ≈${formatDuration(props.layout.total) || '0s'}`;
+  const total = formatDuration(props.layout.total) || '0s';
+  return `${g} ${g === 1 ? 'group' : 'groups'}, ${layerCount.value} layers, ≈${total}`;
 });
 
 /** Scrolls a group into view and flashes it (also used after New group / Add to group). */
@@ -153,6 +191,23 @@ defineExpose({ jump });
 .ghost:hover:not(:disabled) { border-color: #555555; color: #ffffff; background: #1f1f1f; }
 .ghost:disabled { opacity: 0.35; cursor: not-allowed; }
 .ghost.icon-only { padding: 6px 8px; display: flex; align-items: center; }
+
+.plan-pane:focus { outline: none; }
+.ghost.danger:hover:not(:disabled) { border-color: #ef4444; color: #ef4444; }
+
+.sel-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  padding: 8px 16px;
+  background: #242424;
+  border-bottom: 1px solid #333333;
+  font-size: 12px;
+  color: #cccccc;
+  flex-shrink: 0;
+}
+.sel-strip strong { color: #ffffff; }
 
 .armed-strip {
   display: flex;

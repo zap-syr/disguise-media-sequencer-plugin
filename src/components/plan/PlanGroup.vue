@@ -1,5 +1,12 @@
 <template>
-  <section class="group" :class="{ 'is-flash': flash }" :id="`plan-group-${group.id}`">
+  <section
+    class="group"
+    :class="{ 'is-flash': flash, 'is-drop': groupOver }"
+    :id="`plan-group-${group.id}`"
+    @dragover="onGroupOver"
+    @dragleave="onGroupLeave"
+    @drop="onGroupDrop"
+  >
     <header
       class="g-head"
       :class="{ 'map-over': headOver }"
@@ -38,9 +45,58 @@
         </div>
       </div>
 
-      <div v-if="rows.length" class="rows">
-        <div v-for="row in rows" :key="row.id" class="row">
-          <span class="ord">{{ row.index }}</span>
+      <div v-if="rows.length" class="rows" :class="{ 'has-sel': anySelected }">
+        <div class="g-cols">
+          <button
+            type="button"
+            class="cb selall"
+            :class="{ on: allChecked, part: someChecked && !allChecked }"
+            :aria-pressed="allChecked"
+            :aria-label="(allChecked ? 'Deselect all layers in ' : 'Select all layers in ') + label"
+            :title="(allChecked ? 'Deselect all layers in ' : 'Select all layers in ') + label"
+            @click="$emit('group-check')"
+          >
+            <svg v-if="allChecked" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+            <svg v-else-if="someChecked" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 12h12"/></svg>
+          </button>
+          <span></span>
+          <span>Media, start, length</span>
+          <span>Mapping</span>
+          <span></span>
+        </div>
+        <div
+          v-for="row in rows"
+          :key="row.id"
+          class="row"
+          :class="{
+            'is-checked': checked.has(row.id),
+            'is-dragging': draggingRows && dragPayload.ids.includes(row.id),
+            'drop-before': rowOver?.id === row.id && rowOver.pos === 'before',
+            'drop-after': rowOver?.id === row.id && rowOver.pos === 'after'
+          }"
+          draggable="true"
+          :aria-selected="checked.has(row.id)"
+          title="Click to select, Ctrl/Cmd+click to add, Shift+click for a range, drag to move"
+          @click="$emit('row-click', row.id, $event)"
+          @dragstart="onRowDragStart($event, row)"
+          @dragend="onDragEnd"
+          @dragover="onRowOver($event, row)"
+          @dragleave="onRowLeave($event, row)"
+          @drop="onRowDrop($event, row)"
+        >
+          <span class="ord-cell">
+            <span class="ord">{{ row.index }}</span>
+            <button
+              type="button"
+              class="cb"
+              :class="{ on: checked.has(row.id) }"
+              :aria-pressed="checked.has(row.id)"
+              :aria-label="(checked.has(row.id) ? 'Deselect ' : 'Select ') + row.name"
+              @click.stop="$emit('row-check', row.id)"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+            </button>
+          </span>
           <span class="thumb">
             <img v-if="row.thumbUrl && !brokenThumbs[row.id]" :src="row.thumbUrl" alt="" @error="brokenThumbs[row.id] = true" />
           </span>
@@ -55,7 +111,7 @@
             tabindex="0"
             :title="slotTitle(row)"
             :aria-label="slotTitle(row)"
-            @click="onSlotClick(row)"
+            @click.stop="onSlotClick(row)"
             @keydown.enter.prevent="onSlotClick(row)"
             @dragover="onSlotOver($event, row)"
             @dragleave="onSlotLeave(row)"
@@ -70,12 +126,12 @@
             </template>
             <span v-else class="sname empty-slot">{{ armed ? 'Click to assign' : 'Drop mapping here' }}</span>
           </div>
-          <button type="button" class="icon-btn" :aria-label="`Remove ${row.name} from ${label}`" title="Remove from group" @click="$emit('remove-entry', row.id)">
+          <button type="button" class="icon-btn" :aria-label="`Remove ${row.name} from ${label}`" title="Remove from group" @click.stop="$emit('remove-entry', row.id)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
         </div>
       </div>
-      <div v-else class="g-empty">Empty group — select files and use “Add to group…”.</div>
+      <div v-else class="g-empty">Empty group. Select files and use "Add to group", or drag files or rows here.</div>
     </template>
   </section>
 </template>
@@ -84,7 +140,7 @@
 import { computed, reactive, ref } from 'vue';
 import { formatClock, formatDuration } from '../../utils/format';
 import { mappingColor } from '../../utils/mappingColors';
-import { dragPayload, endDrag } from '../../composables/useDragPayload';
+import { dragPayload, startDrag, endDrag } from '../../composables/useDragPayload';
 
 const props = defineProps({
   group: { type: Object, required: true },
@@ -100,10 +156,79 @@ const props = defineProps({
   showTags: { type: Boolean, default: false },
   flash: { type: Boolean, default: false },
   mappingsByPath: { type: Object, default: () => ({}) }, // mapping path -> mapping
-  armed: { type: String, default: null }                  // armed mapping path (click-to-assign)
+  armed: { type: String, default: null },                 // armed mapping path (click-to-assign)
+  checked: { type: Set, default: () => new Set() },       // selected entry ids (whole plan)
+  selectedIds: { type: Array, default: () => [] },        // selected entry ids in plan order
+  anySelected: { type: Boolean, default: false }
 });
 const emit = defineEmits(['toggle', 'rename', 'remove', 'remove-entry', 'set-timing',
-  'assign', 'clear-entries', 'assign-group', 'clear-group']);
+  'assign', 'clear-entries', 'assign-group', 'clear-group',
+  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files']);
+
+const allChecked = computed(() => props.group.items.length > 0 && props.group.items.every(id => props.checked.has(id)));
+const someChecked = computed(() => props.group.items.some(id => props.checked.has(id)));
+
+/** A mapping applied to a selected row goes to the whole selection (docs §2.4). */
+function targetsFor(rowId) {
+  return props.checked.has(rowId) ? props.selectedIds : [rowId];
+}
+
+// --- Row / file drag and drop ---
+const rowOver = ref(null);   // { id, pos: 'before' | 'after' }
+const groupOver = ref(false);
+const draggingRows = computed(() => dragPayload.kind === 'rows');
+const draggingMovable = computed(() => dragPayload.kind === 'rows' || dragPayload.kind === 'files');
+
+function onRowDragStart(event, row) {
+  event.stopPropagation();
+  startDrag(event, 'rows', targetsFor(row.id));
+}
+function onDragEnd() {
+  rowOver.value = null;
+  groupOver.value = false;
+  endDrag();
+}
+function onRowOver(event, row) {
+  if (!draggingMovable.value) return;
+  event.preventDefault();
+  event.stopPropagation();
+  const rect = event.currentTarget.getBoundingClientRect();
+  const pos = event.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+  if (rowOver.value?.id !== row.id || rowOver.value.pos !== pos) rowOver.value = { id: row.id, pos };
+  groupOver.value = false;
+}
+function onRowLeave(event, row) {
+  if (event.relatedTarget && event.currentTarget.contains(event.relatedTarget)) return;
+  if (rowOver.value?.id === row.id) rowOver.value = null;
+}
+function onRowDrop(event, row) {
+  if (!draggingMovable.value) return;
+  event.preventDefault();
+  event.stopPropagation();
+  emitDrop(row.id, rowOver.value?.pos || 'after');
+}
+function onGroupOver(event) {
+  if (!draggingMovable.value) return;
+  event.preventDefault();
+  groupOver.value = true;
+}
+function onGroupLeave(event) {
+  if (event.relatedTarget && event.currentTarget.contains(event.relatedTarget)) return;
+  groupOver.value = false;
+}
+function onGroupDrop(event) {
+  if (!draggingMovable.value) return;
+  event.preventDefault();
+  emitDrop(null, 'after');
+}
+function emitDrop(targetId, pos) {
+  const ids = [...dragPayload.ids];
+  if (dragPayload.kind === 'rows') emit('drop-rows', { ids, targetId, pos });
+  else emit('drop-files', { paths: ids, targetId, pos });
+  rowOver.value = null;
+  groupOver.value = false;
+  endDrag();
+}
 
 const brokenThumbs = reactive({});
 
@@ -120,7 +245,8 @@ function slotTitle(row) {
   return props.armed ? 'Click to assign the armed mapping' : 'Drop a mapping here';
 }
 function onSlotClick(row) {
-  if (props.armed) emit('assign', [row.id], props.armed);
+  if (props.armed) emit('assign', targetsFor(row.id), props.armed);
+  else emit('row-click', row.id, { ctrlKey: false, metaKey: false, shiftKey: false });
 }
 function onSlotOver(event, row) {
   if (!draggingMapping.value) return;
@@ -135,7 +261,7 @@ function onSlotDrop(event, row) {
   if (!draggingMapping.value) return;
   event.preventDefault();
   event.stopPropagation();
-  emit('assign', [row.id], dragPayload.ids[0]);
+  emit('assign', targetsFor(row.id), dragPayload.ids[0]);
   overSlot.value = null;
   endDrag();
 }
@@ -170,7 +296,8 @@ const tagMarks = computed(() => (props.showTags && hasRows.value ? props.layout.
 
 const meta = computed(() => {
   const n = props.group.items.length;
-  return `${n} ${n === 1 ? 'file' : 'files'} · ${formatDuration(props.layout.end - props.layout.start) || '0s'}`;
+  const length = formatDuration(props.layout.end - props.layout.start) || '0s';
+  return `${n} ${n === 1 ? 'file' : 'files'}, ${length}`;
 });
 
 const rows = computed(() => props.layout.rows.map((r, i) => {
@@ -178,7 +305,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   const file = props.filesByPath[mediaId];
   const det = props.details[mediaId];
   const name = file?.name || (mediaId || '').split('/').pop();
-  const sub = [formatClock(r.start), formatDuration(r.duration), det?.res].filter(Boolean).join(' · ');
+  const sub = [formatClock(r.start), formatDuration(r.duration), det?.res].filter(Boolean).join(', ');
   const mappingPath = props.entries[r.id]?.mappingPath || null;
   const mapping = mappingPath ? props.mappingsByPath[mappingPath] : null;
   return {
@@ -206,6 +333,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .group.is-flash { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
+.group.is-drop { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
 
 .g-head {
   display: grid;
@@ -288,8 +416,44 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   border-bottom: 1px solid #222222;
 }
 .row:last-child { border-bottom: none; }
+.row { cursor: default; user-select: none; position: relative; }
 .row:hover { background: #242424; }
+.row.is-checked { background: rgba(10, 132, 255, 0.15); box-shadow: inset 0 0 0 1px rgba(10, 132, 255, 0.5); }
+.row.is-checked:hover { background: rgba(10, 132, 255, 0.2); }
+.row.is-dragging { opacity: 0.4; }
+.row.drop-before { box-shadow: inset 0 2px 0 #0a84ff; }
+.row.drop-after { box-shadow: inset 0 -2px 0 #0a84ff; }
+
+.g-cols {
+  display: grid;
+  grid-template-columns: 26px 40px minmax(0, 1fr) minmax(140px, 200px) 26px;
+  align-items: center;
+  gap: 10px;
+  height: 26px;
+  padding: 0 10px;
+  border-bottom: 1px solid #222222;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #777777;
+  background: #1a1a1a;
+}
+
+.ord-cell { width: 26px; height: 22px; display: flex; align-items: center; justify-content: center; }
 .ord { font-size: 11px; color: #888888; text-align: center; font-variant-numeric: tabular-nums; }
+.cb {
+  display: none;
+  width: 16px; height: 16px; padding: 0;
+  border: 1.5px solid #777777; border-radius: 4px; background: #181818; color: transparent;
+  align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
+}
+.cb:hover { border-color: #cccccc; }
+.cb.on, .cb.part { background: #0a84ff; border-color: #0a84ff; color: #ffffff; }
+.cb:focus-visible { box-shadow: 0 0 0 2px #0a84ff; }
+.cb.selall { display: flex; justify-self: center; }
+/* Checkbox replaces the row number on hover, and everywhere while the plan has a selection */
+.row:hover .cb, .rows.has-sel .cb, .cb:focus-visible { display: flex; }
+.row:hover .ord, .rows.has-sel .ord { display: none; }
 .thumb { width: 40px; height: 26px; border-radius: 4px; background: #151515; overflow: hidden; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pname { min-width: 0; }
