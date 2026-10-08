@@ -1,7 +1,7 @@
 <template>
   <div
     class="media-card"
-    :class="{ 'is-card-selected': selected, 'is-list': viewMode === 'list' }"
+    :class="{ 'is-card-selected': selected, 'is-list': viewMode === 'list', 'is-compact': compact }"
   >
     <div class="card-preview" :class="mediaType">
       <img v-if="thumbnailUrl && !thumbnailError" :src="thumbnailUrl" @error="thumbnailError = true" class="thumbnail-image" />
@@ -22,7 +22,8 @@
       </span>
       <span v-if="viewMode === 'list' && listMeta" class="list-meta">{{ listMeta }}</span>
       <span class="file-meta">
-        <span class="file-type" :class="{ 'is-live': kind === 'live' }">{{ typeLabel }}</span>
+        <span v-if="compact && gridResolution" class="file-type file-res" :title="`${typeLabel} · ${gridResolution}`">{{ gridResolution }}</span>
+        <span v-else class="file-type" :class="{ 'is-live': kind === 'live' }" :title="gridResolution ? `${typeLabel} · ${gridResolution}` : null">{{ typeLabel }}<span v-if="gridResolution" class="file-res"> · {{ gridResolution }}</span></span>
         <span v-if="details?.hasAlpha || details?.hasAudio" class="flags">
           <svg v-if="details.hasAlpha" class="flag" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" role="img" aria-label="Alpha channel"><title>Alpha channel</title><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" fill="none" stroke="currentColor"/><rect x="1" y="1" width="5" height="5" fill="currentColor"/><rect x="6" y="6" width="5" height="5" fill="currentColor"/></svg>
           <svg v-if="details.hasAudio" class="flag" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Audio"><title>Audio</title><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
@@ -58,6 +59,11 @@ const props = defineProps({
     default: undefined
   },
   showOrder: {
+    type: Boolean,
+    default: false
+  },
+  // Small grid tiles: the duration chip already tells video/still/live, so the footer shows only the resolution
+  compact: {
     type: Boolean,
     default: false
   },
@@ -103,6 +109,9 @@ const durationLabel = computed(() => {
   if (kind.value === 'still') return 'still';
   return formatDuration(props.details.duration);
 });
+
+// Grid tiles show the resolution next to the type; list rows show it in listMeta instead.
+const gridResolution = computed(() => (props.viewMode !== 'list' && props.details?.res) || '');
 
 const listMeta = computed(() => {
   if (!props.details) return '';
@@ -241,6 +250,19 @@ const listMeta = computed(() => {
   color: #666666;
 }
 .file-type.is-live { color: #0a84ff; font-weight: 600; }
+.media-card:not(.is-list) .file-type {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.media-card.is-compact .card-footer { padding: 8px 7px; }
+.media-card.is-compact .file-meta { gap: 3px; }
+.file-res {
+  color: #666666;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
 
 .file-meta {
   display: flex;
@@ -256,6 +278,7 @@ const listMeta = computed(() => {
 }
 
 .flags {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 4px;

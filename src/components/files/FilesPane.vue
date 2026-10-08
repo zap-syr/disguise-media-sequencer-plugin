@@ -103,6 +103,7 @@
         :selection-order="selection.selectionOrderMap.value.get(item.id)"
         :show-order="selection.selectedItems.size > 1"
         :details="mediaDetails[item.path]"
+        :compact="viewMode === 'grid' && gridSize === 'small'"
         :class="['media-card-item', { 'no-transition': isViewSwitching }]"
         :data-id="item.id"
         @click.stop="selection.handleSelection(item, index, $event)"
