@@ -30,6 +30,25 @@ export function useLayerPlan() {
     return group.id;
   }
 
+  /**
+   * Inserts several groups at `index` (null = end). defs: [{ name, paths, sourceFolder }].
+   * sourceFolder ({ id, content }) is kept for a future "sync with folder" (docs §11 Q13).
+   * Returns the new group ids.
+   */
+  function insertGroups(defs, index = null) {
+    const created = defs.map(def => ({
+      id: `g${nextGroup++}`,
+      name: def.name,
+      open: true,
+      timing: 'seq',
+      items: makeEntries(def.paths),
+      sourceFolder: def.sourceFolder || null
+    }));
+    const at = index == null ? state.groups.length : Math.max(0, Math.min(index, state.groups.length));
+    state.groups.splice(at, 0, ...created);
+    return created.map(g => g.id);
+  }
+
   function newGroup(paths, name) {
     const gid = addEmptyGroup(name);
     addToGroup(gid, paths);
@@ -168,7 +187,7 @@ export function useLayerPlan() {
 
   return {
     state, layerCount, groupLabelsByMedia, unmappedCount, mappingUsage,
-    addEmptyGroup, newGroup, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
+    addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
     removeGroup, updateGroup, setAllOpen,
     assign, assignGroup, clearMappings
   };

@@ -91,6 +91,67 @@ export function folderFiles(hierarchy, folderId, { includeSubfolders = false, se
   return list;
 }
 
+/** Folder ids in tree order (depth-first, as shown in the sidebar when fully expanded). */
+export function folderOrder(hierarchy) {
+  const order = [];
+  const walk = nodes => nodes.forEach(n => {
+    if (n.type !== 'folder') return;
+    order.push(n.id);
+    if (n.children) walk(n.children);
+  });
+  walk(hierarchy);
+  return order;
+}
+
+const directFiles = folder => (folder.children || []).filter(c => c.type === 'file').sort(byNameAsc);
+
+/**
+ * Plan groups for checked folders (docs §2.3.2).
+ *   content 'direct': one group per folder, its own files only
+ *   content 'deep'  : one group per folder, files of all subfolders flattened in
+ *   content 'split' : one group per folder that has own files, plus one per descendant folder
+ *                     with own files, named by the path relative to the checked folder
+ * Groups follow tree order; files are sorted by name (numeric-aware). With 'deep' / 'split'
+ * a checked folder inside another checked folder is skipped (its files are already covered).
+ * Returns { groups: [{ folderId, name, paths }], files, skippedNested, skippedEmpty }.
+ */
+export function folderGroups(hierarchy, folderIds, content) {
+  const order = folderOrder(hierarchy);
+  const ids = [...folderIds].filter(id => id !== 'all').sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  const covers = content !== 'direct';
+  const isNested = id => covers && ids.some(other => other !== id && id.startsWith(other + '/'));
+
+  const groups = [];
+  let skippedNested = 0;
+  let skippedEmpty = 0;
+
+  ids.forEach(id => {
+    if (isNested(id)) { skippedNested++; return; }
+    const folder = findFolder(hierarchy, id);
+    if (!folder) return;
+    let made = [];
+    if (content === 'deep') {
+      const paths = flattenFiles(folder.children || [], { tag: false }).sort(byNameAsc).map(f => f.path);
+      made = [{ folderId: id, name: folder.name, paths }];
+    } else if (content === 'split') {
+      const walk = (node, chain) => {
+        const own = directFiles(node);
+        if (own.length) made.push({ folderId: node.id, name: chain.join(' / '), paths: own.map(f => f.path) });
+        (node.children || []).filter(c => c.type === 'folder').sort(byNameAsc)
+          .forEach(child => walk(child, [...chain, child.name]));
+      };
+      walk(folder, [folder.name]);
+    } else {
+      made = [{ folderId: id, name: folder.name, paths: directFiles(folder).map(f => f.path) }];
+    }
+    made = made.filter(g => g.paths.length);
+    if (!made.length) skippedEmpty++;
+    groups.push(...made);
+  });
+
+  return { groups, files: groups.reduce((n, g) => n + g.paths.length, 0), skippedNested, skippedEmpty };
+}
+
 export function breadcrumbPath(hierarchy, folderId) {
   if (folderId === 'all') return [{ id: 'all', name: 'ALL FILES' }];
   const path = [];
