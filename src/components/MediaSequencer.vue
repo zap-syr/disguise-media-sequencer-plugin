@@ -11,9 +11,27 @@
         :folders="sidebarFolders"
         :selected-folder-id="selectedFolderId"
         :expanded-folders="expandedFolders"
+        :select-enabled="isAdvanced"
+        :checked-folders="folderSelection.checked"
         @select="selectFolder"
         @toggle="toggleFolder"
-      />
+        @folder-click="folderSelection.click"
+        @folder-check="folderSelection.toggle"
+        @clear-checked="folderSelection.clear"
+        @create-groups="createFolderGroups"
+      >
+        <template v-if="isAdvanced && folderSelection.checked.size" #footer>
+          <FolderGroupsStrip
+            v-model:content="folderContent"
+            v-model:insert-after="folderInsertAfter"
+            :folder-count="folderSelection.checked.size"
+            :result="folderResult"
+            :groups="plan.state.groups"
+            @create="createFolderGroups"
+            @clear="folderSelection.clear"
+          />
+        </template>
+      </FolderTree>
 
       <!-- 2. Center: files and/or layer plan -->
       <FilesPane
@@ -81,6 +99,8 @@
         @drop-rows="onDropRows"
         @drop-files="onDropFiles"
         @remove-selected="onRemoveSelected"
+        @drop-folders="onDropFolders"
+        @drop-folder-groups="onDropFolderGroups"
         @deselect="planSelection.clear"
         @add-group="onAddEmptyGroup"
         @update-group="plan.updateGroup"
@@ -129,7 +149,9 @@ import { buildSimplePlan, buildAdvancedPlan } from '../utils/planBuilder';
 import { computePlanLayout } from '../utils/planLayout';
 import { formatDuration } from '../utils/format';
 import { setMappingPalette } from '../utils/mappingColors';
-import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath } from '../utils/mediaTree';
+import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath, folderOrder, folderGroups } from '../utils/mediaTree';
+import { useFolderSelection } from '../composables/useFolderSelection';
+import FolderGroupsStrip from './tree/FolderGroupsStrip.vue';
 import { useMediaLibrary } from '../composables/useMediaLibrary';
 import { useFileSelection } from '../composables/useFileSelection';
 import { usePersistedRef } from '../composables/usePersistedRef';
@@ -213,6 +235,72 @@ const filteredMediaList = computed(() => folderFiles(library.fullHierarchy.value
 }));
 
 const selection = useFileSelection(filteredMediaList);
+
+// --- Groups from folders (docs §2.3.2) ---
+const allFolderIds = computed(() => folderOrder(library.fullHierarchy.value));
+const folderSelection = useFolderSelection(sidebarFolders, allFolderIds);
+watch(isAdvanced, adv => { if (!adv) folderSelection.clear(); });
+
+// Content mode: persisted once chosen, otherwise follows "Include subfolders" (Q12)
+const storedFolderContent = usePersistedRef('mediaSequencer.folderContent', '', s => ['direct', 'deep', 'split'].includes(s) ? s : undefined);
+const folderContent = computed({
+  get: () => storedFolderContent.value || (includeSubfolders.value ? 'deep' : 'direct'),
+  set: v => { storedFolderContent.value = v; }
+});
+const folderInsertAfter = ref('');
+const folderResult = computed(() => folderGroups(library.fullHierarchy.value, folderSelection.checked, folderContent.value));
+
+function folderGroupDefs(result) {
+  return result.groups.map(g => ({ name: g.name, paths: g.paths, sourceFolder: { id: g.folderId, content: folderContent.value } }));
+}
+
+function skippedNote(result) {
+  const parts = [];
+  if (result.skippedNested) parts.push(`${result.skippedNested} nested skipped`);
+  if (result.skippedEmpty) parts.push(`${result.skippedEmpty} empty skipped`);
+  return parts.length ? ` (${parts.join(', ')})` : '';
+}
+
+/** Adds groups for folder results at a plan index and reveals the first one. */
+function addFolderGroups(result, index) {
+  if (!result.groups.length) {
+    showToast('The selected folders have no files for this content mode.', 'error');
+    return;
+  }
+  const ids = plan.insertGroups(folderGroupDefs(result), index);
+  const n = ids.length;
+  showToast(`${n} ${n === 1 ? 'group' : 'groups'} created, ${result.files} files${skippedNote(result)}`);
+  revealGroup(ids[0]);
+}
+
+function createFolderGroups() {
+  const result = folderResult.value;
+  const after = plan.state.groups.findIndex(g => g.id === folderInsertAfter.value);
+  addFolderGroups(result, after >= 0 ? after + 1 : null);
+  if (result.groups.length) {
+    folderSelection.clear();
+    folderInsertAfter.value = '';
+  }
+}
+
+function onDropFolderGroups({ folderIds, index }) {
+  addFolderGroups(folderGroups(library.fullHierarchy.value, folderIds, folderContent.value), index);
+  folderSelection.clear();
+}
+
+/** Folders dropped onto a group add their files to it (tree order, content mode applies). */
+function onDropFolders({ folderIds, gid, targetId, pos }) {
+  const result = folderGroups(library.fullHierarchy.value, folderIds, folderContent.value);
+  const paths = result.groups.flatMap(g => g.paths);
+  if (!paths.length) {
+    showToast('The dropped folders have no files for this content mode.', 'error');
+    return;
+  }
+  plan.insertFiles(paths, gid, targetId, pos);
+  folderSelection.clear();
+  const gi = plan.state.groups.findIndex(g => g.id === gid);
+  showToast(`${paths.length} files added to G${gi + 1}${skippedNote(result)}`);
+}
 
 const mappingsByPath = computed(() => Object.fromEntries(library.mappings.value.map(m => [m.path, m])));
 // Distinct colour per mapping, in list order (updates after Refresh)
