@@ -72,6 +72,43 @@ export function useLayerPlan() {
     state.groups.forEach(g => { g.open = open; });
   }
 
+  // --- Mappings (Phase 5) ---
+
+  /** via: null for manual assignment, 'name' | 'res' for auto-assign (Phase 8). */
+  function assign(entryIds, mappingPath, via = null) {
+    entryIds.forEach(id => {
+      const entry = state.entries[id];
+      if (entry) Object.assign(entry, { mappingPath, via });
+    });
+  }
+
+  function assignGroup(gid, mappingPath) {
+    const group = state.groups.find(g => g.id === gid);
+    if (group) assign(group.items, mappingPath);
+  }
+
+  /** scope: 'all' | group id | array of entry ids */
+  function clearMappings(scope) {
+    let ids;
+    if (scope === 'all') ids = Object.keys(state.entries);
+    else if (Array.isArray(scope)) ids = scope;
+    else ids = state.groups.find(g => g.id === scope)?.items || [];
+    assign(ids, null);
+  }
+
+  const unmappedCount = computed(() =>
+    state.groups.reduce((n, g) => n + g.items.filter(id => !state.entries[id]?.mappingPath).length, 0));
+
+  /** mappingPath -> number of plan layers using it */
+  const mappingUsage = computed(() => {
+    const usage = {};
+    state.groups.forEach(g => g.items.forEach(id => {
+      const path = state.entries[id]?.mappingPath;
+      if (path) usage[path] = (usage[path] || 0) + 1;
+    }));
+    return usage;
+  });
+
   /** clipPath -> ['G1', 'G3'] for the badges on file cards. */
   const groupLabelsByMedia = computed(() => {
     const map = {};
@@ -88,7 +125,8 @@ export function useLayerPlan() {
   });
 
   return {
-    state, layerCount, groupLabelsByMedia,
-    addEmptyGroup, newGroup, addToGroup, removeEntry, removeGroup, updateGroup, setAllOpen
+    state, layerCount, groupLabelsByMedia, unmappedCount, mappingUsage,
+    addEmptyGroup, newGroup, addToGroup, removeEntry, removeGroup, updateGroup, setAllOpen,
+    assign, assignGroup, clearMappings
   };
 }
