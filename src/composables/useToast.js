@@ -5,10 +5,13 @@ export function useToast(durationMs = 2600) {
   const toast = ref(null);
   let timer = null;
 
-  function show(text, kind = 'info') {
+  /** action: optional { label, fn } button, e.g. Undo; toasts with an action stay longer. */
+  function show(text, kind = 'info', action = null) {
     clearTimeout(timer);
-    toast.value = { text, kind };
-    timer = setTimeout(() => { toast.value = null; }, kind === 'error' ? durationMs * 2 : durationMs);
+    toast.value = { text, kind, action };
+    // Undo-style actions need time to reach the button; errors need time to read
+    const ms = action ? durationMs * 3 : kind === 'error' ? durationMs * 2 : durationMs;
+    timer = setTimeout(() => { toast.value = null; }, ms);
   }
 
   function dismiss() {
