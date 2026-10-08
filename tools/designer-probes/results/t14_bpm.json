@@ -1,0 +1,33 @@
+{
+  "probe": "t14_bpm",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 23,
+  "d3Log": "ResourceLoader::load : file objects/track/zz_probe_test.apx not found !!!\n(working directory: d:/d3 projects/api_test)\nPython script took 2.5167ms\n",
+  "pythonLog": "",
+  "result": {
+    "bpm=60": {
+      "timeToBeat(10s)": 10,
+      "beatToTime(10b)": 10,
+      "bpm": 60,
+      "bpmAt(0)": 60
+    },
+    "bpmBefore": 60,
+    "bpm=120": {
+      "timeToBeat(10s)": 20,
+      "beatToTime(10b)": 5,
+      "bpm": 120,
+      "bpmAt(0)": 120
+    },
+    "bpm=90": {
+      "timeToBeat(10s)": 15,
+      "beatToTime(10b)": 6.666666666666666,
+      "bpm": 90,
+      "bpmAt(0)": 90
+    }
+  }
+}

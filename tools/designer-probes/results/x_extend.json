@@ -1,0 +1,50 @@
+{
+  "probe": "x_extend",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 844,
+  "d3Log": "Python script took 518.6081ms\n",
+  "pythonLog": "",
+  "result": {
+    "crossesNewEnd": {
+      "trackLen": 760,
+      "tStart": 750,
+      "tLength": 10
+    },
+    "lengthBefore": 560,
+    "extended": [
+      {
+        "name": "crosses end, not extended",
+        "tStart": 555,
+        "tLength": 20
+      },
+      {
+        "name": "beyond end, not extended",
+        "tStart": 610,
+        "tLength": -50
+      },
+      {
+        "name": "beyond old end, extended",
+        "tStart": 610,
+        "tLength": 20
+      }
+    ],
+    "lengthAfterSet": 760,
+    "notExtended": [
+      {
+        "name": "crosses end, not extended",
+        "tStart": 555,
+        "tLength": 5
+      },
+      {
+        "name": "beyond end, not extended",
+        "tStart": 610,
+        "tLength": -50
+      }
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "probe": "01_overview",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 52,
+  "d3Log": "Python script took 3.8357ms\n",
+  "pythonLog": "",
+  "result": {
+    "timeToBeat(10s)": 10,
+    "guiTrack": "objects/track/track 1.apx",
+    "beatToTime(playhead)": 15,
+    "tracks": [
+      {
+        "path": "objects/track/track 1.apx",
+        "description": "track 1"
+      }
+    ],
+    "counts": {
+      "Track": 1,
+      "FeedScene": 2,
+      "Projection": 16,
+      "VideoClip": 107,
+      "Projector": 1
+    },
+    "trackTimeSeconds": 15,
+    "guiTrackLayers": 1,
+    "playheadBeats": 15,
+    "project": "api_test",
+    "guiTrackLengthBeats": 560,
+    "guiTrackDescription": "track 1",
+    "globalRefreshRate": 60
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "probe": "x_readfile",
+  "httpStatus": 500,
+  "status": {
+    "code": 5000,
+    "message": "Failed to run plugin: default_plugin\nError code: 0, Error message: class PythonException in 'C:\\blip\\dev\\d3python\\pythonobject.cpp' (line 32):\n\t\nTraceback (most recent call last):\n\n  File \"<string>\", line 39, in <module>\n\n  File \"<string>\", line 37, in userScript\n\n  File \"<string>\", line 25, in run\n\nIOError: [Errno 2] No such file or directory: 'objects/videoasset/test 2/presentation_s05_c_center_5376x1680-.apx'\n.\n",
+    "details": []
+  },
+  "roundTripMs": 53
+}

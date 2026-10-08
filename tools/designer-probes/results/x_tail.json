@@ -1,0 +1,69 @@
+{
+  "probe": "x_tail",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 61,
+  "d3Log": "Python script took 6.4185ms\n",
+  "pythonLog": "",
+  "result": {
+    "sample": [
+      {
+        "tEnd": 555,
+        "name": "chunk 110",
+        "tStart": 550,
+        "tLength": 5
+      },
+      {
+        "tEnd": 560,
+        "name": "chunk 111",
+        "tStart": 555,
+        "tLength": 5
+      },
+      {
+        "tEnd": 560,
+        "name": "chunk 1000",
+        "tStart": 560,
+        "tLength": 0
+      },
+      {
+        "tEnd": 560,
+        "name": "chunk 112",
+        "tStart": 560,
+        "tLength": 0
+      },
+      {
+        "tEnd": 560,
+        "name": "chunk 200",
+        "tStart": 560,
+        "tLength": 0
+      },
+      {
+        "tEnd": 560,
+        "name": "chunk 300",
+        "tStart": 560,
+        "tLength": 0
+      },
+      {
+        "tEnd": 560,
+        "name": "chunk 400",
+        "tStart": 560,
+        "tLength": 0
+      },
+      {
+        "tEnd": 560,
+        "name": "chunk 500",
+        "tStart": 560,
+        "tLength": 0
+      }
+    ],
+    "buckets": {
+      "start>=560": 889,
+      "inside": 111,
+      "crosses 560": 1
+    }
+  }
+}

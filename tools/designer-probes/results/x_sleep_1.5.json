@@ -1,0 +1,10 @@
+{
+  "probe": "x_sleep_1.5",
+  "httpStatus": 500,
+  "status": {
+    "code": 5000,
+    "message": "Failed to run plugin: default_plugin\nError code: 0, Error message: TimeOutError",
+    "details": []
+  },
+  "roundTripMs": 1718
+}

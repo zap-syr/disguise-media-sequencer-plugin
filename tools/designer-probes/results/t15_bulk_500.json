@@ -1,0 +1,20 @@
+{
+  "probe": "t15_bulk_500",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 965,
+  "d3Log": "Python script took 531.4440000000001ms\n!!! Main thread hung < ShallowMemoryMap::doIndent < ShallowMemoryMap::doIndent < ShallowMemoryMap::mapRP < ClassNode::mapObjectVersion < ClassNode::mapObject < Map::mapResource < ResourceState::getState < ResourceChange::close < Operation::close < UndoSystem::closeOperation < PythonPluginSystem::execute < PythonHandler::execute < ThreadExecutor::doThreadExecuteNow < TaskExecutorSystem::doUpdate < SubsystemManager::update < D3::update < D3::frame < D3::doMainThread < d3 update thread\n",
+  "pythonLog": "",
+  "result": {
+    "createMs": 483.66810000000004,
+    "nLayers": 500,
+    "nSections": 500,
+    "clearMs": 44.93580000000008,
+    "N": 500,
+    "msPerLayer": 0.9673362000000001
+  }
+}

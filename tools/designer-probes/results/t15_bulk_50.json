@@ -1,0 +1,20 @@
+{
+  "probe": "t15_bulk_50",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 111,
+  "d3Log": "Python script took 50.39190000000001ms\n",
+  "pythonLog": "",
+  "result": {
+    "createMs": 43.145500000000006,
+    "nLayers": 50,
+    "nSections": 50,
+    "clearMs": 4.5703,
+    "N": 50,
+    "msPerLayer": 0.8629100000000001
+  }
+}

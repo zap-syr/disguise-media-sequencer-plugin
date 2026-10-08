@@ -1,0 +1,16 @@
+{
+  "probe": "x_sleep_0.25",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 350,
+  "d3Log": "Python script took 252.73659999999998ms\n",
+  "pythonLog": "",
+  "result": {
+    "slept": 0.25,
+    "measured": 0.2500179000000031
+  }
+}

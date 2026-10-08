@@ -1,0 +1,125 @@
+{
+  "probe": "05_clip_metadata_timing",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 12,
+  "d3Log": "Python script took 3.3396ms\n",
+  "pythonLog": "",
+  "result": {
+    "count": 107,
+    "sample": [
+      {
+        "path": "objects/videoclip/footages/vortex/whirlpool.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/velvet_tides.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/twisted_light.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/tutti_fuity.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/tornado_confusion.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/the_black_hole.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/swirl_inversion.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/supernu.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/sportex.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/space_tornado.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/space_lotus.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/rainbow_vortex.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/purple_vortex.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/prismatic_expansion.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      },
+      {
+        "path": "objects/videoclip/footages/vortex/pink_twister.mov.apx",
+        "nFrames": 450,
+        "fileFps": 30,
+        "res": "Vec2(1920.000000, 1080.000000)",
+        "isVideoIn": false
+      }
+    ],
+    "errors": {},
+    "elapsedMs": 0,
+    "msPerClip": 0
+  }
+}

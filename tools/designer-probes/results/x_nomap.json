@@ -1,0 +1,21 @@
+{
+  "probe": "x_nomap",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 52,
+  "d3Log": "Python script took 6.4035ms\n",
+  "pythonLog": "",
+  "result": {
+    "projectionCount": 11,
+    "afterClear": null,
+    "setResource(None)": "ok",
+    "defaults": [
+      "objects/fisheyeprojection/10 (fish eye).apx",
+      "objects/fisheyeprojection/10 (fish eye).apx"
+    ]
+  }
+}

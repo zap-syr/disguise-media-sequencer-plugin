@@ -1,0 +1,170 @@
+{
+  "probe": "t12_sequences",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 53,
+  "d3Log": "!!!!! Deprecated member eval called\n{\nFieldSequence.eval() will be restricted from plugins in a future Designer release. Please update your plugins to switch to FieldSequence.getSequencedValue().\n}\n!!!!! Nested expression hit recursion limit in field mode of seq test\n{\n < FieldSequence::eval < FieldSequence::eval < Call:eval < val < :ResourceSequence < DeleteValue:ResourceSequence < DeleteValue:ResourceSequence < PythonSystem::moduleExec < PythonSystem::moduleExecWithTimeout < PythonPluginSystem::execute < PythonHandler::execute < ThreadExecutor::doThreadExecuteNow < TaskExecutorSystem::doUpdate < SubsystemManager::update < D3::update < D3::frame < D3::doMainThread < d3 update thread\n}\n!!!!! Nested expression hit recursion limit in field at_end_point of seq test\n{\n < FieldSequence::eval < FieldSequence::eval < Call:eval < val < :FloatSequence < DeleteValue:FloatSequence < DeleteValue:FloatSequence < PythonSystem::moduleExec < PythonSystem::moduleExecWithTimeout < PythonPluginSystem::execute < PythonHandler::execute < ThreadExecutor::doThreadExecuteNow < TaskExecutorSystem::doUpdate < SubsystemManager::update < D3::update < D3::frame < D3::doMainThread < d3 update thread\n}\n!!!!! Nested expression hit recursion limit in field brightness of seq test\n{\n < FieldSequence::eval < FieldSequence::eval < Call:eval < val < :FloatSequence < DeleteValue:FloatSequence < DeleteValue:FloatSequence < PythonSystem::moduleExec < PythonSystem::moduleExecWithTimeout < PythonPluginSystem::execute < PythonHandler::execute < ThreadExecutor::doThreadExecuteNow < TaskExecutorSystem::doUpdate < SubsystemManager::update < D3::update < D3::frame < D3::doMainThread < d3 update thread\n}\nPython script took 4.1385ms\n",
+  "pythonLog": "",
+  "result": {
+    "defaultsOnFreshLayer": {
+      "At end point": {
+        "keyType": "KeyFloat",
+        "nKeys": 1,
+        "eval(0)": 0,
+        "disableSequencing": true,
+        "key0.v": 0,
+        "seqType": "FloatSequence"
+      },
+      "Brightness": {
+        "keyType": "KeyFloat",
+        "nKeys": 1,
+        "eval(0)": 1,
+        "disableSequencing": true,
+        "key0.v": 1,
+        "seqType": "FloatSequence"
+      },
+      "video": {
+        "seqType": "ResourceSequence",
+        "disableSequencing": true,
+        "key0.r": null,
+        "keyType": "KeyResource",
+        "nKeys": 1
+      },
+      "mapping": {
+        "seqType": "ResourceSequence",
+        "disableSequencing": true,
+        "key0.r": "objects/fisheyeprojection/10 (fish eye).apx",
+        "keyType": "KeyResource",
+        "nKeys": 1
+      },
+      "mode": {
+        "keyType": "KeyFloat",
+        "nKeys": 1,
+        "eval(0)": 1,
+        "disableSequencing": true,
+        "key0.v": 1,
+        "seqType": "FloatSequence"
+      }
+    },
+    "findSequence": {
+      "opacity": false,
+      "volume": true,
+      "Brightness": true,
+      "brightness": true,
+      "mapping": true,
+      "Mapping": true,
+      "at end point": true,
+      "At end point": true,
+      "Video": true,
+      "mode": true,
+      "video": true,
+      "Mode": true
+    },
+    "sequenceNames": [
+      "blendMode",
+      "brightness",
+      "mapping",
+      "palette",
+      "xCol",
+      "yCol",
+      "tint.r",
+      "tint.g",
+      "tint.b",
+      "tint.a",
+      "video",
+      "speed",
+      "mode",
+      "at end point",
+      "transition time",
+      "volume",
+      "output",
+      "brightness (shift)",
+      "contrast (scale)",
+      "gain",
+      "saturation scale",
+      "hue shift",
+      "RGB controlled",
+      "red min",
+      "red max",
+      "red gamma",
+      "green min",
+      "green max",
+      "green gamma",
+      "blue min",
+      "blue max",
+      "blue gamma",
+      "threshold",
+      "hardness",
+      "key colour.r",
+      "key colour.g",
+      "key colour.b",
+      "size",
+      "scale.x",
+      "scale.y",
+      "pos.x",
+      "pos.y",
+      "rotation",
+      "left",
+      "right",
+      "top",
+      "bottom",
+      "cropSoftness",
+      "acesExposure",
+      "acesGamma",
+      "cdl",
+      "ocioExposure",
+      "ocioContrast",
+      "ocioGamma"
+    ],
+    "loadedMapping": true,
+    "afterSet": {
+      "Brightness": {
+        "keyType": "KeyFloat",
+        "nKeys": 2,
+        "eval(0)": 0,
+        "disableSequencing": false,
+        "key0.v": 0,
+        "seqType": "FloatSequence"
+      },
+      "Brightness keyTimes": [
+        0,
+        2
+      ],
+      "mapping": {
+        "seqType": "ResourceSequence",
+        "disableSequencing": true,
+        "key0.r": "objects/perspectiveprojection/5 (Perspective).apx",
+        "keyType": "KeyResource",
+        "nKeys": 1
+      },
+      "At end point": {
+        "keyType": "KeyFloat",
+        "nKeys": 1,
+        "eval(0)": 2,
+        "disableSequencing": true,
+        "key0.v": 2,
+        "seqType": "FloatSequence"
+      },
+      "video": {
+        "seqType": "ResourceSequence",
+        "disableSequencing": true,
+        "key0.r": "objects/videoclip/test/flag_center_hap.mov.apx",
+        "keyType": "KeyResource",
+        "nKeys": 1
+      },
+      "mode": {
+        "keyType": "KeyFloat",
+        "nKeys": 1,
+        "eval(0)": 0,
+        "disableSequencing": true,
+        "key0.v": 0,
+        "seqType": "FloatSequence"
+      }
+    },
+    "loadedClip": true
+  }
+}

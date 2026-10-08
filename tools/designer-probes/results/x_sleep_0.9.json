@@ -1,0 +1,16 @@
+{
+  "probe": "x_sleep_0.9",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 956,
+  "d3Log": "!!! Main thread hung < userScript < userScript < userScript < PythonSystem::moduleExec < PythonSystem::moduleExecWithTimeout < PythonPluginSystem::execute < PythonHandler::execute < ThreadExecutor::doThreadExecuteNow < TaskExecutorSystem::doUpdate < SubsystemManager::update < D3::update < D3::frame < D3::doMainThread < d3 update thread\nd3 gained focus\nPython script took 903.1091ms\n",
+  "pythonLog": "",
+  "result": {
+    "slept": 0.9,
+    "measured": 0.9006270000000001
+  }
+}

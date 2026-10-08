@@ -1,0 +1,28 @@
+{
+  "probe": "06_track_layers",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 17,
+  "d3Log": "Python script took 2.8011999999999997ms\n",
+  "pythonLog": "",
+  "result": {
+    "track": "objects/track/track 1.apx",
+    "layers": [
+      {
+        "index": 0,
+        "name": "Video",
+        "enabled": true,
+        "module": "<_blipValue(VariableVideoModule) instance at 0x0000013CDA7D60A0>",
+        "tStart": 14,
+        "tLength": 60
+      }
+    ],
+    "variableVideoModuleSequenceNames": null,
+    "layerCount": 1,
+    "tags": []
+  }
+}

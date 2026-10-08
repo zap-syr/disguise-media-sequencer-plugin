@@ -1,0 +1,112 @@
+{
+  "probe": "t11_stack_order",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 17,
+  "d3Log": "ResourceLoader::load : file objects/track/zz_probe_test.apx not found !!!\n(working directory: d:/d3 projects/api_test)\nPython script took 6.4627ms\n",
+  "pythonLog": "",
+  "result": {
+    "after moveLayerToIndex(C, last)": [
+      {
+        "i": 0,
+        "name": "E (5th, t=5)",
+        "tStart": 5
+      },
+      {
+        "i": 1,
+        "name": "D (4th, t=20)",
+        "tStart": 20
+      },
+      {
+        "i": 2,
+        "name": "B (2nd, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 3,
+        "name": "A (1st, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 4,
+        "name": "C (3rd, t=0)",
+        "tStart": 0
+      }
+    ],
+    "after D at t=20 and E at t=5": [
+      {
+        "i": 0,
+        "name": "E (5th, t=5)",
+        "tStart": 5
+      },
+      {
+        "i": 1,
+        "name": "D (4th, t=20)",
+        "tStart": 20
+      },
+      {
+        "i": 2,
+        "name": "C (3rd, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 3,
+        "name": "B (2nd, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 4,
+        "name": "A (1st, t=0)",
+        "tStart": 0
+      }
+    ],
+    "after moveLayerToIndex(C, 0)": [
+      {
+        "i": 0,
+        "name": "C (3rd, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 1,
+        "name": "E (5th, t=5)",
+        "tStart": 5
+      },
+      {
+        "i": 2,
+        "name": "D (4th, t=20)",
+        "tStart": 20
+      },
+      {
+        "i": 3,
+        "name": "B (2nd, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 4,
+        "name": "A (1st, t=0)",
+        "tStart": 0
+      }
+    ],
+    "after A,B,C at same beat": [
+      {
+        "i": 0,
+        "name": "C (3rd, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 1,
+        "name": "B (2nd, t=0)",
+        "tStart": 0
+      },
+      {
+        "i": 2,
+        "name": "A (1st, t=0)",
+        "tStart": 0
+      }
+    ]
+  }
+}

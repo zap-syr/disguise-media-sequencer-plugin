@@ -1,0 +1,74 @@
+{
+  "probe": "x_alpha_src",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 49,
+  "d3Log": "Python script took 2.7956ms\n",
+  "pythonLog": "",
+  "result": {
+    "headers": [],
+    "nVideoFileHeader": 0,
+    "videoFiles": [
+      {
+        "path": "objects/videofile/test/flag_center_hap.mov",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "False"
+      },
+      {
+        "path": "objects/videofile/test patterns/aces2065-1_colorchecker2014.exr",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "False"
+      },
+      {
+        "path": "objects/videofile/sample/ada.jpg",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "True"
+      },
+      {
+        "path": "objects/videofile/test patterns/d3_bpc_16-9.d",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "True"
+      },
+      {
+        "path": "objects/videofile/test patterns/d3_color_16-9.png",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "True"
+      },
+      {
+        "path": "objects/videofile/test patterns/d3_color_4-3.png",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "True"
+      },
+      {
+        "path": "objects/videofile/sample/george.jpg",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "True"
+      },
+      {
+        "path": "objects/videofile/test patterns/d3_test_4-3.png",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "True"
+      },
+      {
+        "path": "objects/videofile/test patterns/d3_test_16-9.png",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "True"
+      },
+      {
+        "path": "objects/videofile/videoin_1.mov",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "False"
+      },
+      {
+        "path": "objects/videofile/test/center_hap.mov",
+        "info.hasAudio": "False",
+        "info.hasAlpha": "False"
+      }
+    ],
+    "nVideoFile": 11
+  }
+}

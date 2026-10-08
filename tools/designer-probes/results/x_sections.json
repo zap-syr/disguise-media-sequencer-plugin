@@ -1,0 +1,37 @@
+{
+  "probe": "x_sections",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 49,
+  "d3Log": "Python script took 4.2498ms\n",
+  "pythonLog": "",
+  "result": {
+    "nTagBeats": 212,
+    "lengthInBeats": 560,
+    "lastTagBeats": [
+      1050,
+      1055,
+      1.7976931348623157e+308
+    ],
+    "nSections": 212,
+    "lastSections": [
+      1035,
+      1040,
+      1045,
+      1050,
+      1055
+    ],
+    "maxLayerEnd": 560,
+    "firstSections": [
+      0,
+      5,
+      10,
+      15,
+      20
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "probe": "t10_setup_track",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 73,
+  "d3Log": "Python script took 2.956ms\n",
+  "pythonLog": "",
+  "result": {
+    "nLayers": 0,
+    "lengthInSec": 560,
+    "track": "objects/track/zz_probe_test.apx",
+    "lengthInBeats": 560,
+    "bpm": 60,
+    "nSections": 1,
+    "removedLayers": 0
+  }
+}

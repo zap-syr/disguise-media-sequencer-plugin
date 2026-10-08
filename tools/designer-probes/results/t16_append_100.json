@@ -1,0 +1,19 @@
+{
+  "probe": "t16_append_100",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 561,
+  "d3Log": "Python script took 83.05659999999999ms\n",
+  "pythonLog": "",
+  "result": {
+    "endBeat": 1060,
+    "layersBefore": 900,
+    "pythonMs": 80.24149999999963,
+    "layersAfter": 1000,
+    "N": 100
+  }
+}

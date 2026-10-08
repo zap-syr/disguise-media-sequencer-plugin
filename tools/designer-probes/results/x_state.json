@@ -1,0 +1,26 @@
+{
+  "probe": "x_state",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 48,
+  "d3Log": "Python script took 3.438ms\n",
+  "pythonLog": "",
+  "result": {
+    "names_first": [
+      "chunk 999",
+      "chunk 998",
+      "chunk 997"
+    ],
+    "names_last": [
+      "chunk 2",
+      "chunk 1",
+      "chunk 0"
+    ],
+    "nLayers": 1000,
+    "nSections": 212
+  }
+}

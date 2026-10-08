@@ -1,0 +1,77 @@
+{
+  "probe": "t13_tags_sections",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 12,
+  "d3Log": "Python script took 2.828ms\n",
+  "pythonLog": "",
+  "result": {
+    "findBeatOfNextTag(5)": 7,
+    "sectionAtBeat(11)": false,
+    "sectionAtBeat(10)": true,
+    "findBeatOfNextTag(0)": 5,
+    "tagAtBeat(7, cue)": "2",
+    "sectionsAfterSplits(10,10,25)": [
+      {
+        "i": 0,
+        "beat": 0,
+        "lenBeats": 10
+      },
+      {
+        "i": 1,
+        "beat": 10,
+        "lenBeats": 5
+      },
+      {
+        "i": 2,
+        "beat": 25,
+        "lenBeats": 3
+      }
+    ],
+    "sectionsBefore": [
+      {
+        "i": 0,
+        "beat": 0,
+        "lenBeats": 560
+      }
+    ],
+    "tagsAt5_afterSecondCue": [
+      {
+        "text": "01:00:00:00",
+        "type": 0
+      },
+      {
+        "text": "1.2",
+        "type": 1
+      },
+      {
+        "text": "1.60",
+        "type": 2
+      }
+    ],
+    "tagsAt8": [
+      {
+        "text": "3.4.5",
+        "type": 1
+      }
+    ],
+    "tagsAt5_after3types": [
+      {
+        "text": "01:00:00:00",
+        "type": 0
+      },
+      {
+        "text": "1.1",
+        "type": 1
+      },
+      {
+        "text": "1.60",
+        "type": 2
+      }
+    ]
+  }
+}

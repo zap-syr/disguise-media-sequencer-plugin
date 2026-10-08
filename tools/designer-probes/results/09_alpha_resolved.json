@@ -1,0 +1,1084 @@
+{
+  "probe": "09_alpha_resolved",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 47,
+  "d3Log": "Python script took 19.434ms\n",
+  "pythonLog": "",
+  "result": [
+    {
+      "source": "objects/videofile/footages/vortex/whirlpool.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/whirlpool.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/velvet_tides.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/velvet_tides.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/twisted_light.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/twisted_light.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/tutti_fuity.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/tutti_fuity.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/tornado_confusion.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/tornado_confusion.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/the_black_hole.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/the_black_hole.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/swirl_inversion.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/swirl_inversion.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/supernu.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/supernu.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/sportex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/sportex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/space_tornado.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/space_tornado.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/space_lotus.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/space_lotus.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/rainbow_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/rainbow_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/purple_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/purple_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/prismatic_expansion.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/prismatic_expansion.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/pink_twister.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/pink_twister.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/photonic_twist.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/photonic_twist.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/nova_prism.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/nova_prism.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/my_little_pony.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/my_little_pony.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/hyper_light_drift.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/hyper_light_drift.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/head_spin.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/head_spin.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/green_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/green_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/ghost_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/ghost_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/flaming_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/flaming_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/flaming_rose.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/flaming_rose.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/emerald_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/emerald_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/dual_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/dual_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/cosmic_purple.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/cosmic_purple.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/bortecs.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/bortecs.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/blood_vortex.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/vortex/aqua_twist.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/vortex/aqua_twist.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/yellow_jacket_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/yellow_jacket_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/yamato_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/yamato_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/visual_synthesis_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/visual_synthesis_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/virtuocity_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/virtuocity_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/twitch_factory_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/twitch_factory_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/trance_machine_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/trance_machine_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/snowcrash_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/snowcrash_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/slip_circuit_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/slip_circuit_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/sequencer_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/sequencer_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/rotational_rhythm_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/rotational_rhythm_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/robotech_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/robotech_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/red_revenge_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/red_revenge_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/ninety_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/ninety_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/neutronium_alchemist_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/neutronium_alchemist_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/neuromancer_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/neuromancer_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/mona_lisa_overdrive_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/mona_lisa_overdrive_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/leviathan_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/leviathan_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/kandy_konstruct_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/kandy_konstruct_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/idoru_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/idoru_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/freelancer_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/freelancer_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/fliptech_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/fliptech_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/dron_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/dron_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/disk_platters_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/disk_platters_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/decepticon_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/decepticon_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/count_zero_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/count_zero_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/burning_rhythm_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/burning_rhythm_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/blacklight_tango_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/blacklight_tango_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/beat_structure_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/beat_structure_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/technikal/altered_carbon_am.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/technikal/altered_carbon_am.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/yenelik.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/yenelik.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/taklamakan.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/taklamakan.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/supervision.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/supervision.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/squared_pulse.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/squared_pulse.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/space_tunnel.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/space_tunnel.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/space_rotator.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/space_rotator.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/sound_shapes_5.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/sound_shapes_5.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/sound_shapes_4.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/sound_shapes_4.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/sound_shapes_3.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/sound_shapes_3.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/sound_shapes_2.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/sound_shapes_2.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/sound_shapes_1.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/sound_shapes_1.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/ripple_effect_wave.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/ripple_effect_wave.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/panophelia.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/panophelia.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/musette.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/musette.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/led_tunnel.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/led_tunnel.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/laser_scan_lines.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/laser_scan_lines.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/introspection.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/introspection.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/icosahedron.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/icosahedron.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/flicker_cubes.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/flicker_cubes.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/emerald_eye.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/emerald_eye.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/dotted_concentrics.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/dotted_concentrics.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/aurion.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/aurion.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/aqua_ripples.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/aqua_ripples.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/abyss_sphere_rays.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/abyss_sphere_rays.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/abyss_lighting_6.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/abyss_lighting_6.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/abyss_lighting_5.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/abyss_lighting_5.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/abyss_lighting_4.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/abyss_lighting_4.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/abyss_lighting_3.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/abyss_lighting_3.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/abyss_lighting_2.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/abyss_lighting_2.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/footages/4k emanation/abyss_lighting_1.mov",
+      "codec": "jpeg",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/footages/4k emanation/abyss_lighting_1.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test 2/presentation_s05_c_center_5376x1680-.png",
+      "codec": "still_image:PNG",
+      "alphaReason": "png colour type 6",
+      "clip": "objects/videoclip/test 2/presentation_s05_c_center_5376x1680-.png.apx",
+      "designerHasAlpha": true,
+      "alpha": true,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test 2/jacques_introduction_center 5376x1680_v01.mov",
+      "codec": "NotchLC",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/test 2/jacques_introduction_center 5376x1680.mov.apx",
+      "designerHasAlpha": true,
+      "alpha": true,
+      "bitDepth": 13,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test 2/center_v02.mov",
+      "codec": "hap",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/test 2/center.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": true
+    },
+    {
+      "source": "objects/videofile/test 2/presentation_s05_c_center_5376x1680- (custom).png",
+      "codec": "still_image:PNG",
+      "alphaReason": "png colour type 6",
+      "clip": "objects/videoclip/test 2/presentation_s05_c_center_5376x1680- (custom).png.apx",
+      "designerHasAlpha": true,
+      "alpha": true,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test/flag_center_hap.mov",
+      "codec": "hap",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/test/flag_center_hap.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test patterns/aces2065-1_colorchecker2014.exr",
+      "codec": "still_image:EXR",
+      "alphaReason": "exr channels B,G,R",
+      "clip": "objects/videoclip/test patterns/aces2065-1_colorchecker2014.exr.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 13,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/sample/ada.jpg",
+      "codec": "still_image:JPEG",
+      "alphaReason": "jpeg has no alpha",
+      "clip": "objects/videoclip/sample/ada.jpg.apx",
+      "designerHasAlpha": true,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test patterns/d3_bpc_16-9.d",
+      "codec": "still_image:D",
+      "alphaReason": "unsupported still format D",
+      "clip": "objects/videoclip/test patterns/d3_bpc_16-9.d.apx",
+      "designerHasAlpha": true,
+      "alpha": null,
+      "bitDepth": 9,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test patterns/d3_color_16-9.png",
+      "codec": "still_image:PNG",
+      "alphaReason": "png colour type 2, no tRNS",
+      "clip": "objects/videoclip/test patterns/d3_color_16-9.png.apx",
+      "designerHasAlpha": true,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test patterns/d3_color_4-3.png",
+      "codec": "still_image:PNG",
+      "alphaReason": "png colour type 2, no tRNS",
+      "clip": "objects/videoclip/test patterns/d3_color_4-3.png.apx",
+      "designerHasAlpha": true,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/sample/george.jpg",
+      "codec": "still_image:JPEG",
+      "alphaReason": "jpeg has no alpha",
+      "clip": "objects/videoclip/sample/george.jpg.apx",
+      "designerHasAlpha": true,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test patterns/d3_test_4-3.png",
+      "codec": "still_image:PNG",
+      "alphaReason": "png colour type 2, no tRNS",
+      "clip": "objects/videoclip/test patterns/d3_test_4-3.png.apx",
+      "designerHasAlpha": true,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test patterns/d3_test_16-9.png",
+      "codec": "still_image:PNG",
+      "alphaReason": "png colour type 2, no tRNS",
+      "clip": "objects/videoclip/test patterns/d3_test_16-9.png.apx",
+      "designerHasAlpha": true,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/videoin_1.mov",
+      "codec": "rle",
+      "alphaReason": "live input",
+      "clip": "objects/videoclip/videoin_4.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": null,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/videoin_1.mov",
+      "codec": "rle",
+      "alphaReason": "live input",
+      "clip": "objects/videoclip/videoin_3.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": null,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/videoin_1.mov",
+      "codec": "rle",
+      "alphaReason": "live input",
+      "clip": "objects/videoclip/videoin_1.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": null,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/videoin_1.mov",
+      "codec": "rle",
+      "alphaReason": "live input",
+      "clip": "objects/videoclip/videoin_2.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": null,
+      "bitDepth": 8,
+      "hasAudio": false
+    },
+    {
+      "source": "objects/videofile/test/center_hap.mov",
+      "codec": "hap",
+      "alphaReason": "VideoAsset.hasAlpha",
+      "clip": "objects/videoclip/test/center_hap.mov.apx",
+      "designerHasAlpha": false,
+      "alpha": false,
+      "bitDepth": 8,
+      "hasAudio": false
+    }
+  ]
+}

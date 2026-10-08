@@ -1,0 +1,132 @@
+{
+  "probe": "02_mapping_types",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 15,
+  "d3Log": "Python script took 2.7126ms\n",
+  "pythonLog": "",
+  "result": {
+    "PerspectiveProjection": {
+      "username": "Perspective",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/perspectiveprojection/5 (Perspective).apx",
+          "description": "5 (perspective)"
+        }
+      ]
+    },
+    "Spherical": {
+      "username": "Spherical",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/spherical/7 (spherical).apx",
+          "description": "7 (spherical)"
+        }
+      ]
+    },
+    "FeedProjection": {
+      "username": "Feed",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/feedprojection/1 (feed).apx",
+          "description": "1 (feed)"
+        }
+      ]
+    },
+    "MeshProjection": {
+      "username": "Mesh",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/meshprojection/3 (mesh).apx",
+          "description": "3 (mesh)"
+        }
+      ]
+    },
+    "SpatialMap": {
+      "username": "Spatial",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/spatialmap/8 (special).apx",
+          "description": "8 (special)"
+        }
+      ]
+    },
+    "Cylindrical": {
+      "username": "Cylindrical",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/cylindrical/2 (cylindrical).apx",
+          "description": "2 (cylindrical)"
+        }
+      ]
+    },
+    "Radial": {
+      "username": "Radial",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/radial/6 (radial).apx",
+          "description": "6 (radial)"
+        }
+      ]
+    },
+    "CameraPlate": {
+      "username": "CameraPlate",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/cameraplate/9 (camera plate).apx",
+          "description": "9 (camera plate)"
+        }
+      ]
+    },
+    "FisheyeProjection": {
+      "username": "Fisheye",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/fisheyeprojection/10 (fish eye).apx",
+          "description": "10 (fish eye)"
+        }
+      ]
+    },
+    "DirectProjection": {
+      "username": "Direct",
+      "count": 6,
+      "samples": [
+        {
+          "path": "internal/directprojection/videointexture/videoin_2.mov (direct).apx",
+          "description": "videoin_2.mov (direct)"
+        },
+        {
+          "path": "internal/directprojection/videointexture/videoin_3.mov (direct).apx",
+          "description": "videoin_3.mov (direct)"
+        },
+        {
+          "path": "internal/directprojection/videointexture/videoin_4.mov (direct).apx",
+          "description": "videoin_4.mov (direct)"
+        }
+      ]
+    },
+    "Parallel": {
+      "username": "Parallel",
+      "count": 1,
+      "samples": [
+        {
+          "path": "objects/parallel/4 (Parallel).apx",
+          "description": "4 (parallel)"
+        }
+      ]
+    }
+  }
+}

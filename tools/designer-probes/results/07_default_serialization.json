@@ -1,0 +1,29 @@
+{
+  "probe": "07_default_serialization",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 23,
+  "d3Log": "Python script took 2.3688ms\n",
+  "pythonLog": "",
+  "result": {
+    "Track": {
+      "path": "objects/track/track 1.apx",
+      "_type": "Track",
+      "uid": "0x1324592081ce21b0"
+    },
+    "Projection": {
+      "path": "objects/cameraplate/9 (camera plate).apx",
+      "_type": "CameraPlate",
+      "uid": "0x3578a7d02bcf44e2"
+    },
+    "VideoClip": {
+      "path": "objects/videoclip/footages/vortex/whirlpool.mov.apx",
+      "_type": "VideoClip",
+      "uid": "0x688241fced3db0cc"
+    }
+  }
+}

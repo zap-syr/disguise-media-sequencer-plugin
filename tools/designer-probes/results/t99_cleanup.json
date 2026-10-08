@@ -1,0 +1,15 @@
+{
+  "probe": "t99_cleanup",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 59,
+  "d3Log": "   removing objects/track/zz_probe_test.apx from package \nPython script took 2.6010999999999997ms\n",
+  "pythonLog": "",
+  "result": {
+    "deleted": true
+  }
+}
