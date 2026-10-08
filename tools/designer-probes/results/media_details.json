@@ -1,13 +1,13 @@
 {
-  "probe": "10_media_details",
+  "probe": "media_details",
   "httpStatus": 200,
   "status": {
     "code": 0,
     "message": "",
     "details": []
   },
-  "roundTripMs": 62,
-  "d3Log": "Python script took 11.6142ms\n",
+  "roundTripMs": 91,
+  "d3Log": "Python script took 36.4215ms\n",
   "pythonLog": "",
   "result": {
     "objects/videoclip/footages/technikal/yamato_am.mov.apx": {

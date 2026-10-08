@@ -362,7 +362,7 @@ parent.saveOnDelete()
 | Bit depth | `clip.file.bitDepth` | Enum index: 8 = "8 Bits", 9 = "10 Bits", 11 = "12 Bits", 13 = "16 Bits", 15 = "32 Bits" (0 = unknown) |
 | ⚠ Not audio | `clip.file.audioSampleRate` | 44100 even on silent videos. Use `hasAudio` |
 | Codec | `clip.file.codec` | e.g. `hap`, `NotchLC`, `rle`, `jpeg` (= **Motion-JPEG video**, not a still), `still_image:PNG`, `still_image:JPEG`, `still_image:EXR`. Detect stills by the `still_image:` prefix |
-| Reference implementation | `tools/designer-probes/probes/10_media_details.py` | All per-clip fields the UI needs. Verified against the files on disk with `tools/designer-probes/verify_media.mjs` (99/99 match) |
+| Reference implementation | `src/services/python/media_details.py` | All per-clip fields the UI needs. Verified against the files on disk with `tools/designer-probes/verify_media.mjs` (99/99 match) |
 
 `Projection` (all mapping types) has `resolution` (`Vec2`), `proxyCanvasResolution`,
 `screens`, and `descriptionExtended` (e.g. `"256x256 - 1 screens - direct"`).

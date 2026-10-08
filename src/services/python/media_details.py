@@ -1,5 +1,9 @@
-# Reference implementation of the planned getMediaDetails(): everything the UI needs per clip.
-# Alpha rule: see 09_alpha_resolved.py. Keep the two in sync.
+# getMediaDetails(): per-clip metadata for the UI, keyed by VideoClip path.
+# Imported by disguiseService.js (?raw) and runnable as a probe:
+#   node tools/designer-probes/run.mjs src/services/python/media_details
+# Verified against the media files on disk with tools/designer-probes/verify_media.mjs.
+# Alpha: videos use VideoAsset.hasAlpha; stills read their own file header, because
+# VideoAsset.hasAlpha is a default setting that is wrong for stills (see 09_alpha_resolved.py).
 import os.path
 import struct
 

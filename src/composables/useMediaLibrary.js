@@ -1,9 +1,12 @@
 import { ref } from 'vue';
-import { getMediaList, getMappingList, getTrackList } from '../services/disguiseService';
+import { getMediaList, getMediaDetails, getMappingList, getTrackList } from '../services/disguiseService';
 
-/** Media hierarchy, mappings and tracks loaded from Designer, with initial load and refresh. */
+/** Media hierarchy, per-clip details, mappings and tracks loaded from Designer, with initial load and refresh. */
 export function useMediaLibrary(directorEndpoint) {
   const fullHierarchy = ref([]);
+  // { [clipPath]: { kind, duration, res, hasAlpha, hasAudio, ... } } — optional enrichment:
+  // a failure here must not block the plugin, cards fall back to extension-based types.
+  const mediaDetails = ref({});
   const mappings = ref([]);
   const tracks = ref([]);
   const loading = ref(true);
@@ -11,12 +14,17 @@ export function useMediaLibrary(directorEndpoint) {
   const isRefreshing = ref(false);
 
   async function fetchAll() {
-    const [media, mps, trks] = await Promise.all([
+    const [media, details, mps, trks] = await Promise.all([
       getMediaList(directorEndpoint),
+      getMediaDetails(directorEndpoint).catch(err => {
+        console.error('Media details unavailable:', err);
+        return null;
+      }),
       getMappingList(directorEndpoint),
       getTrackList(directorEndpoint)
     ]);
     if (Array.isArray(media)) fullHierarchy.value = media;
+    if (details) mediaDetails.value = details;
     if (Array.isArray(mps)) mappings.value = mps;
     if (Array.isArray(trks)) tracks.value = trks;
   }
@@ -50,5 +58,5 @@ export function useMediaLibrary(directorEndpoint) {
     tracks.value.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
   }
 
-  return { fullHierarchy, mappings, tracks, loading, error, isRefreshing, load, refresh, addTrack };
+  return { fullHierarchy, mediaDetails, mappings, tracks, loading, error, isRefreshing, load, refresh, addTrack };
 }

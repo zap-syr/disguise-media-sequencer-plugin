@@ -1,0 +1,102 @@
+{
+  "probe": "mapping_list",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 343,
+  "d3Log": "Python script took 3.0559ms\n",
+  "pythonLog": "",
+  "result": [
+    {
+      "uid": "0x3578a7d02bcf44e2",
+      "res": "720x576",
+      "path": "objects/cameraplate/9 (camera plate).apx",
+      "typeLabel": "CameraPlate",
+      "type": "CameraPlate",
+      "description": "9 (camera plate)"
+    },
+    {
+      "uid": "0xeaa43a210b81db7e",
+      "res": "720x576",
+      "path": "objects/spatialmap/8 (special).apx",
+      "typeLabel": "Spatial",
+      "type": "SpatialMap",
+      "description": "8 (special)"
+    },
+    {
+      "uid": "0x246608e70a256844",
+      "res": "720x576",
+      "path": "objects/cylindrical/2 (cylindrical).apx",
+      "typeLabel": "Cylindrical",
+      "type": "Cylindrical",
+      "description": "2 (cylindrical)"
+    },
+    {
+      "uid": "0xf982c69cd8fd2dfe",
+      "res": "720x576",
+      "path": "objects/radial/6 (radial).apx",
+      "typeLabel": "Radial",
+      "type": "Radial",
+      "description": "6 (radial)"
+    },
+    {
+      "uid": "0x124981208216eb52",
+      "res": "1920x1080",
+      "path": "objects/directprojection/surface 1 (direct).apx",
+      "typeLabel": "Direct",
+      "type": "DirectProjection",
+      "description": "surface 1 (direct)"
+    },
+    {
+      "uid": "0x47db7d7ddcaa8924",
+      "res": "720x576",
+      "path": "objects/feedprojection/1 (feed).apx",
+      "typeLabel": "Feed",
+      "type": "FeedProjection",
+      "description": "1 (feed)"
+    },
+    {
+      "uid": "0xd2bb8d61980b0466",
+      "res": "720x576",
+      "path": "objects/fisheyeprojection/10 (fish eye).apx",
+      "typeLabel": "Fisheye",
+      "type": "FisheyeProjection",
+      "description": "10 (fish eye)"
+    },
+    {
+      "uid": "0xac1cb1c817d09e36",
+      "res": "720x576",
+      "path": "objects/meshprojection/3 (mesh).apx",
+      "typeLabel": "Mesh",
+      "type": "MeshProjection",
+      "description": "3 (mesh)"
+    },
+    {
+      "uid": "0x3d1c5539c2a50e9e",
+      "res": "720x576",
+      "path": "objects/parallel/4 (Parallel).apx",
+      "typeLabel": "Parallel",
+      "type": "Parallel",
+      "description": "4 (parallel)"
+    },
+    {
+      "uid": "0xbcb75fb5f1467618",
+      "res": "720x576",
+      "path": "objects/perspectiveprojection/5 (Perspective).apx",
+      "typeLabel": "Perspective",
+      "type": "PerspectiveProjection",
+      "description": "5 (perspective)"
+    },
+    {
+      "uid": "0x7df90b1cc1458fb5",
+      "res": "720x576",
+      "path": "objects/spherical/7 (spherical).apx",
+      "typeLabel": "Spherical",
+      "type": "Spherical",
+      "description": "7 (spherical)"
+    }
+  ]
+}

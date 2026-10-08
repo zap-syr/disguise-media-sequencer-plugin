@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Cross-checks probe 10_media_details against the media files on disk (MOV/MP4 atoms, PNG/JPEG
+// Cross-checks src/services/python/media_details.py against the media files on disk (MOV/MP4 atoms, PNG/JPEG
 // headers). No ffprobe needed.
 //
 // Usage: node tools/designer-probes/verify_media.mjs "<project folder>" [pathFilter]
 //   e.g. node tools/designer-probes/verify_media.mjs "D:/d3 projects/api_test" footages
-// Run `node tools/designer-probes/run.mjs 10_media_details` first.
+// Run `node tools/designer-probes/run.mjs src/services/python/media_details` first.
 
 import { openSync, readSync, fstatSync, closeSync, existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const [projectDir, filter = ''] = process.argv.slice(2);
-const probe = JSON.parse(readFileSync(join(here, 'results', '10_media_details.json'), 'utf8')).result;
+const probe = JSON.parse(readFileSync(join(here, 'results', 'media_details.json'), 'utf8')).result;
 
 function read(fd, pos, len) { const b = Buffer.alloc(len); readSync(fd, b, 0, len, pos); return b; }
 

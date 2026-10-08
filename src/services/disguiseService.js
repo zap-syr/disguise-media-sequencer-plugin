@@ -2,6 +2,11 @@
  * Service to interact with the Disguise REST API.
  */
 
+// Python scripts kept as real .py files so they can also be run as probes
+// (tools/designer-probes/run.mjs src/services/python/<name>).
+import mediaDetailsScript from './python/media_details.py?raw';
+import mappingListScript from './python/mapping_list.py?raw';
+
 /**
  * Generic function to execute a Python script via the d3 API.
  * @param {string} directorIp - The IP address and port.
@@ -54,18 +59,28 @@ export async function getMediaList(directorIp) {
 }
 
 /**
- * Fetches the mappings list using the Python Execute API.
+ * Fetches per-clip metadata (kind, duration, resolution, alpha, audio...) keyed by VideoClip path.
  * @param {string} directorIp - The IP address and port.
- * @returns {Promise<Array>} Filtered list of mappings.
+ * @returns {Promise<Object<string, {kind: 'video'|'still'|'live', codec: string, nFrames: number,
+ *   fps: number, duration: number|null, res: string, hasAlpha: boolean|null, hasAudio: boolean}>>}
+ */
+export async function getMediaDetails(directorIp) {
+  const details = await executePython(directorIp, mediaDetailsScript);
+  return details && typeof details === 'object' && !Array.isArray(details) ? details : {};
+}
+
+/**
+ * Fetches the mappings list using the Python Execute API.
+ * Only user mappings (paths under "objects/"); name = file name without .apx (keeps the user's case,
+ * unlike `description`, which Designer lower-cases).
+ * @param {string} directorIp - The IP address and port.
+ * @returns {Promise<Array<{uid, path, name, description, type, typeLabel, res}>>}
  */
 export async function getMappingList(directorIp) {
-  const script = "return resourceManager.allResources(Projection)";
-  const items = await executePython(directorIp, script);
-  
+  const items = await executePython(directorIp, mappingListScript);
+
   if (!Array.isArray(items)) return [];
 
-  // Filter: only paths starting with "objects/"
-  // Format: name without .apx
   return items
     .filter(item => item.path && item.path.toLowerCase().startsWith('objects/'))
     .map(item => {
@@ -74,11 +89,7 @@ export async function getMappingList(directorIp) {
       if (name.toLowerCase().endsWith('.apx')) {
         name = name.slice(0, -4);
       }
-      return {
-        uid: item.uid,
-        path: item.path,
-        name: name
-      };
+      return { ...item, name };
     })
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 }

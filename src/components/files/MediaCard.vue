@@ -12,6 +12,7 @@
 
       <div v-if="selected" class="selected-overlay"></div>
       <div v-if="showOrder && selected && viewMode !== 'list'" class="order-badge">{{ selectionOrder }}</div>
+      <span v-if="viewMode !== 'list' && durationLabel" class="dur-chip" :class="{ 'is-live': kind === 'live' }">{{ durationLabel }}</span>
     </div>
     <div class="card-footer">
       <span v-if="showOrder && selected && viewMode === 'list'" class="order-pill">{{ selectionOrder }}</span>
@@ -19,13 +20,21 @@
         {{ item.name }}
         <span v-if="item.subfolderPath" class="file-subfolder">· {{ item.subfolderPath }}</span>
       </span>
-      <span class="file-type">{{ mediaType.toUpperCase() }}</span>
+      <span v-if="viewMode === 'list' && listMeta" class="list-meta">{{ listMeta }}</span>
+      <span class="file-meta">
+        <span class="file-type" :class="{ 'is-live': kind === 'live' }">{{ typeLabel }}</span>
+        <span v-if="details?.hasAlpha || details?.hasAudio" class="flags">
+          <svg v-if="details.hasAlpha" class="flag" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" role="img" aria-label="Alpha channel"><title>Alpha channel</title><rect x="0.5" y="0.5" width="11" height="11" rx="1.5" fill="none" stroke="currentColor"/><rect x="1" y="1" width="5" height="5" fill="currentColor"/><rect x="6" y="6" width="5" height="5" fill="currentColor"/></svg>
+          <svg v-if="details.hasAudio" class="flag" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Audio"><title>Audio</title><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>
+        </span>
+      </span>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue';
+import { formatDuration } from '../../utils/format';
 
 const props = defineProps({
   item: {
@@ -51,6 +60,11 @@ const props = defineProps({
   showOrder: {
     type: Boolean,
     default: false
+  },
+  // Entry of getMediaDetails(): { kind, duration, res, hasAlpha, hasAudio, ... } — may be missing
+  details: {
+    type: Object,
+    default: null
   }
 });
 
@@ -67,12 +81,34 @@ const thumbnailUrl = computed(() => {
   return null;
 });
 
-const mediaType = computed(() => {
+// 'video' | 'still' | 'live' from Designer; falls back to the file extension until details load.
+const kind = computed(() => {
+  if (props.details?.kind) return props.details.kind;
   const name = props.item.name.toLowerCase();
   if (name.endsWith('.mov') || name.endsWith('.mp4') || name.endsWith('.avi') || name.endsWith('.wmv')) {
     return 'video';
   }
-  return 'image';
+  return 'still';
+});
+
+// Preview styling / placeholder icon
+const mediaType = computed(() => (kind.value === 'still' ? 'image' : 'video'));
+
+const TYPE_LABELS = { video: 'VIDEO', still: 'IMAGE', live: 'LIVE' };
+const typeLabel = computed(() => TYPE_LABELS[kind.value]);
+
+const durationLabel = computed(() => {
+  if (!props.details) return '';
+  if (kind.value === 'live') return 'LIVE';
+  if (kind.value === 'still') return 'still';
+  return formatDuration(props.details.duration);
+});
+
+const listMeta = computed(() => {
+  if (!props.details) return '';
+  const parts = [props.details.res];
+  if (kind.value === 'video') parts.push(formatDuration(props.details.duration));
+  return parts.filter(Boolean).join(' · ');
 });
 </script>
 
@@ -204,6 +240,50 @@ const mediaType = computed(() => {
   font-size: 10px;
   color: #666666;
 }
+.file-type.is-live { color: #0a84ff; font-weight: 600; }
+
+.file-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+.media-card.is-list .file-meta {
+  flex-shrink: 0;
+  flex-direction: row-reverse;
+  gap: 10px;
+}
+
+.flags {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #aaaaaa;
+}
+.flag { display: block; }
+
+.list-meta {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #666666;
+  font-variant-numeric: tabular-nums;
+}
+
+.dur-chip {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #dddddd;
+  font-size: 10px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.dur-chip.is-live { color: #0a84ff; }
 
 .order-badge {
   position: absolute;

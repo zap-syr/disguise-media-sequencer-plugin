@@ -32,6 +32,7 @@
         <svg v-else class="folder-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
 
         <span class="folder-name">{{ node.name }}</span>
+        <span class="folder-count" :title="`${node.count} file(s) including subfolders`">{{ node.count }}</span>
       </div>
     </div>
 
@@ -192,6 +193,15 @@ function stopResize() {
   font-size: 13px;
   white-space: nowrap;
 }
+
+.folder-count {
+  margin-left: auto;
+  padding-left: 12px;
+  font-size: 11px;
+  color: #666666;
+  font-variant-numeric: tabular-nums;
+}
+.tree-item.is-selected .folder-count { color: #aaaaaa; }
 
 .resize-handle {
   position: absolute;

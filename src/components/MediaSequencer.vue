@@ -24,6 +24,7 @@
         :selected-folder-id="selectedFolderId"
         :is-refreshing="library.isRefreshing.value"
         :director-endpoint="props.directorEndpoint"
+        :media-details="library.mediaDetails.value"
         :selection="selection"
         @select-folder="selectFolder"
         @refresh="library.refresh"

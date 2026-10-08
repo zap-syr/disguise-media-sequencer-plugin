@@ -1,0 +1,41 @@
+{
+  "probe": "x_ui_track_check",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 117,
+  "d3Log": "Python script took 3.306ms\n",
+  "pythonLog": "",
+  "result": {
+    "layers": [
+      {
+        "end": 0,
+        "name": "Video Layer - dual_vortex.mov",
+        "mapping": "objects/parallel/4 (Parallel).apx",
+        "video": "objects/videoclip/footages/vortex/dual_vortex.mov.apx",
+        "mode": 1,
+        "tStart": 6.133333333333334,
+        "tLength": 15
+      },
+      {
+        "end": 0,
+        "name": "Video Layer - blood_vortex.mov",
+        "mapping": "objects/parallel/4 (Parallel).apx",
+        "video": "objects/videoclip/footages/vortex/blood_vortex.mov.apx",
+        "mode": 1,
+        "tStart": 0,
+        "tLength": 6.133333333333334
+      }
+    ],
+    "found": true,
+    "sections": [
+      0,
+      6.133333333333334,
+      21.133333333333333
+    ],
+    "deleted": true
+  }
+}

@@ -79,4 +79,4 @@ The settings panel binds to a `reactive` object with these key fields: `insertMo
   - Designer pre-fills a mapping on every new layer;
   - layer sequences are `layer.fields`, not `layer.sequences`.
 - **Media metadata:** `VideoAsset.hasAlpha` is wrong for still images. Use the rules in
-  `tools/designer-probes/probes/10_media_details.py`.
+  `src/services/python/media_details.py`.

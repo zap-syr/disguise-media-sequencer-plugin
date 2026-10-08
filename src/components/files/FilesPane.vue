@@ -102,6 +102,7 @@
         :view-mode="viewMode"
         :selection-order="selection.selectionOrderMap.value.get(item.id)"
         :show-order="selection.selectedItems.size > 1"
+        :details="mediaDetails[item.path]"
         :class="['media-card-item', { 'no-transition': isViewSwitching }]"
         :data-id="item.id"
         @click.stop="selection.handleSelection(item, index, $event)"
@@ -121,6 +122,8 @@ defineProps({
   selectedFolderId: { type: String, required: true },
   isRefreshing: { type: Boolean, default: false },
   directorEndpoint: { type: String, required: true },
+  // getMediaDetails() result keyed by clip path
+  mediaDetails: { type: Object, default: () => ({}) },
   // return value of useFileSelection()
   selection: { type: Object, required: true }
 });

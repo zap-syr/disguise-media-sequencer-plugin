@@ -682,7 +682,7 @@ the current folder (§5.2).
 | Function | Returns | Notes |
 |---|---|---|
 | `getMediaList(ip)` | unchanged (tree) | Python returns an explicit list `{path, uid, description}` instead of a whole-resource serialisation |
-| `getMediaDetails(ip, paths?)` **new** | `{ [path]: { kind: 'video'|'still'|'live', duration, fps, nFrames, res: 'WxH'|null, codec, hasAlpha: bool|null, hasAudio: bool } }`. **Port the Python verbatim from `tools/designer-probes/probes/10_media_details.py`** (verified against disk) | Batched. Cached in `useMediaLibrary`, cleared on Refresh. Extension-based type stays as a fallback |
+| `getMediaDetails(ip, paths?)` **new** | `{ [path]: { kind: 'video'|'still'|'live', duration, fps, nFrames, res: 'WxH'|null, codec, hasAlpha: bool|null, hasAudio: bool } }`. **Port the Python verbatim from `src/services/python/media_details.py`** (verified against disk) | Batched. Cached in `useMediaLibrary`, cleared on Refresh. Extension-based type stays as a fallback |
 | `getMappingList(ip)` | `{ uid, path, name /*description*/, type /*__name__*/, typeLabel /*__username__*/, res }` | Keep the `objects/` filter. Keep the sorting |
 | `getTrackList`, `createTrack` | unchanged | — |
 | `createLayerPlan(ip, payload, onProgress)` **new** | `{ status, created, errors: [...] }` | Replaces `createLayers`; used by both modes |
@@ -850,6 +850,15 @@ and only then write CSS.
 
 Each phase is a separate PR, and the plugin works after each one. There is no test
 framework, so acceptance is manual in Designer against checklists.
+
+**Progress** (branch `feature/layer-plan`):
+
+| Phase | Status |
+|---|---|
+| 0 — API discovery | ✅ done (§12) |
+| 1 — Refactor, no behaviour change | ✅ done; browser-verified against Designer (§9.1) |
+| 2 — Clip and mapping metadata | ✅ done. The Python lives in `src/services/python/*.py` and is imported with `?raw`, so the same files run as probes |
+| 3 … 9 | pending |
 
 ### Phase 0 — API discovery (no UI changes)
 - Run queries Q-A…Q-D (§5.1). Record mapping type names, the source of mapping and clip
@@ -1083,7 +1092,7 @@ Run 4: owner added `Footages` (89 clips); full re-check of all media data agains
 | Sequences of `VariableVideoModule` | **`layer.fields`, not `layer.sequences`** (the official guide is wrong). 54 fields, all lower-case (`brightness`, `mapping`, `video`, `mode`, `at end point`, `volume`, `speed`, `hue shift`…). `findSequence` is **case-insensitive**. There is no `opacity` |
 | Fresh layer defaults | mode = 1 (Normal), at end point = 0 (Loop), brightness = 1, video = None. **mapping is pre-filled by Designer** (here `10 (fish eye)`). A "layer without mapping" therefore silently gets some mapping unless we clear it. `fs.sequence.setResource(beat, None)` clears it |
 | **Alpha / audio — RESOLVED** (run 3, owner test media in `test 2`, ground truth read from the file headers on disk) | **Videos:** `VideoAsset.hasAlpha` is correct (HAP `Hap1` depth 24 → False; NotchLC depth 32 → True). **Audio:** `clip.hasAudio` is correct (HAP with 2 ch / 16-bit / 48 kHz → True, `audioSampleRate` 48000). **Stills:** `hasAlpha` is wrong. Both JPEGs and all four RGB PNG test patterns report True; only real RGBA PNGs are true. **Rule implemented in probe `09_alpha_resolved.py`** (the reference for `getMediaDetails`), matching ground truth for every clip in ~10 ms for 18 clips: videos use `hasAlpha`; stills read their own source file header from Python; live inputs → unknown. The source file is `clip.file.fragments[0].proxies[0].path` (a `VideoFile`, path relative to the project folder, e.g. `objects/videofile/test 2/x.png`). Header rules: JPEG → no alpha; PNG colour type 4/6 or a `tRNS` chunk → alpha; EXR channel list contains `A` → alpha. `.d` (Disguise still) and other formats → unknown (`null`, no badge) |
-| **Full media-data re-check** (run 4, owner added `Footages`: 89 Photo-JPEG `.mov`, 1920×1080, 30 fps, in 3 subfolders) | New probe **`10_media_details.py`** is the reference implementation of `getMediaDetails` (kind, codec, nFrames, fps, duration, res, hasAlpha, hasAudio, bitDepth, source). **`verify_media.mjs`** cross-checks it against the files on disk (MOV atoms, PNG header). Result: **99 of 99 verifiable clips match** on resolution, frame count, duration (±0.05 s), alpha and audio. The rest are expected: 4 live inputs (the disk file is a 64×48 placeholder; Designer's 1920×1080 live format is right) and 4 stills the checker can't parse (JPEG/EXR/`.d`, verified separately in run 3). 107 clips take ~12 ms in Python. **Motion-JPEG MOVs report codec `jpeg`** (not `still_image:JPEG`), so the video/still split must use the `still_image:` prefix plus `nFrames`, never the codec name alone |
+| **Full media-data re-check** (run 4, owner added `Footages`: 89 Photo-JPEG `.mov`, 1920×1080, 30 fps, in 3 subfolders) | New probe **`src/services/python/media_details.py`** is the reference implementation of `getMediaDetails` (kind, codec, nFrames, fps, duration, res, hasAlpha, hasAudio, bitDepth, source). **`verify_media.mjs`** cross-checks it against the files on disk (MOV atoms, PNG header). Result: **99 of 99 verifiable clips match** on resolution, frame count, duration (±0.05 s), alpha and audio. The rest are expected: 4 live inputs (the disk file is a 64×48 placeholder; Designer's 1920×1080 live format is right) and 4 stills the checker can't parse (JPEG/EXR/`.d`, verified separately in run 3). 107 clips take ~12 ms in Python. **Motion-JPEG MOVs report codec `jpeg`** (not `still_image:JPEG`), so the video/still split must use the `still_image:` prefix plus `nFrames`, never the codec name alone |
 | `transportDuration` format | `"00:00:15.01"` is **SS.FF (frames)**, not decimal seconds: 451 frames @ 30 fps = 15 s + 1 frame. Use `fileNFrames / fileFps` for maths; show `transportDuration` only as text, if at all |
 | Plugin's current `getMediaList` on the real project | Builds the tree correctly (`footages` → `4k emanation` 30, `technikal` 29, `vortex` 30; ~57 ms round trip). Folder and file names come from resource paths, which Designer **lower-cases** (`footages`, while the disk folder is `Footages`). Original casing isn't available from the clip path. Acceptable; mention in the docs |
 | Test data for §2.3.2 (groups from folders) | `footages` has 0 direct files and 3 subfolders. That is exactly the "Folder only → skipped as empty" / "With subfolders → 1 group of 89" / "Split subfolders → 3 groups" case for checklist §9.3 |

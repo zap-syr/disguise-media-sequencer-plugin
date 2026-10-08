@@ -40,14 +40,22 @@ export function findFolder(nodes, id) {
   return null;
 }
 
-/** Folder rows shown in the sidebar: "All Files" + every folder whose ancestors are expanded. */
+/** Number of files in a folder node including all its subfolders. */
+export function countFiles(node) {
+  return node.children ? flattenFiles(node.children, { tag: false }).length : 0;
+}
+
+/**
+ * Folder rows shown in the sidebar: "All Files" + every folder whose ancestors are expanded.
+ * `count` = files in the folder including subfolders.
+ */
 export function visibleFolders(hierarchy, expandedFolders) {
-  const result = [{ id: 'all', name: 'ALL FILES', depth: 0, hasChildren: false }];
+  const result = [{ id: 'all', name: 'ALL FILES', depth: 0, hasChildren: false, count: flattenFiles(hierarchy, { tag: false }).length }];
   const traverse = (nodes, depth) => {
     for (const node of nodes) {
       if (node.type === 'folder') {
         const hasChildren = node.children && node.children.some(c => c.type === 'folder');
-        result.push({ id: node.id, name: node.name, depth, hasChildren });
+        result.push({ id: node.id, name: node.name, depth, hasChildren, count: countFiles(node) });
         if (expandedFolders.has(node.id) && node.children) {
           traverse(node.children, depth + 1);
         }
