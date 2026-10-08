@@ -12,14 +12,33 @@
       <span class="tree-header-title" :class="{ 'hidden': isSidebarCollapsed }">HIERARCHY</span>
     </div>
 
-    <div class="tree-container" :class="{ 'hidden': isSidebarCollapsed }">
+    <div class="tree-container" :class="{ 'hidden': isSidebarCollapsed, 'has-checked': selectEnabled && checkedFolders.size > 0 }" @keydown.esc="$emit('clear-checked')">
       <div
         v-for="node in folders"
         :key="node.id"
-        :class="['tree-item', { 'is-selected': selectedFolderId === node.id }]"
+        :class="['tree-item', { 'is-selected': selectedFolderId === node.id, 'is-checked': checkedFolders.has(node.id) }]"
         :style="{ paddingLeft: `${node.depth * 16 + 12}px`, '--padding-left': `${node.depth * 16 + 12}px` }"
-        @click="$emit('select', node.id)"
+        tabindex="0"
+        :draggable="selectEnabled && node.id !== 'all' ? 'true' : null"
+        :title="selectEnabled && node.id !== 'all' ? 'Click to open, Ctrl/Cmd or Shift+click to select folders, drag into the plan' : null"
+        @click="onRowClick(node, $event)"
+        @keydown.space.prevent="selectEnabled && $emit('folder-check', node.id)"
+        @keydown.enter.prevent="onEnter(node)"
+        @dragstart="onDragStart(node, $event)"
+        @dragend="endDrag"
       >
+        <button
+          v-if="selectEnabled && node.id !== 'all'"
+          type="button"
+          class="fcb"
+          :class="{ on: checkedFolders.has(node.id) }"
+          :aria-pressed="checkedFolders.has(node.id)"
+          :aria-label="(checkedFolders.has(node.id) ? 'Unselect folder ' : 'Select folder ') + node.name"
+          tabindex="-1"
+          @click.stop="$emit('folder-check', node.id)"
+        >
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+        </button>
         <button
           class="chevron-btn"
           :class="{ 'is-expanded': expandedFolders.has(node.id), 'is-hidden': !node.hasChildren }"
@@ -32,8 +51,17 @@
         <svg v-else class="folder-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
 
         <span class="folder-name">{{ node.name }}</span>
+        <span
+          v-if="hiddenChecked(node)"
+          class="checked-badge"
+          :title="`${hiddenChecked(node)} selected folder(s) inside`"
+        >{{ hiddenChecked(node) }}</span>
         <span class="folder-count" :title="`${node.count} file(s) including subfolders`">{{ node.count }}</span>
       </div>
+    </div>
+
+    <div v-if="!isSidebarCollapsed" class="tree-footer">
+      <slot name="footer"></slot>
     </div>
 
     <div class="resize-handle" v-show="!isSidebarCollapsed" @mousedown.prevent="startResize"></div>
@@ -42,13 +70,44 @@
 
 <script setup>
 import { ref } from 'vue';
+import { startDrag, endDrag } from '../../composables/useDragPayload';
 
-defineProps({
+const props = defineProps({
   folders: { type: Array, required: true },
   selectedFolderId: { type: String, required: true },
-  expandedFolders: { type: Set, required: true }
+  expandedFolders: { type: Set, required: true },
+  // Advanced mode: folder multi-selection for "groups from folders" (docs §2.3.2)
+  selectEnabled: { type: Boolean, default: false },
+  checkedFolders: { type: Set, default: () => new Set() }
 });
-defineEmits(['select', 'toggle']);
+const emit = defineEmits(['select', 'toggle', 'folder-click', 'folder-check', 'clear-checked', 'create-groups']);
+
+function onRowClick(node, event) {
+  const gesture = event.ctrlKey || event.metaKey || event.shiftKey;
+  if (props.selectEnabled && gesture && node.id !== 'all') emit('folder-click', node.id, event);
+  else emit('select', node.id);
+}
+
+/** Enter creates the groups when folders are checked, otherwise opens the folder. */
+function onEnter(node) {
+  if (props.selectEnabled && props.checkedFolders.size) emit('create-groups');
+  else emit('select', node.id);
+}
+
+/** Dragging a checked folder drags all checked folders, otherwise just this one. */
+function onDragStart(node, event) {
+  if (!props.selectEnabled || node.id === 'all') return;
+  const ids = props.checkedFolders.has(node.id) ? [...props.checkedFolders] : [node.id];
+  startDrag(event, 'folders', ids);
+}
+
+/** Checked folders hidden inside a collapsed branch, shown as a badge on that branch. */
+function hiddenChecked(node) {
+  if (!props.selectEnabled || !props.checkedFolders.size || !node.hasChildren || props.expandedFolders.has(node.id)) return 0;
+  let n = 0;
+  props.checkedFolders.forEach(id => { if (id.startsWith(node.id + '/')) n++; });
+  return n;
+}
 
 // Controlled by the shell so layouts can collapse it (Split / Plan workspaces)
 const isSidebarCollapsed = defineModel('collapsed', { type: Boolean, default: false });
@@ -157,8 +216,6 @@ function stopResize() {
   overflow: hidden;
 }
 
-.tree-container::-webkit-scrollbar { width: 8px; height: 8px; }
-.tree-container::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
 
 .tree-item {
   border-left: 3px solid transparent;
@@ -203,6 +260,34 @@ function stopResize() {
   font-variant-numeric: tabular-nums;
 }
 .tree-item.is-selected .folder-count { color: #aaaaaa; }
+
+.tree-item:focus-visible { outline: none; box-shadow: inset 0 0 0 1px #0a84ff; }
+.tree-item.is-checked { background: rgba(10, 132, 255, 0.15); color: #ffffff; }
+.tree-item.is-checked:hover { background: rgba(10, 132, 255, 0.2); }
+
+/* Folder checkbox: shown on hover, and on every row while folders are checked */
+.fcb {
+  display: none;
+  width: 14px; height: 14px; margin-right: 4px; padding: 0; flex-shrink: 0;
+  border: 1.5px solid #777777; border-radius: 4px; background: #181818; color: transparent;
+  align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
+}
+.fcb:hover { border-color: #cccccc; }
+.fcb.on { background: #0a84ff; border-color: #0a84ff; color: #ffffff; }
+.tree-item:hover .fcb, .tree-container.has-checked .fcb { display: flex; }
+
+.checked-badge {
+  margin-left: 8px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #0a84ff;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 15px;
+}
+
+.tree-footer { flex-shrink: 0; }
 
 .resize-handle {
   position: absolute;
