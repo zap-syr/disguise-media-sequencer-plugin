@@ -859,7 +859,14 @@ framework, so acceptance is manual in Designer against checklists.
 | 1 — Refactor, no behaviour change | ✅ done; browser-verified against Designer (§9.1) |
 | 2 — Clip and mapping metadata | ✅ done. The Python lives in `src/services/python/*.py` and is imported with `?raw`, so the same files run as probes |
 | 3 — Unified creation engine | ✅ done. `createLayerPlan` = prepare / layer chunks (≤100) / markers. **Verified identical** to 1.1.x `createLayers` on 6 mixed clips: layers, stack order, sequences, 18 tags and 8 sections all match. 250 layers in 3 chunks take 0.9 s; the track is extended past its old end with no truncated layers. Old `createLayers` removed |
-| 4 … 9 | pending |
+| 2a — Grid tiles show resolution (owner feedback) | ✅ done (`2e01bcf`) |
+| 4 — Advanced mode: plan skeleton | ✅ implemented and verified, 👀 **awaiting owner review** (code not committed yet). Simple/Advanced switch (default Simple, persisted); Files / Split / Plan layouts (persisted; Split uses the list view and a compact 420px files pane; the tree collapses next to the plan); Add to group… / + New group / + Group; group rename, collapse / expand all, delete with an Undo toast; gnav chips with jump + flash; rows show # · thumbnail · name · start · length · res; mini-timeline with split/tag markers; header and footer summaries; G-badges on file cards; temporary per-group "Layers start" switch (becomes a chip in Phase 7); Advanced Create via `buildAdvancedPlan`. **Checked in Designer:** a `same` group puts all layers at 0 with row 1 on top, the next group starts at the end of the longest layer (18.43), and splits sit at group starts |
+| 5 — Per-layer mappings | ⏳ pending |
+| 6 — Row selection and moving | ⏳ pending |
+| 6b — Groups from folders | ⏳ pending |
+| 7 — Settings inheritance | ⏳ pending |
+| 8 — Auto-assign | ⏳ pending |
+| 9 — Polish | ⏳ pending |
 
 ### Phase 0 — API discovery (no UI changes)
 - Run queries Q-A…Q-D (§5.1). Record mapping type names, the source of mapping and clip
