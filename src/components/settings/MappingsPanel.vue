@@ -114,8 +114,6 @@ const visibleMappings = computed(() => {
 .chip .cnt { color: #777777; font-weight: 500; }
 
 .maps { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; max-height: 340px; overflow-y: auto; padding-right: 4px; }
-.maps::-webkit-scrollbar { width: 6px; }
-.maps::-webkit-scrollbar-thumb { background: #444444; border-radius: 3px; }
 
 .map {
   display: flex; align-items: center; gap: 8px;

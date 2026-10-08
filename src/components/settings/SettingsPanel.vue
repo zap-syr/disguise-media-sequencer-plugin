@@ -884,12 +884,6 @@ ul.dropdown-list {
   padding: 4px 0 0;
 }
 
-.dropdown-list::-webkit-scrollbar,
-.dropdown-list-scroll::-webkit-scrollbar { width: 6px; }
-.dropdown-list::-webkit-scrollbar-track,
-.dropdown-list-scroll::-webkit-scrollbar-track { background: #1e1e1e; }
-.dropdown-list::-webkit-scrollbar-thumb,
-.dropdown-list-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
 
 .dropdown-item {
   padding: 8px 12px;
