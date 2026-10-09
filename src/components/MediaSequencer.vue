@@ -97,6 +97,8 @@
         @row-check="onRowCheck"
         :override-stats="plan.overrideStats.value"
         :globals="planGlobals"
+        :mappings="library.mappings.value"
+        @auto-assign="plan.applyAutoAssign"
         @set-plan="plan.setPlan"
         @reset-all-overrides="plan.resetAllOverrides"
         @set-group-ov="plan.setGroupOv"

@@ -182,6 +182,7 @@
             <span class="dot" :style="{ background: row.color }"></span>
             <template v-if="row.mappingPath">
               <span class="sname">{{ row.mappingName }}</span>
+              <span v-if="row.via" class="via" :title="row.via === 'name' ? 'Auto-assigned: file name matches' : 'Auto-assigned: resolution matches'">{{ row.via }}</span>
               <button type="button" class="slot-x" :aria-label="`Clear mapping of ${row.name}`" title="Clear mapping" @click.stop="$emit('clear-entries', [row.id])">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
               </button>
@@ -515,6 +516,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
     mappingPath,
     mappingName: mapping?.name || (mappingPath || '').split('/').pop().replace(/\.apx$/i, ''),
     mappingMissing: !!mappingPath && !mapping,
+    via: mappingPath ? props.entries[r.id]?.via || null : null,
     color: mappingColor(mappingPath),
     id: r.id,
     index: props.rowOffset + i + 1,
@@ -744,6 +746,11 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 .sname { flex: 1; min-width: 0; color: #dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sname.empty-slot { color: #666666; font-style: italic; }
+.via {
+  flex-shrink: 0; padding: 1px 5px; border-radius: 4px;
+  background: rgba(10, 132, 255, 0.15); color: #0a84ff;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+}
 .slot-x {
   width: 20px; height: 20px; flex-shrink: 0; border: none; border-radius: 4px;
   background: transparent; color: #888888; cursor: pointer; padding: 0;

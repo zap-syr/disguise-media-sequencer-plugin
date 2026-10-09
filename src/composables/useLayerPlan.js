@@ -221,6 +221,11 @@ export function useLayerPlan() {
     });
   }
 
+  /** Auto-assign result: [{ id, path, via: 'name' | 'res' }] (utils/autoAssign.js). */
+  function applyAutoAssign(assignments) {
+    assignments.forEach(a => assign([a.id], a.path, a.via));
+  }
+
   function assignGroup(gid, mappingPath) {
     const group = state.groups.find(g => g.id === gid);
     if (group) assign(group.items, mappingPath);
@@ -267,7 +272,7 @@ export function useLayerPlan() {
     state, layerCount, groupLabelsByMedia, unmappedCount, mappingUsage,
     addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
     removeGroup, updateGroup, setAllOpen,
-    assign, assignGroup, clearMappings,
+    assign, assignGroup, clearMappings, applyAutoAssign,
     overrideStats, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides, applyGroupValueToAll
   };
 }
