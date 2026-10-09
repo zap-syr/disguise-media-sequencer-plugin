@@ -342,6 +342,59 @@ of checked folders is not displayed; the strip's count is the preview.
   - **CREATE N LAYERS** button: in Advanced N is the number of layers in the plan, in Simple
     the number of selected files.
 
+### 2.5.1. Settings panel redesign (owner request, 2026-10-09)
+
+**Why.** The panel is a long column of boxes that grew feature by feature. Related options sit
+far apart, and a switched-off global option is easy to miss. During the Phase 8 review the
+owner expected splits at group starts, but the global **Split section** switch (in Insert
+settings) was off. The plan chips did say "Split Off", but nothing linked that to the switch.
+Goal: group the settings by purpose, show at a glance what will happen, and connect the global
+switches with the plan.
+
+**Grouping by purpose** (same order in Simple and Advanced; boxes that don't apply are hidden):
+
+| Section | Simple | Advanced |
+|---|---|---|
+| **Mappings** | the single mapping picker | the Mappings panel (search, type chips, cards) |
+| **Where** (insert location) | At playhead / Specific time, Track, Time | same |
+| **Layers** (what each layer gets) | Mode, At end point, Animate brightness, Layer duration, Overlap | hidden: a short note "Set in Plan defaults and group chips" with a button that opens Plan defaults |
+| **Timeline markers** | Split section + TC / Cue / MIDI tags | same switches; placement comes from the group chips |
+
+- **Split section moves out of Insert settings into "Timeline markers"**, next to the tags:
+  both are markers placed at layer or group starts, and they share the same placement rules
+  (Each file / Group start).
+- Overlap moves from Insert settings to **Layers** (it changes layer timing, not the insert
+  location).
+
+**More informative:**
+- Every section is an accordion (moves here from Phase 9). The header shows a **one-line
+  summary**, readable even when the section is collapsed:
+  - Where: "At playhead" / "track 1, 00:01:00:00";
+  - Layers: "Normal, Loop, fade 1s, fit, still 5s";
+  - Timeline markers: "Split on, Cue 1.0 + MIDI 9.1" / "Off".
+  Open/closed state is persisted per section.
+- **On/Off state is visible without opening**: a small status pill on the section header
+  ("2 on" / "Off") and on each marker row.
+- **Timeline markers preview** (Advanced, computed from the plan layout):
+  "Will place 3 splits and 5 cue tags", with "Placement is set per group" and a link that
+  opens Plan defaults.
+- Validation stays inline at the field (invalid timecode, cue mask), and the section header
+  gets a red dot when it contains an invalid field, so a collapsed section can't hide an error.
+
+**Linking the switches with the plan** (fixes the confusion above):
+- The plan's **Split / Tags chip popover**, when the global switch is off, shows the existing
+  note plus a **"Turn on"** button that flips the global switch (Tags: opens and highlights the
+  Timeline markers section, since it has three switches).
+- The chip tooltip names the switch: "Split section is off (Settings, Timeline markers)".
+- The Create footer summary lists markers: "..., 3 splits, 5 cue tags" or "no markers".
+
+**Visual rules** (palette and components from the `disguise-css` skill):
+- One label/value grid per section: label column on the left, control on the right, 8px row
+  gap; secondary hints in `#888888`, 11px.
+- A section header = icon + title + summary (ellipsis) + status pill + chevron.
+- Works at the narrow window size (the settings panel shrinks to 260px): summaries truncate
+  with an ellipsis and a full tooltip; nothing wraps under the chevron.
+
 ### 2.6. Inheritance model (the core of the mockup)
 
 ```
@@ -865,7 +918,8 @@ framework, so acceptance is manual in Designer against checklists.
 | 6 - Row selection and moving | ✅ done (owner-reviewed, committed `770afbd`…`234dbb9`, plus `e817587`: roomier mapping items and distinct colours by list order). `usePlanSelection`: click, Ctrl/Cmd toggle, Shift range across groups, checkboxes (shown on hover or while anything is selected), select-all per group, Esc (after disarming a mapping), Delete/Backspace removes with an Undo toast; selection strip with Clear mappings / Remove / Deselect. Drag rows (one or the whole selection, order kept) before/after any row or onto a group body, also between groups; drag files (one or the selection) from the files pane onto a row position or a group. A mapping dropped or armed-clicked on a selected row goes to the whole selection. Auto-scroll near the plan edges. File cards no longer select text on Shift/Ctrl-click. Verified with real `DragEvent`s in the browser (manual mouse DnD still to be checked by the owner). Also in this change: the em dash and middle dot are removed from UI text, code, docs and skills (owner rule), with ", " / " - " / ":" instead |
 | 6b - Groups from folders | ✅ done (owner-reviewed and committed). Advanced only. In the tree, Ctrl/Cmd+click toggles a folder, Shift+click selects a range of visible folders, and checkboxes show on hover or while folders are checked. A plain click still navigates and keeps the checks. Space toggles, Enter creates, Esc clears. Collapsed branches show a badge with the number of checked folders inside. The strip under the tree shows "N folders, M files" with skip notes, the content mode (Folder only / With subfolders / Split subfolders; persisted, defaults to the Include subfolders toggle), "Insert after", Create N groups and Clear. Folders can also be dragged: drop zones between groups create groups there, and a drop onto a group adds the files. Groups store `sourceFolder` (Q13). Verified in the browser on `footages`: direct skips the empty parent; deep skips the nested child (89 files); split gives "footages / 4k emanation" and its two siblings; insert-after, the collapsed badge, gap drop, group-body drop, Files switching to Split, and hidden in Simple. The tree must be expanded to select folders in Split (header toggle), so no separate "Folders" button was needed. Owner feedback in the same round: the per-group column header row is removed and the select-all checkbox now sits at the start of the "Layers start" row, above the row checkboxes; app-wide slim dark scrollbars without arrow buttons live in `src/style.css` (component-level scrollbar rules removed) |
 | 7 - Settings inheritance | ✅ done (owner-reviewed, committed `f8ba6b3`…`750875c`). `utils/planSchema.js` (defaults, chips, effective values, normalisation helpers); `useLayerPlan` keeps `plan` defaults, `group.ov`/`scope`, `entry.ov` and prunes overrides equal to their parent. Plan defaults panel (gear button) with the override summary and Reset all overrides. Group chips Start/Tags/Split/Mode/End/Fade/Length with ◆ (set here), Mixed, Off, open and layer-counter states; a floating popover (teleported, fixed position, flips above the chip and stays on screen, closes on outside click / Esc; nothing below moves) with Use plan default / Use group value, "N layers override this, Reset", Apply to all groups, Done; Reset to defaults on the group. For selected rows an inline "Group | N selected" switch sits at the start of the chips row (no extra line) with a "Reset N layers" chip; a row click returns the group to selection scope. Plan defaults drop down over the groups (scrollable, outside click / Esc closes). Narrow windows (owner request, checked at 900x560): the Split files pane and the settings panel shrink first, the plan keeps 320px; the plan header wraps; narrow groups hide the mini-timeline and thumbnails; narrow list rows hide the type label, then res/G-badges. ◆ on rows with a tooltip of what they override. Mini-timeline markers follow the effective tag/split placement. Layout and Create use effective values per group and layer. Advanced right panel hides Layer properties, Duration and Overlap and shows the "set per group" hints. Checked in the browser: All at once / plan default reset, Mixed across 2 selected layers, layer overrides pruned when the group takes the same value, Apply to all groups moves the value into defaults; the Create payload carries per-group timing/tag/split and per-layer values |
-| 8 - Auto-assign | ⏳ pending |
+| 8 - Auto-assign | ✅ done (owner-reviewed). `utils/autoAssign.js` (name: case-insensitive "file name contains mapping name", longest wins; resolution: exact `WxH` with exactly one candidate, otherwise skipped as ambiguous; name first, resolution as the fallback; unmatched layers keep their mapping) and `plan/AutoAssign.vue`: an "Auto-assign" header button opens a drop-down over the groups (like Plan defaults, one panel at a time, outside click / Esc closes) with Match name / Match resolution, Apply to Without mapping / Selected / All layers with counts (rules and scope persisted), the result summary, Clear all mappings, Run auto-assign. Rows show a `NAME` / `RES` badge; a manual assignment removes it. Header actions wrap as one right-aligned block and become icons in a narrow pane. Checked: the logic on the §8 test names (`Cyc_Wash_sunrise.mov` takes `Cyc_Wash` over `Cyc`, `led_side_l_waterfall.mov` takes `LED_Side_L`, a resolution shared by two mappings is skipped, empty scope gives "Nothing to process in this scope."); the panel and badges in the browser at 900x560 and 1500x760. The `api_test` project has no mappings whose names or resolutions match its files, so a real-data run there assigns 0 |
+| 8b - Settings panel redesign (§2.5.1, owner request) | ⏳ pending |
 | 9 - Polish | ⏳ pending |
 
 ### Phase 0 - API discovery (no UI changes)
@@ -950,8 +1004,19 @@ framework, so acceptance is manual in Designer against checklists.
 - **Acceptance:** with test names (`Cyc_Wash_sunrise.mov`, `LED_Side_L_waterfall.mov`) and
   shared resolutions, results match expectations and ambiguous cases are skipped.
 
+### Phase 8b - Settings panel redesign (§2.5.1, owner request)
+- Regroup SettingsPanel into Mappings / Where / Layers / Timeline markers; Split section joins
+  the tags; Overlap joins Layers.
+- Accordions with persisted state, header summaries, status pills, error dots.
+- Advanced: markers preview from the plan layout, "Open Plan defaults" links.
+- Chip popovers: "Turn on" for a switched-off Split / Tags; tooltips name the switch; footer
+  summary lists markers.
+- No behaviour change in what gets created: the option names in `useLayerOptions` stay, so
+  `planBuilder` and Simple stay identical (§9.1).
+- **Acceptance:** checklist §9.4 and §9.1.
+
 ### Phase 9 - Polish
-- Right-panel accordions, plan persistence (Q6), Refresh handling (§6.3), accessibility
+- Plan persistence (Q6), Refresh handling (§6.3), accessibility
   (§4.6), style translation (§7), `CLAUDE.md` update (architecture, new components),
   version → 1.2.0.
 
@@ -996,6 +1061,19 @@ framework, so acceptance is manual in Designer against checklists.
 - [ ] Works in Split and Files layouts (Files switches to Split afterwards). Hidden in Simple
       mode.
 - [ ] Refresh keeps checked folders that still exist.
+
+### 9.4. Settings panel (Phase 8b)
+- [ ] Sections appear in the order Mappings / Where / Layers / Timeline markers in both modes;
+      Simple shows Layers in full, Advanced shows the note with "Open Plan defaults".
+- [ ] Collapsed headers show correct summaries and On/Off pills, which update live; open/closed
+      state survives a reload.
+- [ ] An invalid timecode or cue mask puts a red dot on its collapsed section; Create stays
+      disabled as before.
+- [ ] Split chip popover with Split section off shows "Turn on"; pressing it enables the switch
+      and the chips/markers update. Same for Tags (opens Timeline markers).
+- [ ] Advanced markers preview counts match what Designer creates (splits and tags).
+- [ ] Simple creation is identical to before the redesign (§9.1).
+- [ ] Narrow window (~900x560): nothing clipped, summaries truncate with a tooltip.
 
 ---
 
