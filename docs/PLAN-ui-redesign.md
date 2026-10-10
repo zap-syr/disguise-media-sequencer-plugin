@@ -1078,7 +1078,8 @@ framework, so acceptance is manual in Designer against checklists.
 | 8 - Auto-assign | ✅ done (owner-reviewed). `utils/autoAssign.js` (name: case-insensitive "file name contains mapping name", longest wins; resolution: exact `WxH` with exactly one candidate, otherwise skipped as ambiguous; name first, resolution as the fallback; unmatched layers keep their mapping) and `plan/AutoAssign.vue`: an "Auto-assign" header button opens a drop-down over the groups (like Plan defaults, one panel at a time, outside click / Esc closes) with Match name / Match resolution, Apply to Without mapping / Selected / All layers with counts (rules and scope persisted), the result summary, Clear all mappings, Run auto-assign. Rows show a `NAME` / `RES` badge; a manual assignment removes it. Header actions wrap as one right-aligned block and become icons in a narrow pane. Checked: the logic on the §8 test names (`Cyc_Wash_sunrise.mov` takes `Cyc_Wash` over `Cyc`, `led_side_l_waterfall.mov` takes `LED_Side_L`, a resolution shared by two mappings is skipped, empty scope gives "Nothing to process in this scope."); the panel and badges in the browser at 900x560 and 1500x760. The `api_test` project has no mappings whose names or resolutions match its files, so a real-data run there assigns 0 |
 | 8b - Settings panel redesign (§2.5.1, owner request) | ✅ done (owner-reviewed). Settings panel: accordion sections Mappings / Where / Layers / Timeline markers (`settings/SettingsSection.vue`, open state persisted per section) with summaries on their own line, an "N on / Off" pill on Timeline markers, red dots for invalid fields; Split section moved next to the tags, Overlap into Layers; Advanced shows "Open Plan defaults" and the markers preview ("Will place 2 splits and 11 cue tags", `countMarkers` in `utils/planLayout.js`, same rules as `plan_prepare.py`); info-icon tooltips (`common/InfoTip.vue`). Chips: `plan/SettingChip.vue` + `plan/ChipRow.vue` (seven equal columns, Start / Tags / Split stay visible and edit the group in selection scope (owner review), "+N" overflow with a floating list, folding frozen while a popover is open) and one `plan/ChipPopover.vue` (radio list, nested `plan/NumStepper.vue`, Reset + move-up button per level, Split switch / "Tags off" in the header; it keeps its side while open). Floating selection bar (Selected / Group, Clear mappings, Remove, ×; armed mapping in the same bar), constant 76px bottom padding, colour-only row selection. Plan defaults is a floating chip panel with "◆ N" counters, "Clear N overrides" and Reset all. Group "Reset to defaults" moved to a header icon. Footer summary lists markers. The Mappings list sits in a framed scroll well (owner review). Checked in the browser at 1500x800 and in a 900x560 iframe; creation in Designer not re-run (payload code untouched) |
 | 8c - One-row files toolbar, drop files to create groups, folder tree fixes (§2.3.0, owner request) | ✅ done (owner-reviewed). "+ New group" removed; "New group" is the first option of "Add to group…" (existing groups under an "Existing groups" optgroup; the select is enabled with any selection). Files toolbar is one row: `FilesPane` is a size container; at ≤500px the S/M/L toggle hides and the padding tightens, at ≤340px the counter becomes "N/M" and the view icons and select (min 92px) shrink. Checked: one row at 420px and at 270px (the files pane at the 900x560 minimum window); below ~300px it can no longer fit, so the §2.3.0 "down to 220px" is not reached (only windows under 900px get there). Files dragged onto the empty plan, the space under the last group (a 64px "Drop to create a new group" zone plus the list background) or a gap between groups create a group there (`drop-file-group`), toast "G2 created, 1 file", selection cleared; a drop onto a group still adds to it. Tree: the checkbox replaces the folder icon in a fixed 16px cell (names keep their x through hover / check / expand), the arrow is the group-header triangle. Groups-from-folders strip (owner bug report): a size container; under ~290px the content modes become icon radio buttons with tooltips and a caption naming the selected mode, Clear becomes an icon, "Create N groups" stays on one line ("Create N" at the 150px minimum), the insert select reads "At the end"; checked at 150 / 220 / 260 / 300px. Plan header at 900px wide (owner bug report): "+ Group" and the Files / Split / Plan switch become icons in a narrow pane like Auto-assign and Plan defaults, so the header actions stay on one row; the plugin's minimum window width (`disguise-plugin-window-min-size` in `index.html`) is now 900. Follow-up (owner report at 1245px): the plan header never wraps; by plan pane width the summary ellipsizes, the header buttons become icons at ≤760px, the workspace switch at ≤540px, paddings tighten at ≤360px; the files top bar's search shrinks (min 90px) instead of overflowing; the selection bar drops its labels at ≤620px. Files top bar (owner report): in a narrow files pane the title takes the first row (with the workspace switch in the Files layout) and search + refresh a second, full-width row: at ≤380px, or ≤480px when the switch is in the bar; in one row the search keeps 120px and the path ends with an ellipsis. The old Split-only overrides in `MediaSequencer.vue` are removed. Swept every 40px from 900 to 1900 in Files / Split / Plan (Advanced, with a checked layer) and Simple: no toolbar overflows or wraps. Checked in the browser with real `DragEvent`s (end zone, list background, gap, onto a group, empty plan with a reverse-order selection) |
-| 9 - Polish | ⏳ pending |
+| 9 - Polish | ⏳ in progress: A, B, D, E, F, G done (owner-reviewed); C (keyboard) deferred; H (docs and release) in progress |
+| 10 - Reorder groups by drag and drop (owner request) | ⏳ planned |
 
 ### Phase 0 - API discovery (no UI changes)
 - Run queries Q-A…Q-D (§5.1). Record mapping type names, the source of mapping and clip
@@ -1324,13 +1325,54 @@ needed for this release; Esc, Delete and the armed mapping already work from the
 **H. Docs and release**
 - Close the open questions Q4, Q6, Q8, Q11-Q13 (Q7 closed in F) with the owner (keep or change the
   defaults) and move them to "Decided".
+  Done (2026-10-10): all defaults kept, §11 has no open questions.
 - `CLAUDE.md`: architecture (plan components, `useLayerPlan`, `planSchema`, `planLayout`,
   inheritance), data flow for Advanced Create, the new Python files.
+  Done (2026-10-10): also the plan state shape, saved plan, missing clips and the deleted
+  media gotcha.
 - `README.md`: Simple / Advanced modes, groups, mappings per layer, groups from folders,
   drag and drop, screenshots.
 - `CHANGELOG.md` entry and version → 1.2.0 in `package.json`.
 - Full manual run of checklists §9.1-§9.6 at 900x560 and at a wide window before the release.
 - **Acceptance:** checklist §9.6 and §9.1.
+
+### Phase 10 - Reorder groups by drag and drop (owner request, 2026-10-10)
+
+**Why.** Groups can only be added at a position (folder drop zones, "Insert after") or deleted;
+their order cannot change afterwards. The order matters: groups are butted together on the
+timeline in plan order (Q4), so G2 always starts where G1 ends. The owner wants to move a
+group the same way rows are moved: grab it and drag it.
+
+**Interaction** (mirrors row moving, Phase 6):
+- **Grab:** the group header is draggable (`draggable="true"`, `grab` / `grabbing` cursor).
+  The name input, the expand arrow and the header buttons keep their own clicks and do not
+  start a drag (the input is `draggable="false"`, so its text can still be selected).
+- **Payload:** `useDragPayload` gets a new kind `'group'` with the group id, so every other
+  target ignores it: row and slot targets, the header's mapping drop ("Assign to all"), the
+  files / folders gap zones.
+- **Drop target:** another group. The pointer in its upper half inserts **before** it, in the
+  lower half **after** it, shown with the row insert line (`inset 0 2px 0 #0a84ff` on top /
+  `inset 0 -2px 0 #0a84ff` at the bottom of the group box). The list background under the
+  last group drops at the end. Dropping a group on itself, or right before / after itself
+  where nothing changes, is a no-op.
+- **While dragging:** the dragged group is dimmed (`opacity: 0.4`, like dragged rows); the
+  plan auto-scrolls near its top / bottom edge (existing `autoScroll`). Collapsing big groups
+  first (Collapse all) makes long moves short, nothing collapses automatically.
+- **Result:** `useLayerPlan.moveGroup(gid, targetGid | null, 'before' | 'after')` reorders
+  `state.groups`. Everything that depends on the position follows by itself: the G1…Gn
+  numbers and badges on file cards, the gnav chips, the time layout, the mini timelines,
+  marker counts and the Create order. Row selection, overrides and mappings move with the
+  group. The moved group flashes (`jump`). No toast and no Undo, like moving rows: dragging
+  back restores the order. The new order is saved with the plan (Phase 9 A).
+
+**Not in scope:** dragging gnav chips, moving several groups at once, keyboard move
+(deferred with Phase 9 C).
+
+**Files:** `useDragPayload.js` (kind), `useLayerPlan.js` (`moveGroup`), `PlanGroup.vue`
+(draggable header, group drop halves, insert line, dimmed state), `LayerPlan.vue` (end-of-list
+drop, forwarding `drop-group`), `MediaSequencer.vue` (wire `moveGroup`, reveal the group).
+
+- **Acceptance:** checklist §9.7 and §9.1.
 
 ---
 
@@ -1445,6 +1487,20 @@ needed for this release; Esc, Delete and the armed mapping already work from the
       progress and a report.
 - [ ] Version 1.2.0 in `package.json` and `CHANGELOG.md`; README describes Advanced mode.
 
+### 9.7. Reorder groups (Phase 10)
+- [ ] Drag G3 by its header above G1: it becomes G1, the others renumber, the gnav chips and
+      the file card badges follow, the moved group flashes.
+- [ ] The insert line shows above or below the hovered group by pointer half; dropping under
+      the last group moves to the end; a drop on itself changes nothing.
+- [ ] The time layout follows: the moved group starts at 0 and the next one where it ends;
+      Create places the groups on the timeline in the new order.
+- [ ] Typing in the group name, the arrow and the header buttons still work and never start
+      a drag. A mapping dropped on a header still assigns it; a group dragged over a header
+      does not.
+- [ ] Rows, files and folders still drop as before while no group is dragged.
+- [ ] Reload the panel: the new order is kept.
+- [ ] Works at 900x560 and in a wide window.
+
 ---
 
 ## 10. Risks
@@ -1490,23 +1546,24 @@ needed for this release; Esc, Delete and the armed mapping already work from the
   - success: neutral toast `#242424` with a `#0a84ff` border (no green);
   - the 12-colour mapping set in `utils/mappingColors.js`, differing in hue and lightness.
 
-### Still open - with the default that will be used unless the owner says otherwise
+### Decided (2026-10-10, Phase 9 H: the owner kept the defaults as implemented)
 
-- **Q4.** Overlap/gap **between groups**. **Default: none.** Groups are butted together, as in
-  the mockup.
-- **Q6.** Persist the plan across panel reloads. **Default: yes, in localStorage** per director,
-  with a schema version. **No export/import** in this release.
-- **Q11.** Groups from folders - order of groups. **Default: tree order.** Alternative:
-  the order in which folders were checked.
-- **Q12.** Groups from folders - default content mode. **Default: follow the "Include
-  subfolders" toggle** ("With subfolders" if on, "Folder only" if off). "Split subfolders" is
-  an explicit choice.
-- **Q13.** Groups from folders - should a group remember its source folder, so that a
-  "↻ Sync with folder" action can later re-pull new files after a Refresh? **Default: no**;
-  groups are plain groups once created. The source path is stored on the group anyway
+- **Q4 - overlap/gap between groups:** **none.** Groups are butted together: the next group
+  starts where the longest layer of the previous one ends. Overlap exists inside a group only.
+- **Q6 - persist the plan across panel reloads:** **yes, in localStorage** per director, with
+  a schema version (Phase 9 A). **No export/import** in this release.
+- **Q8 - default mode for new users:** **Simple** (the familiar workflow). The last chosen
+  mode is then remembered.
+- **Q11 - groups from folders, order of groups:** **tree order**, not the order in which
+  folders were checked.
+- **Q12 - groups from folders, default content mode:** **follow the "Include subfolders"
+  toggle** ("With subfolders" if on, "Folder only" if off). "Split subfolders" is an explicit
+  choice, remembered once made.
+- **Q13 - remember the source folder for a "↻ Sync with folder" action:** **no**; groups are
+  plain groups once created. The source path is stored on the group anyway
   (`group.sourceFolder`), so the feature can be added later without migration.
-- **Q8.** Default mode for new users. **Default: Simple** (the familiar workflow). The last
-  chosen mode is then remembered.
+
+No questions are open.
 
 ---
 
