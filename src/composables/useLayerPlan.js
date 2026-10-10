@@ -5,8 +5,10 @@ import { PLAN_DEFAULTS, CHIPS, coerce, effectiveGroup, effectiveLayer, pruneOver
  * Advanced-mode layer plan: ordered groups of entries (one entry = one future layer).
  * An entry references a clip by path, so the same clip can appear several times.
  * Settings inherit Plan defaults -> group.ov -> entry.ov (utils/planSchema.js).
+ * isMissing(clipPath): true when the clip is gone from the project (docs §6.3); such rows stay
+ * in the plan but are not created.
  */
-export function useLayerPlan() {
+export function useLayerPlan(isMissing = () => false) {
   const state = reactive({
     plan: { ...PLAN_DEFAULTS },
     // [{ id, name, open, scope: 'auto'|'group', ov: {}, items: [entryId], sourceFolder }]
@@ -21,6 +23,8 @@ export function useLayerPlan() {
   let nextEntry = 1;
 
   const layerCount = computed(() => state.groups.reduce((n, g) => n + g.items.length, 0));
+  const isMissingEntry = id => isMissing(state.entries[id]?.mediaId);
+  const missingCount = computed(() => state.groups.reduce((n, g) => n + g.items.filter(isMissingEntry).length, 0));
 
   function makeEntries(paths) {
     return paths.map(mediaId => {
@@ -281,8 +285,25 @@ export function useLayerPlan() {
     assign(ids, null);
   }
 
+  /**
+   * Clears mappings that are gone from the project (after Refresh or a restored plan, docs §6.3).
+   * Returns { mappings, layers }: distinct paths cleared and rows touched.
+   */
+  function clearUnknownMappings(isKnown) {
+    const gone = new Set();
+    let layers = 0;
+    Object.values(state.entries).forEach(entry => {
+      if (!entry.mappingPath || isKnown(entry.mappingPath)) return;
+      gone.add(entry.mappingPath);
+      layers++;
+      Object.assign(entry, { mappingPath: null, via: null });
+    });
+    return { mappings: gone.size, layers };
+  }
+
+  // Missing rows are not created, so they do not count as layers without mapping
   const unmappedCount = computed(() =>
-    state.groups.reduce((n, g) => n + g.items.filter(id => !state.entries[id]?.mappingPath).length, 0));
+    state.groups.reduce((n, g) => n + g.items.filter(id => !state.entries[id]?.mappingPath && !isMissingEntry(id)).length, 0));
 
   /** mappingPath -> number of plan layers using it */
   const mappingUsage = computed(() => {
@@ -310,8 +331,8 @@ export function useLayerPlan() {
   });
 
   return {
-    state, layerCount, groupLabelsByMedia, unmappedCount, mappingUsage,
-    addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
+    state, layerCount, missingCount, groupLabelsByMedia, unmappedCount, mappingUsage,
+    clearUnknownMappings, addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
     removeGroup, updateGroup, setAllOpen, load,
     assign, assignGroup, clearMappings, applyAutoAssign,
     overrideStats, overrideCounts, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides,

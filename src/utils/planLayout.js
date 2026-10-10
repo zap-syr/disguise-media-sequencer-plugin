@@ -22,11 +22,13 @@ export function clipSeconds(details, settings) {
  * @param entries   { [entryId]: { mediaId, ov } }
  * @param details   getMediaDetails() result keyed by clip path
  * @param defaults  Plan defaults (Advanced) or the Simple settings shaped like them
- * Each group in the result: { id, start, end, rows: [{ id, start, duration }], starts, closing, values, last }
- * where `closing` = where a closing split goes (seq: the cursor, same: the group end)
- * and `last` = the last group that places layers.
+ * @param isMissing clip path -> true when the clip is gone from the project; such rows get zero
+ *                  length and place nothing, like plan_prepare.py skipping a clip it cannot load
+ * Each group in the result: { id, start, end, rows: [{ id, start, duration, missing }], starts, closing, values, last }
+ * where `starts` = starts of the placed (not missing) rows, `closing` = where a closing split
+ * goes (seq: the cursor, same: the group end) and `last` = the last group that places layers.
  */
-export function computePlanLayout(groups, entries, details, defaults) {
+export function computePlanLayout(groups, entries, details, defaults, isMissing = () => false) {
   let cursor = 0;
   let total = 0;
   const out = groups.map(g => {
@@ -38,6 +40,7 @@ export function computePlanLayout(groups, entries, details, defaults) {
     const overlap = seq ? Math.max(0, Number(values.overlap) || 0) : 0;
     const rows = g.items.map(id => {
       const entry = entries[id];
+      if (isMissing(entry?.mediaId)) return { id, start: seq ? t : gStart, duration: 0, missing: true };
       const d = clipSeconds(details[entry?.mediaId], effectiveLayer(values, entry));
       let start;
       if (seq) {
@@ -47,14 +50,14 @@ export function computePlanLayout(groups, entries, details, defaults) {
         start = gStart;
       }
       gEnd = Math.max(gEnd, start + d);
-      return { id, start, duration: d };
+      return { id, start, duration: d, missing: false };
     });
-    const starts = [...new Set(rows.map(r => r.start))];
+    const starts = [...new Set(rows.filter(r => !r.missing).map(r => r.start))];
     cursor = gEnd;
     total = Math.max(total, gEnd);
     return { id: g.id, start: gStart, end: gEnd, rows, starts, closing: seq ? t : gEnd, values, last: false };
   });
-  const lastPlaced = out.filter(g => g.rows.length).pop();
+  const lastPlaced = out.filter(g => g.starts.length).pop();
   if (lastPlaced) lastPlaced.last = true;
   return { groups: out, total };
 }
@@ -63,10 +66,10 @@ export function computePlanLayout(groups, entries, details, defaults) {
  * Marker times of one layout group, same placement rules as plan_prepare.py:
  * split 'file' = every start + the closing split, 'group' = the group start (+ the group end
  * for the last group); tag 'file' = every unique start, 'group' = the group start.
- * Empty groups place nothing.
+ * Groups with no placed rows place nothing.
  */
 export function groupMarkerTimes(group) {
-  if (!group.rows.length) return { splits: [], tags: [] };
+  if (!group.starts.length) return { splits: [], tags: [] };
   const { start, end, starts, closing, values, last } = group;
   return {
     splits: values.split === 'file' ? [...new Set([...starts, closing])] : (last ? [start, end] : [start]),

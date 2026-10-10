@@ -143,6 +143,7 @@
         :layer-count="createCount"
         :summary="footerSummary"
         :unmapped-count="isAdvanced ? plan.unmappedCount.value : 0"
+        :missing-count="isAdvanced ? plan.missingCount.value : 0"
         :mappings-used="Object.keys(plan.mappingUsage.value).length"
         :markers="markerCounts"
         :is-creating="isCreating"
@@ -230,7 +231,15 @@ const effectiveViewMode = computed({
 const treeCollapsed = ref(false);
 watch(effectiveWorkspace, ws => { treeCollapsed.value = ws !== 'files'; }, { immediate: true });
 
-const plan = useLayerPlan();
+const filesByPath = computed(() => Object.fromEntries(
+  flattenFiles(library.fullHierarchy.value, { tag: false }).map(f => [f.path, f])
+));
+// A plan row whose clip is gone (after Refresh or a restored plan, docs §6.3): removed from the
+// project, or still listed but its media was deleted (Designer flags the clip "in error")
+const isMissingClip = path => !library.loading.value && !library.error.value &&
+  (!filesByPath.value[path] || !!library.mediaDetails.value[path]?.missing);
+
+const plan = useLayerPlan(isMissingClip);
 // The plan survives a panel reload, one per director (docs §6.4)
 const planWasReset = usePlanStorage(plan, `mediaSequencer.plan.${props.directorEndpoint}`);
 const layerPlanRef = ref(null);
@@ -332,9 +341,14 @@ const mappingsByPath = computed(() => Object.fromEntries(library.mappings.value.
 // Distinct colour per mapping, in list order (updates after Refresh)
 watch(() => library.mappings.value, list => setMappingPalette(list), { immediate: true });
 
-const filesByPath = computed(() => Object.fromEntries(
-  flattenFiles(library.fullHierarchy.value, { tag: false }).map(f => [f.path, f])
-));
+// Each load / Refresh: mappings gone from the project are cleared from the plan (docs §6.3)
+watch(() => library.mappings.value, list => {
+  const known = new Set(list.map(m => m.path));
+  const { mappings, layers } = plan.clearUnknownMappings(path => known.has(path));
+  if (mappings) {
+    showToast(`${mappings} ${mappings === 1 ? 'mapping no longer exists' : 'mappings no longer exist'}, cleared from ${layers} ${layers === 1 ? 'layer' : 'layers'}`);
+  }
+});
 const thumbBase = computed(() => {
   const ep = props.directorEndpoint;
   return `${ep.startsWith('http') ? ep : 'http://' + ep}/api/v1/thumbnail/`;
@@ -373,7 +387,7 @@ const simpleValues = computed(() => ({
   movieDur: layerOptions.movieDuration,
   stillDur: layerOptions.stillDuration
 }));
-const planLayout = computed(() => computePlanLayout(plan.state.groups, plan.state.entries, library.mediaDetails.value, plan.state.plan));
+const planLayout = computed(() => computePlanLayout(plan.state.groups, plan.state.entries, library.mediaDetails.value, plan.state.plan, isMissingClip));
 // Simple = a virtual one-group plan of the selected files
 const simpleLayout = computed(() => {
   const paths = selectedClipPaths();
@@ -402,7 +416,8 @@ function resetScope(id) {
   if (group && group.scope !== 'auto') plan.updateGroup(group.id, { scope: 'auto' });
 }
 
-const createCount = computed(() => (isAdvanced.value ? plan.layerCount.value : selection.selectedItems.size));
+// Advanced: rows with a missing clip are skipped by Create
+const createCount = computed(() => (isAdvanced.value ? plan.layerCount.value - plan.missingCount.value : selection.selectedItems.size));
 const footerSummary = computed(() => {
   if (isAdvanced.value) {
     const g = plan.state.groups.length;
@@ -411,9 +426,11 @@ const footerSummary = computed(() => {
     const unmapped = plan.unmappedCount.value;
     const parts = [
       `${g} ${g === 1 ? 'group' : 'groups'}`,
-      `${plan.layerCount.value} layers`,
+      `${createCount.value} layers`,
+      missing ? `${missing} missing ${missing === 1 ? 'clip' : 'clips'}` : null,
       `${maps} ${maps === 1 ? 'mapping' : 'mappings'}`,
       unmapped ? `${unmapped} without mapping` : null,
+    const missing = plan.missingCount.value;
       `≈${formatDuration(planLayout.value.total) || '0s'}`,
       markersText.value
     ];
@@ -533,7 +550,7 @@ async function handleCreateLayers(requestOptions) {
     isCreating.value = true;
     const advanced = isAdvanced.value;
     const payload = advanced
-      ? buildAdvancedPlan(requestOptions, plan.state)
+      ? buildAdvancedPlan(requestOptions, plan.state, isMissingClip)
       : buildSimplePlan(requestOptions, selectedClipPaths());
     const expected = payload.groups.reduce((n, g) => n + g.layers.length, 0);
 

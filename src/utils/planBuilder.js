@@ -57,13 +57,13 @@ export function layerSettingsFromValues(v) {
  * Advanced mode: one plan group per UI group with its effective timing / overlap / tag and
  * split placement, each layer with its effective settings and its own mapping (null = none:
  * plan_layers.py clears Designer's pre-filled mapping). The insert location and the global
- * tag / split switches come from the settings panel.
+ * tag / split switches come from the settings panel. Rows whose clip is gone from the project
+ * (isMissing) are skipped; a group left with no layers is dropped.
  */
-export function buildAdvancedPlan(options, planState) {
+export function buildAdvancedPlan(options, planState, isMissing = () => false) {
   return {
     ...buildPlanEnvelope(options),
     groups: planState.groups
-      .filter(g => g.items.length)
       .map(g => {
         const gv = effectiveGroup(planState.plan, g);
         return {
@@ -71,16 +71,17 @@ export function buildAdvancedPlan(options, planState) {
           overlap: Number(gv.overlap) || 0,
           tagAt: gv.tag,
           splitAt: gv.split,
-          layers: g.items.map(id => {
-            const entry = planState.entries[id];
-            return {
+          layers: g.items
+            .map(id => planState.entries[id])
+            .filter(entry => !isMissing(entry.mediaId))
+            .map(entry => ({
               clipPath: entry.mediaId,
               mappingPath: entry.mappingPath || null,
               ...layerSettingsFromValues(effectiveLayer(gv, entry))
-            };
-          })
+            }))
         };
       })
+      .filter(g => g.layers.length)
   };
 }
 

@@ -120,8 +120,9 @@
           <span class="thumb">
             <img v-if="row.thumbUrl && !brokenThumbs[row.id]" :src="row.thumbUrl" alt="" @error="brokenThumbs[row.id] = true" />
           </span>
-          <div class="pname">
-            <div class="pname-txt" :title="row.name">
+          <div class="pname" :class="{ missing: row.missing }">
+            <div class="pname-txt" :title="row.missing ? `Clip not found in the project: ${row.mediaId}` : row.name">
+              <svg v-if="row.missing" class="miss-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-label="Missing clip" role="img"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
               <button
                 v-if="row.ovText"
                 type="button"
@@ -427,7 +428,9 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   const file = props.filesByPath[mediaId];
   const det = props.details[mediaId];
   const name = file?.name || (mediaId || '').split('/').pop();
-  const sub = [formatClock(r.start), formatDuration(r.duration), det?.res].filter(Boolean).join(', ');
+  const sub = r.missing
+    ? 'Missing, will be skipped'
+    : [formatClock(r.start), formatDuration(r.duration), det?.res].filter(Boolean).join(', ');
   const mappingPath = props.entries[r.id]?.mappingPath || null;
   const mapping = mappingPath ? props.mappingsByPath[mappingPath] : null;
   const ov = props.entries[r.id]?.ov || {};
@@ -439,6 +442,8 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
     via: mappingPath ? props.entries[r.id]?.via || null : null,
     color: mappingColor(mappingPath),
     id: r.id,
+    mediaId,
+    missing: r.missing,
     index: props.rowOffset + i + 1,
     name,
     sub,
@@ -569,6 +574,8 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .pname { min-width: 0; }
 .pname-txt { font-size: 12px; color: #cccccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pname-sub { font-size: 11px; color: #666666; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pname.missing .pname-txt, .pname.missing .pname-sub { color: #ef4444; }
+.miss-icon { vertical-align: -2px; margin-right: 5px; }
 .slot {
   display: flex; align-items: center; gap: 8px;
   height: 30px; padding: 0 4px 0 10px; min-width: 0;

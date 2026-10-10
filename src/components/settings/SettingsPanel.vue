@@ -311,14 +311,15 @@
 
     <div class="settings-footer">
       <div v-if="summary" class="footer-summary">{{ summary }}</div>
-      <div v-if="confirmUnmapped" class="confirm-strip" role="alert">
-        <span>{{ unmappedCount }} {{ unmappedCount === 1 ? 'layer has' : 'layers have' }} no mapping and will be created without one.</span>
+      <div v-if="confirmCreateAsk" class="confirm-strip" role="alert">
+        <span v-if="missingCount">{{ missingCount }} {{ missingCount === 1 ? 'clip is' : 'clips are' }} missing from the project and will be skipped.</span>
+        <span v-if="unmappedCount">{{ unmappedCount }} {{ unmappedCount === 1 ? 'layer has' : 'layers have' }} no mapping and will be created without one.</span>
         <div class="confirm-actions">
-          <button type="button" class="create-track-cancel-btn" @click="confirmUnmapped = false">Cancel</button>
+          <button type="button" class="create-track-cancel-btn" @click="confirmCreateAsk = false">Cancel</button>
           <button type="button" class="create-track-confirm-btn" @click="confirmCreate">Create anyway</button>
         </div>
       </div>
-      <button v-if="!confirmUnmapped"
+      <button v-if="!confirmCreateAsk"
         class="create-btn"
         :disabled="!isCreateLayersEnabled || isCreating"
         @click="handleCreate"
@@ -350,6 +351,8 @@ const props = defineProps({
   summary: { type: String, default: '' },
   // Advanced: plan layers without a mapping (docs §11 Q1: warn, confirm, create with mapping cleared)
   unmappedCount: { type: Number, default: 0 },
+  // Advanced: plan rows whose clip is gone from the project; Create skips them after a confirm (docs §6.3)
+  missingCount: { type: Number, default: 0 },
   // Advanced: distinct mappings used in the plan
   mappingsUsed: { type: Number, default: 0 },
   // countMarkers() of what Create would place (Advanced preview)
@@ -612,20 +615,21 @@ const handleClickOutside = (e) => {
 
 // --- Create ---
 
-const confirmUnmapped = ref(false);
-watch([() => props.unmappedCount, creationMode], () => { confirmUnmapped.value = false; });
+// Advanced: Create asks first when layers have no mapping or clips are missing
+const confirmCreateAsk = ref(false);
+watch([() => props.unmappedCount, () => props.missingCount, creationMode], () => { confirmCreateAsk.value = false; });
 
 function handleCreate() {
   if (!isCreateLayersEnabled.value || props.isCreating) return;
-  if (isAdvanced.value && props.unmappedCount > 0) {
-    confirmUnmapped.value = true;
+  if (isAdvanced.value && (props.unmappedCount > 0 || props.missingCount > 0)) {
+    confirmCreateAsk.value = true;
     return;
   }
   emitCreate();
 }
 
 function confirmCreate() {
-  confirmUnmapped.value = false;
+  confirmCreateAsk.value = false;
   emitCreate();
 }
 
