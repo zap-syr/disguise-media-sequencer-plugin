@@ -36,11 +36,15 @@
           class="master-checkbox-btn"
           @click.stop="selection.toggleSelectAll"
           :disabled="items.length === 0"
-          :title="selection.isAllSelected.value ? 'Deselect All' : 'Select All'"
+          :title="selection.selectedItems.size ? 'Deselect all' : 'Select all'"
+          :aria-label="selection.selectedItems.size ? 'Deselect all files' : 'Select all files'"
+          :aria-pressed="selection.isAllSelected.value"
         >
-          <svg v-if="selection.isAllSelected.value && items.length > 0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#ffffff" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3" stroke="none"/><path d="M8 12l3 3 6-6" fill="none" stroke="#111111" stroke-width="3"/></svg>
-          <svg v-else-if="selection.isIndeterminate.value" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#666666" stroke="#111111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3" stroke="none"/><line x1="7" y1="12" x2="17" y2="12" stroke="#111111" stroke-width="3"/></svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"/></svg>
+          <!-- Same checkbox as the layer plan rows (PlanGroup .cb) -->
+          <span class="cb" :class="{ on: selection.isAllSelected.value, part: selection.isIndeterminate.value && !selection.isAllSelected.value }">
+            <svg v-if="selection.isAllSelected.value" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+            <svg v-else-if="selection.isIndeterminate.value" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 12h12"/></svg>
+          </span>
         </button>
 
         <span class="status-text" :title="selection.selectedItems.size > 0 ? `${selection.selectedItems.size} of ${items.length} selected` : `${items.length} item(s)`">
@@ -285,9 +289,18 @@ watch(viewMode, () => {
 }
 .selection-group { display: flex; align-items: center; gap: 12px; }
 .action-toolbar { gap: 12px; }
-.master-checkbox-btn { background: transparent; border: none; color: #777777; padding: 4px; margin-left: -4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
-.master-checkbox-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
+.master-checkbox-btn { background: transparent; border: none; padding: 4px; margin-left: -4px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
 .master-checkbox-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.master-checkbox-btn:focus-visible { outline: none; }
+.master-checkbox-btn:focus-visible .cb { box-shadow: 0 0 0 2px #0a84ff; }
+/* Checkbox of the layer plan (PlanGroup.vue .cb) */
+.cb {
+  width: 16px; height: 16px;
+  border: 1.5px solid #777777; border-radius: 4px; background: #181818; color: transparent;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+}
+.master-checkbox-btn:hover:not(:disabled) .cb { border-color: #cccccc; }
+.cb.on, .cb.part, .master-checkbox-btn:hover:not(:disabled) .cb.on, .master-checkbox-btn:hover:not(:disabled) .cb.part { background: #0a84ff; border-color: #0a84ff; color: #ffffff; }
 
 .status-text { font-size: 12px; color: #888888; white-space: nowrap; }
 .highlight { color: #ffffff; font-weight: 600; }

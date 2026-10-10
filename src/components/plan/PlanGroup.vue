@@ -49,8 +49,8 @@
             class="cb selall"
             :class="{ on: allChecked, part: someChecked && !allChecked }"
             :aria-pressed="allChecked"
-            :aria-label="(allChecked ? 'Deselect all layers in ' : 'Select all layers in ') + label"
-            :title="(allChecked ? 'Deselect all layers in ' : 'Select all layers in ') + label"
+            :aria-label="(someChecked ? 'Deselect all layers in ' : 'Select all layers in ') + label"
+            :title="(someChecked ? 'Deselect all layers in ' : 'Select all layers in ') + label"
             @click="$emit('group-check')"
           >
             <svg v-if="allChecked" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>

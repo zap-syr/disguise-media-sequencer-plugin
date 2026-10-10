@@ -50,10 +50,10 @@ export function usePlanSelection(planState) {
     anchor = id;
   }
 
-  /** Select-all checkbox of a group: selects all its rows, or clears them if all were selected. */
+  /** Select-all checkbox of a group: clears its rows if any are selected, otherwise selects them all. */
   function toggleGroup(group) {
-    const all = group.items.length > 0 && group.items.every(id => checked.has(id));
-    group.items.forEach(id => (all ? checked.delete(id) : checked.add(id)));
+    const any = group.items.some(id => checked.has(id));
+    group.items.forEach(id => (any ? checked.delete(id) : checked.add(id)));
   }
 
   function clear() {

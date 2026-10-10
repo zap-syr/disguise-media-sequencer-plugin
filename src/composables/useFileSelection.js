@@ -67,8 +67,9 @@ export function useFileSelection(itemsRef, isLocked = () => false) {
     wasDragging.value = false;
   }
 
+  /** Master checkbox: any selection (partial or full) is cleared first; with none, selects all. */
   function toggleSelectAll() {
-    if (isAllSelected.value) {
+    if (selectedItems.size > 0) {
       clear();
     } else {
       itemsRef.value.forEach((item, index) => {
