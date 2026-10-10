@@ -17,7 +17,8 @@
 #   same: every layer starts at gStart
 #   group end = end of its LONGEST layer; the next group starts there.
 #   Splits "file": at every layer start + closing split (seq: the cursor, same: group end).
-#   Splits "group": one split at the group start.
+#   Splits "group": one split at the group start; the last placed group also gets a closing
+#   split at its end (the next group would start there), like the "file" closing split.
 #   Tags "file": at every unique layer start; "group": at the group start. Numbering is
 #   continuous across the plan (i-th placed tag), like 1.1.x.
 # Creation order: 'same' groups are reversed, because addNewLayer always puts the new layer on
@@ -95,6 +96,7 @@ def run():
     errors = []
     cursor = start
     max_end = start
+    closing_end = None  # end of the last placed group when it splits at the group start
 
     for gi, g in enumerate(ARGS["groups"]):
         seq = g["timing"] == "seq"
@@ -132,11 +134,16 @@ def run():
         if g["splitAt"] == "file":
             split_beats.extend(starts)
             split_beats.append(t if seq else g_end)
+            closing_end = None
         else:
             split_beats.append(g_start)
+            closing_end = g_end
 
         tag_beats.extend(starts if g["tagAt"] == "file" else [g_start])
         cursor = g_end
+
+    if closing_end is not None:
+        split_beats.append(closing_end)
 
     tags = []
     if tags_cfg["tc"]["on"]:

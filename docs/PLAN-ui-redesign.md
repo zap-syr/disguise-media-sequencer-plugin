@@ -749,7 +749,8 @@ track. After that the old `createLayers` is removed.
 > split at every unique `start`. These are not the same: the current behaviour also has a
 > closing split at the end of the last layer. Resolution: in `'file'` mode place a split at
 > every `start` **and** at the end of the group's last layer. This matches the current logic.
-> `'group'` = one split at the group start only (decision Q3, §11).
+> `'group'` = one split at the group start; the last placed group also gets a closing split
+> at its end (decision Q3, §11).
 
 ### 4.4. Global vs group settings
 
@@ -1313,8 +1314,9 @@ framework, so acceptance is manual in Designer against checklists.
   - for those layers the service explicitly clears the mapping
     (`setResource(beat, None)`), because Designer pre-fills one otherwise.
 - **Q2 - Simple mapping as fallback:** no. This follows from Q1.
-- **Q3 - Split "Group start":** **one split at the group start only.** The next group's split
-  closes the previous one; the last group gets no closing split.
+- **Q3 - Split "Group start":** **one split at the group start.** The next group's split
+  closes the previous one; the last placed group gets a closing split at its end (the end of
+  its longest layer), like the closing split of "Each file" (owner request after Phase 8c).
   - Split "Each file" keeps today's behaviour: a split at every layer start plus a closing
     split after the last layer. Simple mode must stay identical to 1.1.2.
   - With `timing='same'` all starts coincide, so a group gets one split at the start plus the

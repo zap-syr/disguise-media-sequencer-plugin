@@ -22,8 +22,9 @@ export function clipSeconds(details, settings) {
  * @param entries   { [entryId]: { mediaId, ov } }
  * @param details   getMediaDetails() result keyed by clip path
  * @param defaults  Plan defaults (Advanced) or the Simple settings shaped like them
- * Each group in the result: { id, start, end, rows: [{ id, start, duration }], starts, closing, values }
- * where `closing` = where a closing split goes (seq: the cursor, same: the group end).
+ * Each group in the result: { id, start, end, rows: [{ id, start, duration }], starts, closing, values, last }
+ * where `closing` = where a closing split goes (seq: the cursor, same: the group end)
+ * and `last` = the last group that places layers.
  */
 export function computePlanLayout(groups, entries, details, defaults) {
   let cursor = 0;
@@ -51,21 +52,24 @@ export function computePlanLayout(groups, entries, details, defaults) {
     const starts = [...new Set(rows.map(r => r.start))];
     cursor = gEnd;
     total = Math.max(total, gEnd);
-    return { id: g.id, start: gStart, end: gEnd, rows, starts, closing: seq ? t : gEnd, values };
+    return { id: g.id, start: gStart, end: gEnd, rows, starts, closing: seq ? t : gEnd, values, last: false };
   });
+  const lastPlaced = out.filter(g => g.rows.length).pop();
+  if (lastPlaced) lastPlaced.last = true;
   return { groups: out, total };
 }
 
 /**
  * Marker times of one layout group, same placement rules as plan_prepare.py:
- * split 'file' = every start + the closing split, 'group' = the group start;
- * tag 'file' = every unique start, 'group' = the group start. Empty groups place nothing.
+ * split 'file' = every start + the closing split, 'group' = the group start (+ the group end
+ * for the last group); tag 'file' = every unique start, 'group' = the group start.
+ * Empty groups place nothing.
  */
 export function groupMarkerTimes(group) {
   if (!group.rows.length) return { splits: [], tags: [] };
-  const { start, starts, closing, values } = group;
+  const { start, end, starts, closing, values, last } = group;
   return {
-    splits: values.split === 'file' ? [...new Set([...starts, closing])] : [start],
+    splits: values.split === 'file' ? [...new Set([...starts, closing])] : (last ? [start, end] : [start]),
     tags: values.tag === 'file' ? starts : [start]
   };
 }
