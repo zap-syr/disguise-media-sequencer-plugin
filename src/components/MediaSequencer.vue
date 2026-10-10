@@ -96,15 +96,19 @@
         @row-click="onRowClick"
         @row-check="onRowCheck"
         :override-stats="plan.overrideStats.value"
+        :override-counts="plan.overrideCounts.value"
         :globals="planGlobals"
         :mappings="library.mappings.value"
         @auto-assign="plan.applyAutoAssign"
         @set-plan="plan.setPlan"
+        @reset-plan-keys="plan.resetPlanKeys"
+        @clear-overrides="plan.clearOverrides"
         @reset-all-overrides="plan.resetAllOverrides"
         @set-group-ov="plan.setGroupOv"
         @set-layer-ov="plan.setLayerOv"
         @reset-group="plan.resetGroup"
         @apply-to-all="plan.applyGroupValueToAll"
+        @apply-to-group="plan.applyLayerValueToGroup"
         @group-check="planSelection.toggleGroup"
         @drop-rows="onDropRows"
         @drop-files="onDropFiles"
@@ -125,6 +129,7 @@
 
       <!-- 3. Settings Sidebar (Right) -->
       <SettingsPanel
+        ref="settingsRef"
         v-model:creation-mode="creationMode"
         :director-endpoint="props.directorEndpoint"
         :mappings="library.mappings.value"
@@ -133,10 +138,13 @@
         :layer-count="createCount"
         :summary="footerSummary"
         :unmapped-count="isAdvanced ? plan.unmappedCount.value : 0"
+        :mappings-used="Object.keys(plan.mappingUsage.value).length"
+        :markers="markerCounts"
         :is-creating="isCreating"
         :create-progress="createProgress"
         @create="handleCreateLayers"
         @track-created="library.addTrack"
+        @open-plan-defaults="openPlanDefaults"
       >
         <template v-if="isAdvanced" #mappings>
           <MappingsPanel
@@ -153,10 +161,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick, provide } from 'vue';
 import { createLayerPlan } from '../services/disguiseService';
 import { buildSimplePlan, buildAdvancedPlan } from '../utils/planBuilder';
-import { computePlanLayout } from '../utils/planLayout';
+import { computePlanLayout, countMarkers, describeMarkers } from '../utils/planLayout';
 import { formatDuration } from '../utils/format';
 import { setMappingPalette } from '../utils/mappingColors';
 import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath, folderOrder, folderGroups } from '../utils/mediaTree';
@@ -332,15 +340,45 @@ function selectedClipPaths() {
 
 const tagsOn = computed(() => layerOptions.addTimecodeTag || layerOptions.addCueTag || layerOptions.addMidiNote);
 const planGlobals = computed(() => ({ tagsOn: !!tagsOn.value, splitOn: !!layerOptions.splitSection }));
-// Simple settings shaped like Plan defaults, for the Simple footer estimate
+
+// Plan chip popovers switch the global markers: Split section in the Split popover header,
+// the Tags "Off" pill opens the Timeline markers section (docs §2.5.1)
+const settingsRef = ref(null);
+provide('markerControls', {
+  setSplit: on => { layerOptions.splitSection = !!on; },
+  openMarkers: () => settingsRef.value?.revealSection('markers')
+});
+
+async function openPlanDefaults() {
+  if (workspace.value === 'files') workspace.value = 'split';
+  await nextTick();
+  layerPlanRef.value?.openDefaults();
+}
+
+// Simple settings shaped like Plan defaults, for the Simple footer estimate (tags and splits at every file)
 const simpleValues = computed(() => ({
   timing: 'seq',
   overlap: layerOptions.overlap,
+  tag: 'file',
+  split: 'file',
   fit: layerOptions.fitToContent,
   movieDur: layerOptions.movieDuration,
   stillDur: layerOptions.stillDuration
 }));
 const planLayout = computed(() => computePlanLayout(plan.state.groups, plan.state.entries, library.mediaDetails.value, plan.state.plan));
+// Simple = a virtual one-group plan of the selected files
+const simpleLayout = computed(() => {
+  const paths = selectedClipPaths();
+  const entries = Object.fromEntries(paths.map((p, i) => [i, { mediaId: p }]));
+  return computePlanLayout([{ items: paths.map((p, i) => i) }], entries, library.mediaDetails.value, simpleValues.value);
+});
+const markerCounts = computed(() => countMarkers(isAdvanced.value ? planLayout.value : simpleLayout.value, {
+  split: layerOptions.splitSection,
+  tc: layerOptions.addTimecodeTag,
+  cue: layerOptions.addCueTag,
+  midi: layerOptions.addMidiNote
+}));
+const markersText = computed(() => describeMarkers(markerCounts.value).join(', ') || 'no markers');
 
 /** A row click or check edits that row again, so its group leaves "Edit group instead". */
 function onRowClick(id, event) {
@@ -368,16 +406,14 @@ const footerSummary = computed(() => {
       `${plan.layerCount.value} layers`,
       `${maps} ${maps === 1 ? 'mapping' : 'mappings'}`,
       unmapped ? `${unmapped} without mapping` : null,
-      `≈${formatDuration(planLayout.value.total) || '0s'}`
+      `≈${formatDuration(planLayout.value.total) || '0s'}`,
+      markersText.value
     ];
     return parts.filter(Boolean).join(', ');
   }
   const n = selection.selectedItems.size;
   if (!n) return 'No media selected';
-  const paths = selectedClipPaths();
-  const entries = Object.fromEntries(paths.map((p, i) => [i, { mediaId: p }]));
-  const virtual = computePlanLayout([{ items: paths.map((p, i) => i) }], entries, library.mediaDetails.value, simpleValues.value);
-  return `${n} layers, one after another, ≈${formatDuration(virtual.total) || '0s'}`;
+  return `${n} layers, one after another, ≈${formatDuration(simpleLayout.value.total) || '0s'}, ${markersText.value}`;
 });
 
 // --- Plan actions ---

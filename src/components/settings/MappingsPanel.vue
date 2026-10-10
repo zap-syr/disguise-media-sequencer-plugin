@@ -1,9 +1,7 @@
 <template>
-  <div class="group-box">
-    <div class="box-head">
-      <span class="group-header">MAPPINGS</span>
-      <span class="hint">drag, or click to arm</span>
-    </div>
+  <!-- Body of the settings panel's Mappings section -->
+  <div class="maps-panel">
+    <div class="hint">Drag onto layers, or click to arm</div>
 
     <div class="search-bar">
       <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -88,15 +86,7 @@ const visibleMappings = computed(() => {
 <style scoped>
 * { box-sizing: border-box; }
 
-.group-box {
-  background: #242424;
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid #333333;
-}
-.box-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-.group-header { font-size: 11px; color: #0a84ff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0; }
-.hint { font-size: 11px; color: #777777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.hint { font-size: 11px; color: #888888; margin-bottom: 8px; }
 
 .search-bar { display: flex; align-items: center; background: #181818; border: 1px solid #3a3a3a; border-radius: 6px; padding: 6px 10px; transition: border-color 0.2s ease; }
 .search-bar:focus-within { border-color: #0a84ff; }
@@ -113,7 +103,13 @@ const visibleMappings = computed(() => {
 .chip.on { background: rgba(10, 132, 255, 0.2); border-color: #0a84ff; color: #ffffff; }
 .chip .cnt { color: #777777; font-weight: 500; }
 
-.maps { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; max-height: 340px; overflow-y: auto; padding-right: 4px; }
+/* Framed scroll well: the list's edges are visible, so cards cut at the top or bottom read as "scroll for more" */
+.maps {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-top: 10px; max-height: 340px; overflow-y: auto;
+  padding: 6px;
+  background: #181818; border: 1px solid #333333; border-radius: 6px;
+}
 
 .map {
   display: flex; align-items: center; gap: 8px;

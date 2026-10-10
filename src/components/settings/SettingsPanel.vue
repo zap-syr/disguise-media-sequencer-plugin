@@ -8,21 +8,20 @@
       </div>
     </div>
     <div class="mode-hint">
-      {{ creationMode === 'advanced'
-        ? 'Advanced: groups of files with their own settings. Build the plan and set Plan defaults in the Layer plan pane.'
-        : 'Simple: one mapping for all layers, created one after another.' }}
+      {{ isAdvanced ? 'Groups of files, each with its own settings.' : 'One mapping, layers one after another.' }}
     </div>
 
     <div class="settings-sidebar-content">
 
-      <!-- Advanced: per-layer mappings panel -->
-      <slot name="mappings"></slot>
-
-      <!-- LAYER PROPERTIES (Advanced: Plan defaults and group chips in the Layer plan) -->
-      <div v-if="creationMode === 'simple'" class="group-box">
-        <div class="group-header">LAYER PROPERTIES</div>
-        <div class="control">
-          <label>Mapping</label>
+      <!-- MAPPINGS -->
+      <SettingsSection id="mappings" title="Mappings" :summary="mappingsSummary">
+        <template #icon>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 10h18M9 4v14"/></svg>
+        </template>
+        <!-- Advanced: per-layer mappings panel -->
+        <slot v-if="isAdvanced" name="mappings"></slot>
+        <div v-else class="kv">
+          <span class="kv-lbl">Mapping</span>
           <div class="searchable-select" ref="mappingRef">
             <input
               type="text"
@@ -30,6 +29,7 @@
               @focus="toggleMappingMenu(true)"
               :placeholder="selectedMapping ? selectedMapping.name : 'Search Mapping...'"
               class="standard-input dropdown-input"
+              aria-label="Mapping"
             />
             <span class="dropdown-arrow">▼</span>
 
@@ -49,152 +49,69 @@
             </ul>
           </div>
         </div>
-        <div class="row">
-          <div class="control">
-            <label>Mode</label>
-            <div class="searchable-select" ref="modeRef">
-              <div class="dropdown-trigger" @click="toggleModeMenu">{{ options.mode }}</div>
-              <span class="dropdown-arrow">▼</span>
-              <ul v-if="isModeMenuOpen" class="dropdown-list">
-                <li class="dropdown-item" :class="{ selected: options.mode === 'Normal' }" @click="selectMode('Normal')">Normal</li>
-                <li class="dropdown-item" :class="{ selected: options.mode === 'Locked' }" @click="selectMode('Locked')">Locked</li>
+      </SettingsSection>
+
+      <!-- WHERE (insert location) -->
+      <SettingsSection id="where" title="Where" :summary="whereSummary" :error="whereError">
+        <template #icon>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8l-3 4 3 4M19 8l3 4-3 4"/></svg>
+        </template>
+        <div class="segmented-control">
+          <button
+            type="button"
+            class="segment"
+            :class="{ active: options.insertMode === 'At Playhead' }"
+            @click="options.insertMode = 'At Playhead'"
+          >
+            At Playhead
+          </button>
+          <button
+            type="button"
+            class="segment"
+            :class="{ active: options.insertMode === 'Specific location' }"
+            @click="options.insertMode = 'Specific location'"
+          >
+            Specific Time
+          </button>
+        </div>
+
+        <div class="kv kv-gap" :class="{ disabled: !isSpecific }">
+          <span class="kv-lbl">Track</span>
+          <div class="searchable-select" ref="trackRef">
+            <input
+              type="text"
+              v-model="trackSearchQuery"
+              @focus="toggleTrackMenu(true)"
+              :placeholder="selectedTrack ? selectedTrack.name : 'Search Track...'"
+              class="standard-input dropdown-input"
+              :class="{ invalid: isSpecific && !selectedTrack && !isTrackMenuOpen }"
+              aria-label="Track"
+              :disabled="!isSpecific"
+            />
+            <span class="dropdown-arrow">▼</span>
+
+            <div v-if="isTrackMenuOpen" class="dropdown-list">
+              <ul class="dropdown-list-scroll">
+                <li
+                  v-for="t in filteredTracks"
+                  :key="t.uid"
+                  class="dropdown-item"
+                  :class="{ selected: selectedTrack?.uid === t.uid }"
+                  @click="selectTrack(t)"
+                >
+                  {{ t.name }}
+                </li>
+                <li v-if="filteredTracks.length === 0" class="dropdown-empty">
+                  No results found
+                </li>
               </ul>
-            </div>
-          </div>
-          <div class="control">
-            <label>At End Point</label>
-            <div class="searchable-select" ref="atEndPointRef">
-              <div class="dropdown-trigger" @click="toggleAtEndPointMenu">{{ options.atEndPoint }}</div>
-              <span class="dropdown-arrow">▼</span>
-              <ul v-if="isAtEndPointMenuOpen" class="dropdown-list">
-                <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Loop' }" @click="selectAtEndPoint('Loop')">Loop</li>
-                <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Ping-Pong' }" @click="selectAtEndPoint('Ping-Pong')">Ping-Pong</li>
-                <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Pause' }" @click="selectAtEndPoint('Pause')">Pause</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="toggle-list">
-          <div class="toggle-group">
-            <label class="ios-toggle space-between">
-              <span class="label-text">Animate Brightness</span>
-              <div class="switch">
-                <input type="checkbox" v-model="options.animateBrightness">
-                <span class="slider"></span>
-              </div>
-            </label>
-
-            <div class="inline-row toggle-input-wrapper" :class="{ disabled: !options.animateBrightness }">
-              <span class="label-text-secondary">Time</span>
-              <div class="input-with-unit">
-                <input type="number" v-model.number="options.brightnessDuration" min="0" step="0.5" :disabled="!options.animateBrightness" />
-                <span class="unit">s</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CONTENT DURATION -->
-      <div v-if="creationMode === 'simple'" class="group-box">
-        <div class="group-header">LAYER DURATION</div>
-
-        <div class="control">
-          <label>Movie Duration</label>
-          <div class="toggle-group">
-            <label class="ios-toggle space-between">
-              <span class="label-text">Fit To Contents</span>
-              <div class="switch">
-                <input type="checkbox" v-model="options.fitToContent">
-                <span class="slider"></span>
-              </div>
-            </label>
-
-            <div class="inline-row toggle-input-wrapper" :class="{ disabled: options.fitToContent }">
-              <span class="label-text-secondary">Time</span>
-              <div class="input-with-unit">
-                <input type="number" v-model.number="options.movieDuration" min="0" step="1" :disabled="options.fitToContent" />
-                <span class="unit">s</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="control">
-          <label>Still Image Duration</label>
-          <div class="inline-row">
-            <span class="label-text-secondary">Time</span>
-            <div class="input-with-unit">
-              <input type="number" v-model.number="options.stillDuration" min="0" step="1" />
-              <span class="unit">s</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- INSERT SETTINGS -->
-      <div class="group-box">
-        <div class="group-header">INSERT SETTINGS</div>
-        <div class="control">
-          <label>Insert Location</label>
-          <div class="segmented-control">
-            <button
-              type="button"
-              class="segment"
-              :class="{ active: options.insertMode === 'At Playhead' }"
-              @click="options.insertMode = 'At Playhead'"
-            >
-              At Playhead
-            </button>
-            <button
-              type="button"
-              class="segment"
-              :class="{ active: options.insertMode === 'Specific location' }"
-              @click="options.insertMode = 'Specific location'"
-            >
-              Specific Time
-            </button>
-          </div>
-        </div>
-
-        <div class="stacked-controls" :class="{ disabled: options.insertMode !== 'Specific location' }">
-          <div class="control">
-            <label>Track</label>
-            <div class="searchable-select" ref="trackRef">
-              <input
-                type="text"
-                v-model="trackSearchQuery"
-                @focus="toggleTrackMenu(true)"
-                :placeholder="selectedTrack ? selectedTrack.name : 'Search Track...'"
-                class="standard-input dropdown-input"
-                :disabled="options.insertMode !== 'Specific location'"
-              />
-              <span class="dropdown-arrow">▼</span>
-
-              <div v-if="isTrackMenuOpen" class="dropdown-list">
-                <ul class="dropdown-list-scroll">
-                  <li
-                    v-for="t in filteredTracks"
-                    :key="t.uid"
-                    class="dropdown-item"
-                    :class="{ selected: selectedTrack?.uid === t.uid }"
-                    @click="selectTrack(t)"
-                  >
-                    {{ t.name }}
-                  </li>
-                  <li v-if="filteredTracks.length === 0" class="dropdown-empty">
-                    No results found
-                  </li>
-                </ul>
-                <div class="dropdown-create-item" @click.stop="startCreateTrack">
-                  + Create New Track
-                </div>
+              <div class="dropdown-create-item" @click.stop="startCreateTrack">
+                + Create New Track
               </div>
             </div>
           </div>
 
-          <div v-if="isCreatingTrack" class="create-track-panel" @click.stop>
+          <div v-if="isCreatingTrack" class="create-track-panel kv-full" @click.stop>
             <label>New Track Name</label>
             <input
               ref="newTrackNameInput"
@@ -221,128 +138,175 @@
             </div>
           </div>
 
-          <div class="control">
-            <label>Time</label>
-            <input
-              type="text"
-              v-model="options.startTime"
-              class="standard-input"
-              placeholder="00:00:00:00"
-              :class="{ invalid: options.insertMode === 'Specific location' && !isStartTimeValid }"
-              :disabled="options.insertMode !== 'Specific location'"
-            />
-          </div>
+          <span class="kv-lbl">Time</span>
+          <input
+            type="text"
+            v-model="options.startTime"
+            class="standard-input"
+            placeholder="00:00:00:00"
+            aria-label="Start time"
+            :class="{ invalid: isSpecific && !isStartTimeValid }"
+            :disabled="!isSpecific"
+          />
         </div>
+      </SettingsSection>
 
-        <div v-if="creationMode === 'simple'" class="control">
-          <label>Overlap Layers</label>
-          <div class="inline-row">
-            <span class="label-text-secondary">Time</span>
-            <div class="input-with-unit">
-              <input type="number" v-model.number="options.overlap" min="0" step="0.5" />
-              <span class="unit">s</span>
-            </div>
-          </div>
+      <!-- LAYERS (what each layer gets) -->
+      <SettingsSection id="layers" title="Layers" :summary="layersSummary">
+        <template #icon>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>
+        </template>
+        <div v-if="isAdvanced" class="adv-note">
+          <span>Set in Plan defaults and group chips.</span>
+          <button type="button" class="link-btn" @click="$emit('open-plan-defaults')">Open Plan defaults</button>
         </div>
+        <div v-else class="kv">
+          <span class="kv-lbl">Mode</span>
+          <div class="searchable-select" ref="modeRef">
+            <div class="dropdown-trigger" @click="toggleModeMenu">{{ options.mode }}</div>
+            <span class="dropdown-arrow">▼</span>
+            <ul v-if="isModeMenuOpen" class="dropdown-list">
+              <li class="dropdown-item" :class="{ selected: options.mode === 'Normal' }" @click="selectMode('Normal')">Normal</li>
+              <li class="dropdown-item" :class="{ selected: options.mode === 'Locked' }" @click="selectMode('Locked')">Locked</li>
+            </ul>
+          </div>
 
-        <div class="toggle-list">
-          <label class="ios-toggle space-between">
-            <label>Split Section</label>
-            <div class="switch">
-              <input type="checkbox" v-model="options.splitSection">
-              <span class="slider"></span>
-            </div>
+          <span class="kv-lbl">At end</span>
+          <div class="searchable-select" ref="atEndPointRef">
+            <div class="dropdown-trigger" @click="toggleAtEndPointMenu">{{ options.atEndPoint }}</div>
+            <span class="dropdown-arrow">▼</span>
+            <ul v-if="isAtEndPointMenuOpen" class="dropdown-list">
+              <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Loop' }" @click="selectAtEndPoint('Loop')">Loop</li>
+              <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Ping-Pong' }" @click="selectAtEndPoint('Ping-Pong')">Ping-Pong</li>
+              <li class="dropdown-item" :class="{ selected: options.atEndPoint === 'Pause' }" @click="selectAtEndPoint('Pause')">Pause</li>
+            </ul>
+          </div>
+
+          <span class="kv-lbl">Fade in <InfoTip text="Animate brightness from 0 to full at the layer start" /></span>
+          <label class="switch kv-end">
+            <input type="checkbox" v-model="options.animateBrightness" aria-label="Animate brightness">
+            <span class="slider"></span>
           </label>
+          <span class="kv-lbl sub" :class="{ disabled: !options.animateBrightness }">Duration</span>
+          <NumStepper class="kv-end" :class="{ disabled: !options.animateBrightness }" :model-value="Number(options.brightnessDuration) || 0" label="Fade duration" :disabled="!options.animateBrightness" @update:model-value="v => options.brightnessDuration = v" />
+
+          <span class="kv-lbl">Fit to contents <InfoTip text="Videos get their own length; off = every video gets the fixed duration" /></span>
+          <label class="switch kv-end">
+            <input type="checkbox" v-model="options.fitToContent" aria-label="Fit to contents">
+            <span class="slider"></span>
+          </label>
+          <span class="kv-lbl sub" :class="{ disabled: options.fitToContent }">Movie</span>
+          <NumStepper class="kv-end" :class="{ disabled: options.fitToContent }" :model-value="Number(options.movieDuration) || 0" label="Movie duration" :disabled="options.fitToContent" @update:model-value="v => options.movieDuration = v" />
+
+          <span class="kv-lbl">Still images</span>
+          <NumStepper class="kv-end" :model-value="Number(options.stillDuration) || 0" label="Still image duration" @update:model-value="v => options.stillDuration = v" />
+
+          <span class="kv-lbl">Overlap <InfoTip text="Each layer starts this long before the previous one ends" /></span>
+          <NumStepper class="kv-end" :model-value="Number(options.overlap) || 0" label="Overlap" @update:model-value="v => options.overlap = v" />
         </div>
-        <div v-if="creationMode === 'advanced'" class="box-hint">Placement and overlap are set per group in the Layer plan.</div>
-      </div>
+      </SettingsSection>
 
-      <!-- TAGS -->
-      <div class="group-box">
-        <div class="group-header">TAGS</div>
-        <div class="toggle-list">
-          <div class="toggle-group">
-            <label class="ios-toggle space-between">
-              <span class="label-text">Add Timecode Tag</span>
-              <div class="switch">
-                <input type="checkbox" v-model="options.addTimecodeTag">
-                <span class="slider"></span>
-              </div>
+      <!-- TIMELINE MARKERS (split + tags) -->
+      <SettingsSection
+        ref="markersSection"
+        id="markers"
+        title="Timeline markers"
+        :summary="markersSummary"
+        :pill="markersOn ? `${markersOn} on` : 'Off'"
+        :pill-on="markersOn > 0"
+        :error="markersError"
+      >
+        <template #icon>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h11l-2 4 2 4H5"/></svg>
+        </template>
+        <div class="markers">
+          <div class="mk-row">
+            <span class="kv-lbl">Split section <InfoTip :text="isAdvanced ? 'Section splits; placement (each file or group start) is set per group' : 'A section split at every layer start and one after the last layer'" /></span>
+            <label class="switch">
+              <input type="checkbox" v-model="options.splitSection" aria-label="Split section">
+              <span class="slider"></span>
             </label>
-
-            <div class="toggle-input-wrapper timecode-grid" :class="{ disabled: !options.addTimecodeTag }">
-              <div>
-                <span class="label-text-secondary">Start Time</span>
-                <input
-                  type="text"
-                  v-model="options.timecodeStart"
-                  class="standard-input"
-                  placeholder="00:00:00:00"
-                  :disabled="!options.addTimecodeTag"
-                  :class="{ invalid: options.addTimecodeTag && !isTimecodeStartValid && options.timecodeStart !== '' }"
-                />
-              </div>
-              <div>
-                <span class="label-text-secondary">Increment Time</span>
-                <input
-                  type="text"
-                  v-model="options.timecodeIncrement"
-                  class="standard-input"
-                  placeholder="00:00:00:00"
-                  :disabled="!options.addTimecodeTag"
-                  :class="{ invalid: options.addTimecodeTag && !isTimecodeIncrementValid && options.timecodeIncrement !== '' }"
-                />
-              </div>
-            </div>
           </div>
 
-          <div class="toggle-group">
-            <label class="ios-toggle space-between">
-              <span class="label-text">Add Cue Tag</span>
-              <div class="switch">
-                <input type="checkbox" v-model="options.addCueTag">
-                <span class="slider"></span>
-              </div>
+          <div class="mk-row">
+            <span class="kv-lbl">Timecode tag <InfoTip :text="isAdvanced ? 'A TC tag at each placement; numbering continues across the plan' : 'A TC tag at every layer start: start time + increment per layer'" /></span>
+            <label class="switch">
+              <input type="checkbox" v-model="options.addTimecodeTag" aria-label="Add timecode tag">
+              <span class="slider"></span>
             </label>
-
-            <div class="toggle-input-wrapper" :class="{ disabled: !options.addCueTag }">
+          </div>
+          <div v-if="options.addTimecodeTag" class="timecode-grid">
+            <div>
+              <span class="label-text-secondary">Start</span>
               <input
                 type="text"
-                v-model="options.cueValue"
+                v-model="options.timecodeStart"
                 class="standard-input"
-                placeholder="e.g. 1.2.3"
-                :disabled="!options.addCueTag"
-                :class="{ invalid: options.addCueTag && !isCueValid && options.cueValue !== '' }"
-                @input="handleCueTagInput"
-                @blur="handleCueTagBlur"
+                placeholder="00:00:00:00"
+                aria-label="Timecode start"
+                :class="{ invalid: !isTimecodeStartValid && options.timecodeStart !== '' }"
+              />
+            </div>
+            <div>
+              <span class="label-text-secondary">Increment</span>
+              <input
+                type="text"
+                v-model="options.timecodeIncrement"
+                class="standard-input"
+                placeholder="00:00:00:00"
+                aria-label="Timecode increment"
+                :class="{ invalid: !isTimecodeIncrementValid && options.timecodeIncrement !== '' }"
               />
             </div>
           </div>
 
-          <div class="toggle-group">
-            <label class="ios-toggle space-between">
-              <span class="label-text">Add MIDI Tag</span>
-              <div class="switch">
-                <input type="checkbox" v-model="options.addMidiNote">
-                <span class="slider"></span>
-              </div>
+          <div class="mk-row">
+            <span class="kv-lbl">Cue tag <InfoTip text="Cue number of the first tag; the last part goes up by one per tag" /></span>
+            <label class="switch">
+              <input type="checkbox" v-model="options.addCueTag" aria-label="Add cue tag">
+              <span class="slider"></span>
             </label>
+          </div>
+          <input
+            v-if="options.addCueTag"
+            type="text"
+            v-model="options.cueValue"
+            class="standard-input"
+            placeholder="e.g. 1.2.3"
+            aria-label="Cue value"
+            :class="{ invalid: !isCueValid && options.cueValue !== '' }"
+            @input="handleCueTagInput"
+            @blur="handleCueTagBlur"
+          />
 
-            <div class="toggle-input-wrapper" :class="{ disabled: !options.addMidiNote }">
-              <input
-                type="text"
-                v-model="options.midiNoteValue"
-                class="standard-input"
-                placeholder="e.g. 9.1"
-                :disabled="!options.addMidiNote"
-                :class="{ invalid: options.addMidiNote && !isMidiNoteValid && options.midiNoteValue !== '' }"
-                @input="handleMidiNoteInput"
-              />
+          <div class="mk-row">
+            <span class="kv-lbl">MIDI tag <InfoTip text="MIDI note of the first tag; the last part goes up by one per tag" /></span>
+            <label class="switch">
+              <input type="checkbox" v-model="options.addMidiNote" aria-label="Add MIDI tag">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <input
+            v-if="options.addMidiNote"
+            type="text"
+            v-model="options.midiNoteValue"
+            class="standard-input"
+            placeholder="e.g. 9.1"
+            aria-label="MIDI note value"
+            :class="{ invalid: !isMidiNoteValid && options.midiNoteValue !== '' }"
+            @input="handleMidiNoteInput"
+          />
+
+          <!-- Advanced: what the plan layout will place -->
+          <div v-if="isAdvanced" class="mk-preview">
+            <div class="mk-will">{{ markersPreview }}</div>
+            <div class="mk-hint">
+              Placement is set per group.
+              <button type="button" class="link-btn" @click="$emit('open-plan-defaults')">Plan defaults</button>
             </div>
           </div>
         </div>
-        <div v-if="creationMode === 'advanced'" class="box-hint">Placement (each file / group start) is set per group.</div>
-      </div>
+      </SettingsSection>
     </div>
 
     <div class="settings-footer">
@@ -369,7 +333,11 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { createTrack } from '../../services/disguiseService';
 import { TIMECODE_RE } from '../../utils/timecode';
+import { describeMarkers } from '../../utils/planLayout';
 import { maskCueValue, isCueValueValid, maskMidiValue, isMidiValueValid } from '../../utils/tagInputs';
+import SettingsSection from './SettingsSection.vue';
+import NumStepper from '../plan/NumStepper.vue';
+import InfoTip from '../common/InfoTip.vue';
 
 const props = defineProps({
   directorEndpoint: { type: String, required: true },
@@ -382,12 +350,18 @@ const props = defineProps({
   summary: { type: String, default: '' },
   // Advanced: plan layers without a mapping (docs §11 Q1: warn, confirm, create with mapping cleared)
   unmappedCount: { type: Number, default: 0 },
+  // Advanced: distinct mappings used in the plan
+  mappingsUsed: { type: Number, default: 0 },
+  // countMarkers() of what Create would place (Advanced preview)
+  markers: { type: Object, default: null },
   isCreating: { type: Boolean, default: false },
   createProgress: { type: Object, default: null } // { created, total }
 });
-const emit = defineEmits(['create', 'track-created']);
+const emit = defineEmits(['create', 'track-created', 'open-plan-defaults']);
 const creationMode = defineModel('creationMode', { type: String, default: 'simple' });
 const options = props.options;
+const isAdvanced = computed(() => creationMode.value === 'advanced');
+const isSpecific = computed(() => options.insertMode === 'Specific location');
 
 
 const selectedMapping = ref(null);
@@ -406,6 +380,7 @@ const trackRef = ref(null);
 const modeRef = ref(null);
 const atEndPointRef = ref(null);
 const newTrackNameInput = ref(null);
+const markersSection = ref(null);
 
 // Create Track state
 const isCreatingTrack = ref(false);
@@ -444,22 +419,70 @@ const newTrackNameError = computed(() => {
   return null;
 });
 
+const validCue = computed(() => isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true));
+const validMidi = computed(() => isMidiNoteValid.value && (options.addMidiNote ? options.midiNoteValue !== '' : true));
+const validTimecode = computed(() => isTimecodeStartValid.value && isTimecodeIncrementValid.value);
+const validLocation = computed(() => options.insertMode === 'At Playhead' || (!!selectedTrack.value && isStartTimeValid.value));
+
 const isCreateLayersEnabled = computed(() => {
   const hasSelection = props.layerCount > 0;
   // Advanced assigns mappings per layer in the plan
-  const hasMapping = creationMode.value === 'advanced' || !!selectedMapping.value;
-  const validCue = isCueValid.value && (options.addCueTag ? options.cueValue !== '' : true);
-  const validMidi = isMidiNoteValid.value && (options.addMidiNote ? options.midiNoteValue !== '' : true);
-  const validTimecode = isTimecodeStartValid.value && isTimecodeIncrementValid.value;
-  const validLocation = options.insertMode === 'At Playhead' || (selectedTrack.value && isStartTimeValid.value);
-
-  return hasSelection && hasMapping && validCue && validMidi && validTimecode && validLocation;
+  const hasMapping = isAdvanced.value || !!selectedMapping.value;
+  return hasSelection && hasMapping && validCue.value && validMidi.value && validTimecode.value && validLocation.value;
 });
 
 const createLabel = computed(() => {
   if (!props.isCreating) return props.layerCount > 0 ? `CREATE ${props.layerCount} LAYERS` : 'CREATE LAYERS';
   const p = props.createProgress;
   return p && p.total > 0 ? `CREATING... ${p.created}/${p.total}` : 'CREATING...';
+});
+
+// --- Section summaries, pills and error dots (docs §2.5.1) ---
+
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const sec = v => `${Number(v) || 0}s`;
+
+const mappingsSummary = computed(() => {
+  if (!isAdvanced.value) return selectedMapping.value ? selectedMapping.value.name : 'None selected';
+  const parts = [`${props.mappingsUsed} used`];
+  if (props.unmappedCount) parts.push(`${plural(props.unmappedCount, 'layer', 'layers')} without mapping`);
+  return parts.join(', ');
+});
+
+const whereSummary = computed(() => {
+  if (!isSpecific.value) return 'At playhead';
+  return `${selectedTrack.value ? selectedTrack.value.name : 'no track'}, ${options.startTime || 'no time'}`;
+});
+const whereError = computed(() => !validLocation.value);
+
+const layersSummary = computed(() => {
+  if (isAdvanced.value) return 'Per group';
+  return [
+    options.mode,
+    options.atEndPoint,
+    options.animateBrightness ? `fade ${sec(options.brightnessDuration)}` : null,
+    options.fitToContent ? 'fit' : `movie ${sec(options.movieDuration)}`,
+    `still ${sec(options.stillDuration)}`,
+    Number(options.overlap) ? `overlap ${sec(options.overlap)}` : null
+  ].filter(Boolean).join(', ');
+});
+
+const markersOn = computed(() => [options.splitSection, options.addTimecodeTag, options.addCueTag, options.addMidiNote].filter(Boolean).length);
+const markersSummary = computed(() => {
+  const tags = [
+    options.addTimecodeTag ? `TC ${options.timecodeStart}` : null,
+    options.addCueTag ? `Cue ${options.cueValue || '?'}` : null,
+    options.addMidiNote ? `MIDI ${options.midiNoteValue || '?'}` : null
+  ].filter(Boolean);
+  const parts = [options.splitSection ? 'Split on' : null, tags.length ? tags.join(' + ') : null].filter(Boolean);
+  return parts.length ? parts.join(', ') : 'Off';
+});
+const markersError = computed(() => !validCue.value || !validMidi.value || !validTimecode.value);
+const markersPreview = computed(() => {
+  const parts = props.markers ? describeMarkers(props.markers) : [];
+  if (!parts.length) return 'No markers will be placed';
+  const last = parts.pop();
+  return `Will place ${parts.length ? `${parts.join(', ')} and ${last}` : last}`;
 });
 
 // --- Input masks ---
@@ -594,7 +617,7 @@ watch([() => props.unmappedCount, creationMode], () => { confirmUnmapped.value =
 
 function handleCreate() {
   if (!isCreateLayersEnabled.value || props.isCreating) return;
-  if (creationMode.value === 'advanced' && props.unmappedCount > 0) {
+  if (isAdvanced.value && props.unmappedCount > 0) {
     confirmUnmapped.value = true;
     return;
   }
@@ -625,6 +648,13 @@ watch(isCreatingTrack, async (val) => {
 
 onMounted(() => window.addEventListener('mousedown', handleClickOutside));
 onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
+
+/** Opens and highlights a section (the Tags "Off" pill in a plan chip popover). */
+function revealSection(id) {
+  if (id === 'markers') markersSection.value?.reveal();
+}
+
+defineExpose({ revealSection });
 </script>
 
 <style scoped>
@@ -650,7 +680,7 @@ onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 16px 20px 6px 20px;
+  padding: 16px 16px 6px 16px;
 }
 
 .settings-header-title {
@@ -664,10 +694,8 @@ onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
   font-size: 11px;
   color: #777777;
   line-height: 1.4;
-  padding: 0 20px 12px 20px;
+  padding: 0 16px 12px 16px;
 }
-
-.box-hint { font-size: 11px; color: #777777; line-height: 1.4; }
 
 .segmented-control.compact { display: inline-flex; width: auto; }
 .segmented-control.compact .segment { flex: none; padding: 5px 10px; }
@@ -696,40 +724,36 @@ onUnmounted(() => window.removeEventListener('mousedown', handleClickOutside));
 .settings-sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: 0 20px 20px 20px;
+  padding: 0 16px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
-/* Group cards */
-.group-box {
-  background: #242424;
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid #333333;
+/* One label / value grid per section: label on the left, control on the right */
+.kv {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 8px;
 }
-
-.group-header {
-  font-size: 11px;
-  color: #0a84ff;
-  font-weight: 700;
-  margin-bottom: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.kv-gap { margin-top: 10px; }
+.kv-full { grid-column: 1 / -1; }
+.kv-end { justify-self: end; }
+.kv-lbl {
+  font-size: 12px;
+  color: #cccccc;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
-
-.control { margin-bottom: 14px; }
-.control:last-child { margin-bottom: 0; }
-.row { display: flex; gap: 12px; transition: opacity 0.3s ease; margin-bottom: 14px; }
-.row:last-child { margin-bottom: 0; }
-.row .control { flex: 1; margin-bottom: 0; }
-.stacked-controls { transition: opacity 0.3s ease; margin-bottom: 14px; }
-.stacked-controls .control { margin-bottom: 14px; }
-.stacked-controls .control:last-child { margin-bottom: 0; }
-.inline-row { display: flex; align-items: center; justify-content: space-between; }
+.kv-lbl.sub { font-weight: 500; color: #888888; padding-left: 10px; }
 
 .disabled { opacity: 0.3; pointer-events: none; }
+.kv-lbl.disabled, .kv-end.disabled { opacity: 0.4; }
 
 label {
   display: block;
@@ -738,6 +762,23 @@ label {
   margin-bottom: 6px;
   font-weight: 600;
 }
+
+.adv-note { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 11px; color: #888888; }
+.link-btn {
+  border: 1px solid #3a3a3a; background: transparent; color: #cccccc;
+  border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.link-btn:hover { border-color: #555555; background: #2a2a2a; color: #ffffff; }
+.link-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
+
+/* Timeline markers */
+.markers { display: flex; flex-direction: column; gap: 8px; }
+.mk-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 22px; }
+.mk-preview { margin-top: 4px; padding-top: 10px; border-top: 1px solid #2e2e2e; display: flex; flex-direction: column; gap: 6px; }
+.mk-will { font-size: 12px; color: #dddddd; }
+.mk-hint { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; font-size: 11px; color: #888888; }
+.mk-hint .link-btn { padding: 3px 8px; }
 
 /* Horizontal Switcher (Segmented Control) */
 .segmented-control {
@@ -761,6 +802,7 @@ label {
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
+  white-space: nowrap;
 }
 
 .segment:hover:not(:disabled) { color: #ccc; }
@@ -791,45 +833,16 @@ label {
 
 .standard-input.invalid { border-color: #ef4444; }
 
-.input-with-unit {
-  position: relative;
-  width: 80px;
-  flex-shrink: 0;
-  transition: opacity 0.3s ease;
-}
-
-.input-with-unit input {
-  width: 100%;
-  background: #181818;
-  border: 1px solid #3a3a3a;
-  color: #eee;
-  padding: 8px 24px 8px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  outline: none;
-  transition: all 0.2s;
-}
-
-.input-with-unit input:focus { border-color: #0a84ff; }
-
-.unit {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 10px;
-  color: #777;
-  pointer-events: none;
-}
-
 /* Custom Searchable Dropdown Styles */
 .searchable-select {
   position: relative;
   width: 100%;
+  min-width: 0;
 }
 
 .dropdown-input {
   padding-right: 24px; /* Room for the arrow */
+  text-overflow: ellipsis;
 }
 
 .dropdown-arrow {
@@ -912,34 +925,26 @@ ul.dropdown-list {
   text-align: center;
 }
 
-/* Toggles (iOS style) */
-.toggle-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
-.ios-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; text-transform: none; }
-.ios-toggle.space-between { justify-content: space-between; }
-.label-text { font-size: 12px; color: #aaaaaa; font-weight: 500; text-transform: none; }
 .label-text-secondary { font-size: 11px; color: #777777; font-weight: 500; }
 
-.switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
-.switch input { opacity: 0; width: 0; height: 0; }
+.switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin: 0; cursor: pointer; }
+.switch input { opacity: 0; width: 0; height: 0; position: absolute; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #3a3a3a; transition: .3s; border-radius: 34px; }
 .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: #888; transition: .3s; border-radius: 50%; }
 input:checked + .slider { background-color: #0a84ff; }
 input:checked + .slider:before { transform: translateX(16px); background-color: white; }
-
-.toggle-group { display: flex; flex-direction: column; gap: 8px; }
-.toggle-input-wrapper { margin-left: 2px; transition: opacity 0.3s ease; }
+.switch input:focus-visible + .slider { box-shadow: 0 0 0 2px rgba(10, 132, 255, 0.5); }
 
 .timecode-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 8px;
 }
 .timecode-grid .label-text-secondary { display: block; margin-bottom: 4px; }
 
 /* Footer */
 .settings-footer {
-  padding: 20px;
+  padding: 16px;
   background: #1e1e1e;
   border-top: 1px solid #36373a;
 }
@@ -979,8 +984,6 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   background: #1a1a1a;
   border: 1px solid #0a84ff44;
   border-radius: 6px;
-  margin-top: 4px;
-  margin-bottom: 14px;
 }
 
 .create-track-error {
