@@ -367,8 +367,9 @@ switches with the plan.
   location).
 
 **More informative:**
-- Every section is an accordion (moves here from Phase 9). The header shows a **one-line
-  summary**, readable even when the section is collapsed:
+- Every section is an accordion (moves here from Phase 9). The header shows a **summary on its
+  own line under the title** (it wraps, it is never cut with an ellipsis), readable even when
+  the section is collapsed:
   - Where: "At playhead" / "track 1, 00:01:00:00";
   - Layers: "Normal, Loop, fade 1s, fit, still 5s";
   - Timeline markers: "Split on, Cue 1.0 + MIDI 9.1" / "Off".
@@ -382,18 +383,116 @@ switches with the plan.
   gets a red dot when it contains an invalid field, so a collapsed section can't hide an error.
 
 **Linking the switches with the plan** (fixes the confusion above):
-- The plan's **Split / Tags chip popover**, when the global switch is off, shows the existing
-  note plus a **"Turn on"** button that flips the global switch (Tags: opens and highlights the
-  Timeline markers section, since it has three switches).
-- The chip tooltip names the switch: "Split section is off (Settings, Timeline markers)".
+- The plan's **Split chip popover** carries the global Split section switch in its header, so
+  it can be turned on where the placement is chosen; the **Tags** popover shows an "Off" pill
+  that opens and highlights the Timeline markers section (it has three switches).
+- The chip tooltip says when a value is off for the whole plan.
+- **One popover layout for every group chip**: simple but finished (owner feedback on the
+  mockup). The segmented control stays a settings-panel pattern; no diagrams (the group
+  header already has the mini-timeline). 268px, `#1e1e1e`, 1px `#3a3a3a` border, soft shadow,
+  three zones separated by `#2e2e2e` lines:
+  - **header**: setting name, the group as a small blue tag ("G1"), a close × button. Split
+    adds "On/Off" + a small switch for the global Split section; Tags shows a "Tags off" button
+    when all tags are off (opens Timeline markers). While the global switch is off the options
+    are dimmed. No warning box;
+  - **body**: the options as a bordered list (`#181818`, rows 36px, hairline dividers), radio
+    dot + label, an optional one-word muted hint on the right ("+ end"); the selected row gets a
+    faint blue fill, a filled `#0a84ff` dot and semibold white text. **A number belongs to its
+    option** (progressive disclosure, as in PatternFly): it appears indented inside the selected
+    option only (Overlap under In order, Duration under Fade in, Duration under Fixed length),
+    on a 36px row aligned with the option text and set off by a thin divider; its label uses
+    the option row style (12px, same colour). A value that always applies gets its own
+    subsection titled like the popover title (12px, semibold, white): "Still images", Duration.
+    Numbers use a compact stepper (− value s +, 26px, one border, the unit "s" inside the
+    field). The value is typed by hand: focus selects the number, Enter or blur applies, Esc
+    cancels, a comma is accepted, ↑/↓ step; the focused field gets a blue border;
+  - **footer** (`#1a1a1a`): "Reset" as a quiet button (enabled only when this level sets its
+    own value) and the "move up" action as a secondary button with an icon. Buttons have a
+    border and a hover fill (`#2a2a2a`, border `#555555`), never a text underline. No Done
+    button: the popover closes on × / outside click / Esc. Labels per level:
+
+    | Opened from | Tag | Reset | Secondary button |
+    |---|---|---|---|
+    | Group chip | "G1" | back to the Plan default | "Apply to all groups": the value becomes the Plan default and is removed from every group |
+    | Chip in selection scope | "2 layers" | back to the group value | "Apply to whole group": the value goes to the group and is removed from its layers |
+    | Plan defaults chip | "All groups" | back to the built-in value | "Clear N overrides" (disabled "No overrides" when N = 0): removes the setting from every group and layer that sets its own value; the long explanation is the tooltip |
+
+  - real `role="radio"` buttons in a `radiogroup` (arrow keys), labelled steppers.
 - The Create footer summary lists markers: "..., 3 splits, 5 cue tags" or "no markers".
+
+**Setting chips** (owner-approved on the mockup, 2026-10-10). The group chips row, the chips in
+selection scope and the Plan defaults panel all use one chip component:
+- **Equal width, one row.** The chips sit in a grid of seven equal columns that fills the row
+  (`repeat(7, minmax(0, 1fr))`, 6px gap). A chip's width never depends on its value, so stepping
+  or typing a number, or picking another option, never moves the neighbours or the popover.
+  The row never wraps to a second line.
+- **Two lines, 36px high**: the key on top (10px, 700, uppercase, letter-spacing 0.6px,
+  `#aaaaaa`), the value under it (12px, 500, white, tabular numbers). A value that doesn't fit
+  ends with an ellipsis; the full value is in the tooltip.
+- **Short values** so they fit the column: Start "In order" / "Overlap 4s" / "All at once"
+  (the option itself is renamed "In order"); Length "Fit" / "30s" (still images duration is in
+  the tooltip and the popover); Fade "Off" / "1s"; Tags and Split "Each file" / "Group start" /
+  "Off".
+- The ◆ override marker and the red warning dot sit in the top right corner, absolutely
+  positioned, so they don't change the width.
+- States: override = yellow border and value (`rgba(255,214,10,.55)` border, `#ffd60a` value);
+  off for the whole plan = muted struck-through value; open = blue border + 1px ring; selection
+  scope = blue-tinted border and fill on every chip.
+- **Narrow pane: "+N" overflow** (priority+ pattern, as in GitHub and Gmail toolbars). Below the
+  width where seven columns fit (~80px each), the chips that don't fit fold into a "+N" chip of
+  the same size. It opens a floating list of the hidden settings (key, value, ◆ or warning dot,
+  chevron); a row opens that chip's popover at the same place. Chips with the plan default fold
+  first, so overridden values stay visible; "+N" shows ◆ or the red dot when a hidden chip has
+  one. Computed with a `ResizeObserver` on the chips row.
+
+**Layer selection without layout shift** (owner request, 2026-10-10). Checking a layer must never
+move anything, so rows can be checked one after another without moving the mouse:
+- The selection actions move into one **floating selection bar** at the bottom centre of the
+  plan pane (the pattern of Gmail, Google Drive, Linear, Notion, Airtable): absolute
+  position over the list, `#242424`, 1px `#3a3a3a` border, soft shadow, 44px high:
+  `[2] layers selected | Chips edit [Selected | Group] | Clear mappings | Remove | ×`. The count
+  is a blue badge, Remove turns red on hover, × deselects (tooltip "Deselect (Esc)").
+- It replaces the in-flow `sel-strip` in `LayerPlan.vue` (today it pushes every group down) and
+  the inline "Group | N selected" switch in the group chips row (today it squeezes the chips).
+  The "Assigning <mapping>" strip (`armed-strip`) moves into the same floating bar while a
+  mapping is armed, for the same reason.
+- The list keeps a constant bottom padding (~76px) so the last group can always be scrolled
+  above the bar; the padding does not depend on the selection.
+- Selection is shown only with colour: checked rows get `rgba(10,132,255,.10)`, the chips of the
+  group get the selection-scope tint. No element changes size.
+- **Scope on a new selection: "Selected"** (the chips edit the checked layers), switchable to
+  "Group" in the bar. This changes the Phase 7 behaviour where a row click reset the scope to
+  the group.
+- In selection scope the Start / Tags / Split chips stay hidden (§9.2), but their grid columns
+  stay empty, so the remaining chips keep their place.
+- The group checkbox left of the chips selects all layers of the group; it shows a dash when
+  only some are checked.
+
+**Plan defaults panel** (owner-approved on the mockup, 2026-10-10). Replaces the current
+drop-down form (seven blocks of segmented controls and inputs, a long intro line, Done button):
+- A **floating panel** under the Layer plan header, as wide as the group cards, over the groups
+  (nothing moves). The "Plan defaults" button shows its open state (blue border, tinted fill).
+  The settings panel's "Open Plan defaults" button opens the same panel.
+- **Header** (40px): "Plan defaults", a blue "All groups" tag (like "G1" on a group), the short
+  hint "Every group starts from these values" (ellipsis when narrow), ×.
+- **Body**: the same seven chips as a group, the same equal-width grid. Instead of ◆ a chip shows
+  a yellow counter "◆ 2" in its corner: how many groups and layers set their own value for that
+  setting. Each chip opens the shared popover (labels in the table above).
+- **Footer** (`#1a1a1a`): the summary "◆ 3 group values and 1 layer set their own values" (or
+  "Every group uses these values") and a quiet "Reset all overrides" button (disabled when
+  there is nothing to reset). No Done button: × / outside click / Esc close it.
+- Overflow at a narrow width uses the same "+N" chip.
 
 **Visual rules** (palette and components from the `disguise-css` skill):
 - One label/value grid per section: label column on the left, control on the right, 8px row
   gap; secondary hints in `#888888`, 11px.
-- A section header = icon + title + summary (ellipsis) + status pill + chevron.
-- Works at the narrow window size (the settings panel shrinks to 260px): summaries truncate
-  with an ellipsis and a full tooltip; nothing wraps under the chevron.
+- A section header = row 1: icon + title + status pill + chevron; row 2: the summary.
+- **Short helper texts** (owner feedback on the mockup): a hint under a control is two or three
+  words ("Per group", "Each file", "At layer start"). The full explanation goes into a tooltip
+  on a small info icon next to the label. Popovers keep to their compact layout (above).
+- Works at the narrow window size (the settings panel shrinks to 260px): summaries wrap on
+  their own line; nothing is clipped.
+- Approval mockup (Claude artifact, owner-reviewed): https://claude.ai/artifact/RLtFT6fZZHQbc1SWZATcuD
 
 ### 2.6. Inheritance model (the core of the mockup)
 
@@ -1009,8 +1108,17 @@ framework, so acceptance is manual in Designer against checklists.
   the tags; Overlap joins Layers.
 - Accordions with persisted state, header summaries, status pills, error dots.
 - Advanced: markers preview from the plan layout, "Open Plan defaults" links.
-- Chip popovers: "Turn on" for a switched-off Split / Tags; tooltips name the switch; footer
-  summary lists markers.
+- Chip popovers: one compact layout for all seven chips (§2.5.1), the global Split switch in
+  the Split popover header, an "Off" pill in the Tags popover; footer summary lists markers.
+- Setting chips (§2.5.1): one shared chip component, equal-width grid of seven, two-line
+  key/value, short values, corner ◆, no wrapping; "+N" overflow with a floating list in a narrow
+  pane.
+- Floating selection bar (§2.5.1): replaces `sel-strip`, the inline scope switch and
+  `armed-strip`; constant bottom padding; new selections default to the "Selected" scope.
+- Plan defaults (§2.5.1): the drop-down form becomes a floating chip panel with override
+  counters, the shared popover ("Clear N overrides") and "Reset all overrides".
+- Check at the narrow window size (~900x560): chips fold into "+N", nothing wraps or moves when
+  values change or layers are checked.
 - No behaviour change in what gets created: the option names in `useLayerOptions` stay, so
   `planBuilder` and Simple stay identical (§9.1).
 - **Acceptance:** checklist §9.4 and §9.1.
@@ -1069,11 +1177,28 @@ framework, so acceptance is manual in Designer against checklists.
       state survives a reload.
 - [ ] An invalid timecode or cue mask puts a red dot on its collapsed section; Create stays
       disabled as before.
-- [ ] Split chip popover with Split section off shows "Turn on"; pressing it enables the switch
-      and the chips/markers update. Same for Tags (opens Timeline markers).
+- [ ] Every chip popover uses the same compact layout (header, option rows, nested steppers,
+      Reset / move-up button with the labels of its level); it closes on ×, an outside click
+      or Esc. Numbers can be typed (Enter / blur apply, Esc cancels, comma accepted, ↑/↓ step).
+- [ ] All seven chips have the same width and stay on one row; changing any value (stepper,
+      typing, option) moves no other chip and no popover.
+- [ ] In a narrow pane the extra chips fold into "+N"; its list opens each hidden chip's
+      popover; overridden chips stay visible; "+N" shows ◆ / the warning dot of hidden chips.
+- [ ] Checking and unchecking layers moves nothing: the floating bar appears at the bottom,
+      rows and chips keep their place, the last group can still be scrolled above the bar.
+- [ ] The bar's Selected / Group switch changes what the chips edit; Clear mappings, Remove and
+      × (Esc) work; the armed-mapping message shows in the same bar.
+- [ ] Plan defaults opens as a floating chip panel; counters "◆ N" match the groups and layers
+      that set their own value; "Clear N overrides" and "Reset all overrides" update the
+      counters and the group chips at once.
+- [ ] "Apply to all groups" (group) and "Apply to whole group" (selection) move the value one
+      level up and clear it below.
+- [ ] The switch in the Split popover header turns Split section on/off; the options dim while
+      it is off, and chips/markers update. The Tags "Off" pill opens Timeline markers.
 - [ ] Advanced markers preview counts match what Designer creates (splits and tags).
 - [ ] Simple creation is identical to before the redesign (§9.1).
-- [ ] Narrow window (~900x560): nothing clipped, summaries truncate with a tooltip.
+- [ ] Narrow window (~900x560): nothing clipped, summaries wrap on their own line, helper
+      texts stay short with the details in info-icon tooltips.
 
 ---
 
