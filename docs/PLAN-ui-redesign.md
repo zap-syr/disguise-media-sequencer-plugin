@@ -97,7 +97,8 @@ features are added on top of what exists. The current workflow is kept in full a
   - master checkbox (all / partial / none) and "N of M selected" - same as today;
   - search, placeholder "Search all files…" or "Search current folder…";
   - Advanced only: **"Add to group…"** `select` with options "G1, Name (count)" and a
-    **"+ New group"** button. Both are disabled when nothing is selected.
+    **"+ New group"** button. Both are disabled when nothing is selected. *(Phase 8c: the
+    button is removed; "New group" becomes the select's first option, see §2.3.0.)*
 - **Browse** - card grid:
   - selection-order badge;
   - **"G1, G3"** badge: which plan groups already contain this file. **New**, useful;
@@ -116,6 +117,55 @@ features are added on top of what exists. The current workflow is kept in full a
 - In the mockup a Shift-range keeps its direction (`range.reverse()`), and Ctrl+Shift adds the
   range to the existing selection. Today Shift replaces the selection without Ctrl additivity
   - **align with the mockup**.
+
+#### 2.3.0. One-row toolbar, drop-to-create groups, folder tree fixes (owner request, 2026-10-10)
+
+**Why.** In Split the files pane is narrow (420px, down to 220px), and the Advanced toolbar takes
+two rows: master checkbox + "N of M selected", "Add to group…", "+ New group" on the first, the
+view toggles wrapped onto the second. Dragging files into the plan is the main way to build it,
+so the separate "+ New group" button is not needed.
+
+- **"+ New group" button removed** (Advanced, every layout). Its job moves to:
+  - the **"Add to group…" select**: a first option **"New group"** above "G1, Name (count)"
+    (a separator between them). It keeps a way to create a group without dragging: keyboard
+    users and the Files layout, where the plan is not visible. Same result as the old button:
+    the new group gets the selected files in selection order, the selection is cleared, the
+    workspace switches Files → Split, the group flashes;
+  - **dropping files onto empty plan space** (below).
+- **One toolbar row**: master checkbox, "N of M selected", "Add to group…", then the view
+  toggles (grid/list, size) pushed right. Nothing wraps at the Split width. When the pane is
+  narrower (down to 220px): "N of M selected" shortens to "N/M", the select shrinks (min
+  ~110px, its label ends with an ellipsis), and the size toggle hides before anything wraps.
+  Simple mode is unchanged (it has no group controls).
+- **Drop files onto empty plan space → a new group**:
+  - targets: the empty plan (no groups yet) and the free space under the last group, including
+    the list's bottom padding;
+  - while files are dragged, the target shows a dashed zone "Drop to create a new group"
+    (the style of the folder gap zones); it highlights blue on hover;
+  - result: a new group "Group N" at the end of the plan with the dragged files in drag order
+    (the selection order when the selection is dragged), no overrides; toast "G3 created,
+    5 files"; the group flashes and scrolls into view; the file selection is cleared;
+  - the zones **between** groups that folders already show (§2.3.2) also accept files and
+    create the group at that position, so files and folders behave alike;
+  - a drop onto a group or a row keeps today's behaviour (add to that group);
+  - folders dropped on the same empty space already create groups (§2.3.2), no change.
+- The empty-plan hint becomes: "Drag files here to create a group, or select folders in the
+  tree. Repeat to build Group 2, Group 3 and so on."
+
+**Folder tree fixes** (owner request, 2026-10-10, same phase):
+- **Folder names never move.** Today the folder checkbox (Advanced) is added with
+  `display: none → flex` on hover and while folders are checked, so it pushes the folder icon and
+  the name to the right. Instead the checkbox takes the **folder icon's place** in the same
+  16px cell (the pattern of the plan rows, where the checkbox replaces the row number): the icon
+  shows by default, the checkbox shows on hover, on keyboard focus and on every row while
+  folders are checked. The cell never changes width, so names, counts and the selected-row
+  border stay put. "ALL FILES" has no checkbox and keeps its icon.
+- **Expand arrow like the group header.** The tree chevron is a thin grey stroke "›" (`#555555`,
+  rotated without animation). It becomes the same control as the group header's (`.chev` in
+  `PlanGroup.vue`): a filled triangle 10px, `#aaaaaa`, white on hover, a 22×22 button with
+  4px radius, rotated 90° when expanded with a 0.18s transition, `aria-expanded` and an
+  "Expand / Collapse <folder>" label. Rows without children keep an empty cell of the same
+  width, so names stay aligned.
 
 #### 2.3.1. Alpha and audio indicators (owner request, not in the mockup)
 
@@ -306,6 +356,8 @@ of checked folders is not displayed; the strip's count is the preview.
   - **×** on a row - remove the layer from the group;
   - empty group - "Empty group - select files above and press “Add to G1”, or drag rows here."
 - Empty plan - "Select files and press “New group”. Repeat to build Group 2, Group 3…".
+  *(Phase 8c: "Drag files here to create a group…", and the empty plan accepts a file drop,
+  see §2.3.0.)*
 
 ### 2.5. Right panel
 
@@ -463,8 +515,11 @@ move anything, so rows can be checked one after another without moving the mouse
 - **Scope on a new selection: "Selected"** (the chips edit the checked layers), switchable to
   "Group" in the bar. This changes the Phase 7 behaviour where a row click reset the scope to
   the group.
-- In selection scope the Start / Tags / Split chips stay hidden (§9.2), but their grid columns
-  stay empty, so the remaining chips keep their place.
+- In selection scope the Start / Tags / Split chips **stay visible** (owner review of 8b,
+  2026-10-10; this replaces hiding them, §9.2). They are group-only settings, so they keep
+  showing and editing the group: no selection tint, the popover is tagged "G1" with the group
+  Reset and "Apply to all groups". The layer chips (Mode / End / Fade / Length) get the tint
+  and edit the selected layers.
 - The group checkbox left of the chips selects all layers of the group; it shows a dash when
   only some are checked.
 
@@ -1018,7 +1073,8 @@ framework, so acceptance is manual in Designer against checklists.
 | 6b - Groups from folders | ✅ done (owner-reviewed and committed). Advanced only. In the tree, Ctrl/Cmd+click toggles a folder, Shift+click selects a range of visible folders, and checkboxes show on hover or while folders are checked. A plain click still navigates and keeps the checks. Space toggles, Enter creates, Esc clears. Collapsed branches show a badge with the number of checked folders inside. The strip under the tree shows "N folders, M files" with skip notes, the content mode (Folder only / With subfolders / Split subfolders; persisted, defaults to the Include subfolders toggle), "Insert after", Create N groups and Clear. Folders can also be dragged: drop zones between groups create groups there, and a drop onto a group adds the files. Groups store `sourceFolder` (Q13). Verified in the browser on `footages`: direct skips the empty parent; deep skips the nested child (89 files); split gives "footages / 4k emanation" and its two siblings; insert-after, the collapsed badge, gap drop, group-body drop, Files switching to Split, and hidden in Simple. The tree must be expanded to select folders in Split (header toggle), so no separate "Folders" button was needed. Owner feedback in the same round: the per-group column header row is removed and the select-all checkbox now sits at the start of the "Layers start" row, above the row checkboxes; app-wide slim dark scrollbars without arrow buttons live in `src/style.css` (component-level scrollbar rules removed) |
 | 7 - Settings inheritance | ✅ done (owner-reviewed, committed `f8ba6b3`…`750875c`). `utils/planSchema.js` (defaults, chips, effective values, normalisation helpers); `useLayerPlan` keeps `plan` defaults, `group.ov`/`scope`, `entry.ov` and prunes overrides equal to their parent. Plan defaults panel (gear button) with the override summary and Reset all overrides. Group chips Start/Tags/Split/Mode/End/Fade/Length with ◆ (set here), Mixed, Off, open and layer-counter states; a floating popover (teleported, fixed position, flips above the chip and stays on screen, closes on outside click / Esc; nothing below moves) with Use plan default / Use group value, "N layers override this, Reset", Apply to all groups, Done; Reset to defaults on the group. For selected rows an inline "Group | N selected" switch sits at the start of the chips row (no extra line) with a "Reset N layers" chip; a row click returns the group to selection scope. Plan defaults drop down over the groups (scrollable, outside click / Esc closes). Narrow windows (owner request, checked at 900x560): the Split files pane and the settings panel shrink first, the plan keeps 320px; the plan header wraps; narrow groups hide the mini-timeline and thumbnails; narrow list rows hide the type label, then res/G-badges. ◆ on rows with a tooltip of what they override. Mini-timeline markers follow the effective tag/split placement. Layout and Create use effective values per group and layer. Advanced right panel hides Layer properties, Duration and Overlap and shows the "set per group" hints. Checked in the browser: All at once / plan default reset, Mixed across 2 selected layers, layer overrides pruned when the group takes the same value, Apply to all groups moves the value into defaults; the Create payload carries per-group timing/tag/split and per-layer values |
 | 8 - Auto-assign | ✅ done (owner-reviewed). `utils/autoAssign.js` (name: case-insensitive "file name contains mapping name", longest wins; resolution: exact `WxH` with exactly one candidate, otherwise skipped as ambiguous; name first, resolution as the fallback; unmatched layers keep their mapping) and `plan/AutoAssign.vue`: an "Auto-assign" header button opens a drop-down over the groups (like Plan defaults, one panel at a time, outside click / Esc closes) with Match name / Match resolution, Apply to Without mapping / Selected / All layers with counts (rules and scope persisted), the result summary, Clear all mappings, Run auto-assign. Rows show a `NAME` / `RES` badge; a manual assignment removes it. Header actions wrap as one right-aligned block and become icons in a narrow pane. Checked: the logic on the §8 test names (`Cyc_Wash_sunrise.mov` takes `Cyc_Wash` over `Cyc`, `led_side_l_waterfall.mov` takes `LED_Side_L`, a resolution shared by two mappings is skipped, empty scope gives "Nothing to process in this scope."); the panel and badges in the browser at 900x560 and 1500x760. The `api_test` project has no mappings whose names or resolutions match its files, so a real-data run there assigns 0 |
-| 8b - Settings panel redesign (§2.5.1, owner request) | ⏳ pending |
+| 8b - Settings panel redesign (§2.5.1, owner request) | ✅ done (owner-reviewed). Settings panel: accordion sections Mappings / Where / Layers / Timeline markers (`settings/SettingsSection.vue`, open state persisted per section) with summaries on their own line, an "N on / Off" pill on Timeline markers, red dots for invalid fields; Split section moved next to the tags, Overlap into Layers; Advanced shows "Open Plan defaults" and the markers preview ("Will place 2 splits and 11 cue tags", `countMarkers` in `utils/planLayout.js`, same rules as `plan_prepare.py`); info-icon tooltips (`common/InfoTip.vue`). Chips: `plan/SettingChip.vue` + `plan/ChipRow.vue` (seven equal columns, Start / Tags / Split stay visible and edit the group in selection scope (owner review), "+N" overflow with a floating list, folding frozen while a popover is open) and one `plan/ChipPopover.vue` (radio list, nested `plan/NumStepper.vue`, Reset + move-up button per level, Split switch / "Tags off" in the header; it keeps its side while open). Floating selection bar (Selected / Group, Clear mappings, Remove, ×; armed mapping in the same bar), constant 76px bottom padding, colour-only row selection. Plan defaults is a floating chip panel with "◆ N" counters, "Clear N overrides" and Reset all. Group "Reset to defaults" moved to a header icon. Footer summary lists markers. The Mappings list sits in a framed scroll well (owner review). Checked in the browser at 1500x800 and in a 900x560 iframe; creation in Designer not re-run (payload code untouched) |
+| 8c - One-row files toolbar, drop files to create groups, folder tree fixes (§2.3.0, owner request) | ⏳ pending |
 | 9 - Polish | ⏳ pending |
 
 ### Phase 0 - API discovery (no UI changes)
@@ -1123,6 +1179,20 @@ framework, so acceptance is manual in Designer against checklists.
   `planBuilder` and Simple stay identical (§9.1).
 - **Acceptance:** checklist §9.4 and §9.1.
 
+### Phase 8c - One-row files toolbar, drop files to create groups, folder tree fixes (§2.3.0, owner request)
+- Remove the "+ New group" button; "New group" becomes the first option of "Add to group…"
+  (same behaviour as the old button: selection order, clear selection, Files → Split, flash).
+- Files toolbar in one row at the Split width; at narrower widths "N/M", a shrinking select and
+  the hidden size toggle instead of wrapping.
+- `LayerPlan`: while files are dragged, a "Drop to create a new group" zone on the empty plan
+  and under the last group; the folder gap zones between groups also accept files. Drop →
+  new group at that position (`useLayerPlan.insertGroups`), toast, flash, selection cleared.
+- New empty-plan hint text.
+- `FolderTree`: the checkbox replaces the folder icon in a fixed cell (names never move); the
+  expand arrow becomes the group-header triangle with the same size, colours and animation.
+- Depends on Phases 4 and 6 (groups, file DnD) and 6b (gap zones); independent of 8b.
+- **Acceptance:** checklist §9.5 and §9.1.
+
 ### Phase 9 - Polish
 - Plan persistence (Q6), Refresh handling (§6.3), accessibility
   (§4.6), style translation (§7), `CLAUDE.md` update (architecture, new components),
@@ -1152,7 +1222,8 @@ framework, so acceptance is manual in Designer against checklists.
       Group "Reset to defaults". "Reset all overrides".
 - [ ] Linked keys (`bright`/`brightT`, `fit`/`movieDur`/`stillDur`, `timing`/`overlap`) reset together.
 - [ ] "Apply to all groups" promotes the value to defaults and removes it from groups.
-- [ ] Start/Tags/Split chips are hidden in selection scope.
+- [ ] Start/Tags/Split chips stay visible in selection scope and edit the group (Phase 8b
+      change; Phase 7 hid them).
 
 ### 9.3. Groups from folders (Phase 6b)
 - [ ] A plain click still navigates, and Ctrl/Shift/checkbox only change `checkedFolders`;
@@ -1199,6 +1270,23 @@ framework, so acceptance is manual in Designer against checklists.
 - [ ] Simple creation is identical to before the redesign (§9.1).
 - [ ] Narrow window (~900x560): nothing clipped, summaries wrap on their own line, helper
       texts stay short with the details in info-icon tooltips.
+
+### 9.5. Files toolbar and drop-to-create (Phase 8c)
+- [ ] Advanced: no "+ New group" button; the files toolbar is one row in Split (420px) and
+      still one row at 220px ("N/M", shortened select, no size toggle). Simple unchanged.
+- [ ] "Add to group… > New group" creates a group from the selection in selection order,
+      clears the selection, switches Files → Split and flashes the group; G1… options still add.
+- [ ] Dragging files onto the empty plan creates G1; onto the space under the last group
+      creates a group at the end; onto a gap between groups creates it there.
+- [ ] The drop zones appear only while files (or folders) are dragged and highlight on hover;
+      dropping onto a group or a row still adds to that group.
+- [ ] Dragging one unselected file creates a group with that file only; dragging the selection
+      keeps the selection order.
+- [ ] Toast "G3 created, 5 files"; the new group has no overrides.
+- [ ] Folder tree: hovering, checking and unchecking folders moves no name, icon or count; the
+      checkbox appears in place of the folder icon; Simple mode shows the icon only.
+- [ ] Tree expand arrow looks and animates like the group header arrow (triangle, `#aaaaaa`,
+      white on hover, 90° turn); leaf folders stay aligned with folders that have children.
 
 ---
 
