@@ -12,6 +12,8 @@ import planMarkersScript from './python/plan_markers.py?raw';
 
 /** Layers per execute call. Designer's ~1 s timeout and per-call undo cost make bigger calls unsafe (docs §12). */
 export const LAYER_CHUNK_SIZE = 100;
+/** Tags + splits per execute call: a 500-layer plan with TC, cue and MIDI tags places ~2000 markers. */
+export const MARKER_CHUNK_SIZE = 300;
 
 /**
  * Turns `args` into a Python unicode string literal holding JSON, for `json.loads(__ARGS__)`.
@@ -260,14 +262,22 @@ export async function createLayerPlan(directorIp, plan, onProgress) {
     onProgress?.(created, total);
   }
 
-  if (prep.tags.length || prep.splits.length) {
-    const res = await runScript(directorIp, planMarkersScript, {
-      trackPath: prep.trackPath,
-      tags: prep.tags,
-      splits: prep.splits
-    });
+  // Splits first, then tags, in chunks (order between calls does not matter)
+  const markers = [...prep.splits.map(beat => ({ split: beat })), ...prep.tags.map(tag => ({ tag }))];
+  for (let i = 0; i < markers.length; i += MARKER_CHUNK_SIZE) {
+    const chunk = markers.slice(i, i + MARKER_CHUNK_SIZE);
+    let res;
+    try {
+      res = await runScript(directorIp, planMarkersScript, {
+        trackPath: prep.trackPath,
+        splits: chunk.filter(m => 'split' in m).map(m => m.split),
+        tags: chunk.filter(m => m.tag).map(m => m.tag)
+      });
+    } catch (err) {
+      throw new Error(`${err.message} (all ${created} layers were created, ${i} of ${markers.length} tags/splits placed)`);
+    }
     if (!res || res.status !== 'success') {
-      throw new Error(`${res?.message || 'Placing tags/splits failed'} (all ${created} layers were created)`);
+      throw new Error(`${res?.message || 'Placing tags/splits failed'} (all ${created} layers were created, ${i} of ${markers.length} tags/splits placed)`);
     }
   }
 

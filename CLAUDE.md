@@ -40,7 +40,7 @@ This is a **Vue 3 + Vite plugin** that integrates as a window panel inside Disgu
      track beats, tag texts/positions and split positions, and the required track length;
    - `plan_layers.py` in chunks of ≤100 (`LAYER_CHUNK_SIZE`): extends the track first, then creates
      layers and sets video/mapping/mode/end/brightness;
-   - `plan_markers.py`: tags and section splits.
+   - `plan_markers.py`: section splits, then tags, in chunks of ≤300 (`MARKER_CHUNK_SIZE`).
 4. Progress is reported per chunk; partial creation is reported in the error (Designer never rolls back).
 
 ### Media Hierarchy
