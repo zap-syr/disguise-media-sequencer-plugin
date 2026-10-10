@@ -1285,12 +1285,23 @@ needed for this release; Esc, Delete and the armed mapping already work from the
   Done: `.fcb` styles in `FolderTree.vue`.
 
 **F. Visual consistency (§7, Q7)**
-- Sweep all components against the `disguise-css` palette: no stray hex values, 6px radius,
-  all four states (default, hover, focus, disabled) on every control.
+- ~~Sweep all components against the `disguise-css` palette~~ - dropped (owner decision,
+  2026-10-10: the current design and colours are accepted as they are).
 - Record in the `disguise-css` skill the colours the redesign actually uses and the owner
   has seen: the override marker, the 12-colour mapping set (`utils/mappingColors.js`), the
   toast variants; close Q7.
+  Done: the skill now also records the overall redesign style (radius rule, focus ring,
+  shadows, ghost / icon buttons, setting chip states, chip popover, floating bar, group and
+  row styles, drag and drop, badges, toasts, narrow-window rules). Q7 moved to "Decided".
 - Timecodes and durations in tabular numbers everywhere (plan rows, chips, cards, footer).
+  Done: added to the plan header summary, gnav counts, settings footer and Create button,
+  the three timecode inputs and the mapping usage count; the rest already had it.
+- **One checkbox style, select-all clears first** (owner request, 2026-10-10): the files
+  toolbar master checkbox was a white filled square, the plan uses blue checkboxes. It now
+  uses the plan checkbox (`.cb`: `#777777` border, blue when checked or partial). With any
+  selection, the master checkbox and a group's select-all checkbox **clear** it on the first
+  click instead of selecting everything; with none, they select all.
+  Done: `FilesPane.vue`, `useFileSelection.toggleSelectAll`, `usePlanSelection.toggleGroup`.
 
 **G. Robustness**
 - Large plan check: 500 layers in 10 groups. Plan scrolling, chip folding and marquee stay
@@ -1299,7 +1310,7 @@ needed for this release; Esc, Delete and the armed mapping already work from the
   console error; no `alert()` / `confirm()` left outside the agreed Create confirmation.
 
 **H. Docs and release**
-- Close the open questions Q4, Q6, Q7, Q8, Q11-Q13 with the owner (keep or change the
+- Close the open questions Q4, Q6, Q8, Q11-Q13 (Q7 closed in F) with the owner (keep or change the
   defaults) and move them to "Decided".
 - `CLAUDE.md`: architecture (plan components, `useLayerPlan`, `planSchema`, `planLayout`,
   inheritance), data flow for Advanced Create, the new Python files.
@@ -1411,6 +1422,9 @@ needed for this release; Esc, Delete and the armed mapping already work from the
       Undo restores the previous mappings; the mapping stays armed. Disabled on an empty plan.
       The armed bar stays one row at 900x560.
 - [ ] Timeline markers: Split section is visually separated from the tag rows.
+- [ ] The files toolbar checkbox looks like the plan checkboxes. With some files selected,
+      one click clears the selection (the same for a group's select-all); with none, it
+      selects all.
 - [ ] Folder tree (Advanced): hovering a row swaps the icon for a blue-outlined checkbox that
       is clearly not the folder icon; hovering the box itself tints it stronger; while folders
       are checked the other rows show light grey boxes; Tab focus shows a blue ring; names
@@ -1457,6 +1471,12 @@ needed for this release; Esc, Delete and the armed mapping already work from the
   the project (Phase 0 found 11 types).
 - **Q10 - live video inputs:** **use the Still duration**, as today. The card and row get a
   "LIVE" badge instead of "still".
+- **Q7 - new colours** (decided 2026-10-10, Phase 9 F): the owner accepts the colours as
+  shipped, recorded in the `disguise-css` skill:
+  - override / attention: `#ffd60a` (◆ marker, overridden value) with a
+    `rgba(255, 214, 10, 0.55)` chip border, instead of the proposed `#f5b83d` set;
+  - success: neutral toast `#242424` with a `#0a84ff` border (no green);
+  - the 12-colour mapping set in `utils/mappingColors.js`, differing in hue and lightness.
 
 ### Still open - with the default that will be used unless the owner says otherwise
 
@@ -1464,12 +1484,6 @@ needed for this release; Esc, Delete and the armed mapping already work from the
   the mockup.
 - **Q6.** Persist the plan across panel reloads. **Default: yes, in localStorage** per director,
   with a schema version. **No export/import** in this release.
-- **Q7.** New colours. **Default:** add three semantics to the `disguise-css` skill before
-  writing CSS:
-  - override/attention: `#f5b83d` / `#2a2312` / `#6b5320`;
-  - success: neutral toast `#242424` with a `#0a84ff` border;
-  - a 12-colour mapping set, differing in lightness.
-  The owner reviews them in the UI.
 - **Q11.** Groups from folders - order of groups. **Default: tree order.** Alternative:
   the order in which folders were checked.
 - **Q12.** Groups from folders - default content mode. **Default: follow the "Include
