@@ -181,6 +181,7 @@ import { usePersistedRef } from '../composables/usePersistedRef';
 import { useToast } from '../composables/useToast';
 import { useLayerOptions } from '../composables/useLayerOptions';
 import { useLayerPlan } from '../composables/useLayerPlan';
+import { usePlanStorage } from '../composables/usePlanStorage';
 import { usePlanSelection } from '../composables/usePlanSelection';
 import FolderTree from './tree/FolderTree.vue';
 import FilesPane from './files/FilesPane.vue';
@@ -230,6 +231,8 @@ const treeCollapsed = ref(false);
 watch(effectiveWorkspace, ws => { treeCollapsed.value = ws !== 'files'; }, { immediate: true });
 
 const plan = useLayerPlan();
+// The plan survives a panel reload, one per director (docs §6.4)
+const planWasReset = usePlanStorage(plan, `mediaSequencer.plan.${props.directorEndpoint}`);
 const layerPlanRef = ref(null);
 
 const planSelection = usePlanSelection(plan.state);
@@ -520,6 +523,7 @@ watch([selectedFolderId, searchQuery, includeSubfolders], () => {
 
 onMounted(() => {
   library.load();
+  if (planWasReset) showToast('Saved plan was reset');
 });
 
 async function handleCreateLayers(requestOptions) {

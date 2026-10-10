@@ -65,6 +65,61 @@ export function hasOverrides(obj) {
   return !!obj?.ov && Object.keys(obj.ov).length > 0;
 }
 
+// --- Saved plan (docs §6.4, Q6) ---
+
+/** Bump when the stored shape changes; an older saved plan is then reset. */
+export const PLAN_SCHEMA_VERSION = 1;
+
+function cleanValues(ov, keys) {
+  const out = {};
+  if (ov && typeof ov === 'object') keys.forEach(k => { if (k in ov) out[k] = coerce(k, ov[k]); });
+  return out;
+}
+
+/** The plan state (Plan defaults, groups, entries) as a JSON string for localStorage. */
+export function serializePlan(state) {
+  return JSON.stringify({ v: PLAN_SCHEMA_VERSION, plan: state.plan, groups: state.groups, entries: state.entries });
+}
+
+/**
+ * Parses a saved plan back into { plan, groups, entries }, or null when the JSON is broken
+ * or from another schema version. Unknown keys are dropped; rows whose entry is gone and
+ * entries no group holds are dropped too.
+ */
+export function parsePlan(text) {
+  let data;
+  try { data = JSON.parse(text); } catch (e) { return null; }
+  if (!data || data.v !== PLAN_SCHEMA_VERSION || !Array.isArray(data.groups) || !data.entries || typeof data.entries !== 'object') return null;
+
+  const entries = {};
+  Object.entries(data.entries).forEach(([id, e]) => {
+    if (!e || typeof e.mediaId !== 'string') return;
+    entries[id] = {
+      mediaId: e.mediaId,
+      mappingPath: typeof e.mappingPath === 'string' ? e.mappingPath : null,
+      via: e.via === 'name' || e.via === 'res' ? e.via : null,
+      ov: cleanValues(e.ov, LAYER_KEYS)
+    };
+  });
+
+  const groups = data.groups.filter(g => g && typeof g.id === 'string').map(g => ({
+    id: g.id,
+    name: String(g.name ?? ''),
+    open: g.open !== false,
+    scope: g.scope === 'group' ? 'group' : 'auto',
+    ov: cleanValues(g.ov, GROUP_KEYS),
+    items: (Array.isArray(g.items) ? g.items : []).filter(id => entries[id]),
+    sourceFolder: g.sourceFolder && typeof g.sourceFolder.id === 'string'
+      ? { id: g.sourceFolder.id, content: g.sourceFolder.content }
+      : null
+  }));
+
+  const held = new Set(groups.flatMap(g => g.items));
+  Object.keys(entries).forEach(id => { if (!held.has(id)) delete entries[id]; });
+
+  return { plan: { ...PLAN_DEFAULTS, ...cleanValues(data.plan, GROUP_KEYS) }, groups, entries };
+}
+
 /**
  * Short value shown on a chip; it has to fit an equal-width chip column (docs §2.5.1).
  * `globals` = { tagsOn, splitOn } from the right panel.

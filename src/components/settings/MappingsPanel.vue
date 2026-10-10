@@ -51,6 +51,7 @@
 import { ref, computed } from 'vue';
 import { mappingColor } from '../../utils/mappingColors';
 import { startDrag, endDrag } from '../../composables/useDragPayload';
+import { usePersistedRef } from '../../composables/usePersistedRef';
 
 const props = defineProps({
   mappings: { type: Array, required: true },   // getMappingList()
@@ -60,7 +61,12 @@ const props = defineProps({
 const armed = defineModel('armed', { type: String, default: null });
 
 const query = ref('');
-const typeFilter = ref('all');
+// Remembered per viewer; a type missing from this project counts as "All"
+const storedTypeFilter = usePersistedRef('mediaSequencer.mappingTypeFilter', 'all', s => s || undefined);
+const typeFilter = computed({
+  get: () => (typeChips.value.some(t => t.key === storedTypeFilter.value) ? storedTypeFilter.value : 'all'),
+  set: v => { storedTypeFilter.value = v; }
+});
 
 // Dynamic chips from the types present in the project (docs §11 Q9)
 const typeChips = computed(() => {

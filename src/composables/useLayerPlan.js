@@ -138,6 +138,16 @@ export function useLayerPlan() {
     state.groups.forEach(g => { g.open = open; });
   }
 
+  /** Replaces the whole plan with a saved one (planSchema parsePlan); ids keep counting from the restored maximum. */
+  function load(saved) {
+    const maxId = ids => ids.reduce((n, id) => Math.max(n, Number(id.slice(1)) || 0), 0);
+    state.plan = saved.plan;
+    state.groups = saved.groups;
+    state.entries = saved.entries;
+    nextGroup = maxId(saved.groups.map(g => g.id)) + 1;
+    nextEntry = maxId(Object.keys(saved.entries)) + 1;
+  }
+
   // --- Settings inheritance (Phase 7, docs §2.6) ---
 
   function groupOf(entryId) {
@@ -302,7 +312,7 @@ export function useLayerPlan() {
   return {
     state, layerCount, groupLabelsByMedia, unmappedCount, mappingUsage,
     addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
-    removeGroup, updateGroup, setAllOpen,
+    removeGroup, updateGroup, setAllOpen, load,
     assign, assignGroup, clearMappings, applyAutoAssign,
     overrideStats, overrideCounts, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides,
     applyGroupValueToAll, applyLayerValueToGroup, resetPlanKeys, clearOverrides
