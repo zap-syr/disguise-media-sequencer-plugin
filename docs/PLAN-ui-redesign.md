@@ -1195,9 +1195,84 @@ framework, so acceptance is manual in Designer against checklists.
 - **Acceptance:** checklist §9.5 and §9.1.
 
 ### Phase 9 - Polish
-- Plan persistence (Q6), Refresh handling (§6.3), accessibility
-  (§4.6), style translation (§7), `CLAUDE.md` update (architecture, new components),
-  version → 1.2.0.
+Status of the earlier items at the start of Phase 9 (checked against the code, 2026-10-10):
+plan persistence, Refresh handling of missing clips and keyboard navigation of plan rows are
+not done yet; missing mappings already get a red slot border; Esc / focus return in chip
+popovers, the armed mapping and Delete on selected rows are done.
+
+**A. Plan persistence (§6.4, Q6)**
+- Save the plan (groups, entries, overrides, Plan defaults) to localStorage under
+  `mediaSequencer.plan.<director>` with a schema version; debounced on change; reset on a
+  version mismatch or broken JSON (toast "Saved plan was reset").
+- Restore when the panel starts, before the media library loads, so no save can overwrite
+  the stored plan with an empty one; missing clips are flagged once the library is ready (B).
+  Entry ids and group ids keep counting from the restored maximum. A broken or old saved
+  plan is removed from localStorage, so the reset toast shows once.
+  Done: `utils/planSchema.js` (`serializePlan` / `parsePlan`, `PLAN_SCHEMA_VERSION`),
+  `composables/usePlanStorage.js`, `useLayerPlan.load()`.
+- Persist the Mappings panel type filter (`MappingsPanel` `typeFilter`, today a plain `ref`).
+- Selection, the armed mapping and open popovers are not persisted.
+
+**B. Refresh with a non-empty plan (§6.3)**
+- After Refresh (and after restoring a saved plan), rows whose clip is gone get a "missing"
+  state: warning icon, red name, tooltip with the path. They count in the footer
+  ("2 missing clips") and are skipped by Create with a confirm, like layers without mapping.
+- A mapping that no longer exists is cleared from its rows with a toast
+  "2 mappings no longer exist"; the red slot border stays only for the moment before Refresh.
+- Plan layout and marker counts treat missing clips as zero length.
+
+**C. Accessibility and keyboard (§4.6)**
+- Plan rows: `role="row"` and `tabindex`, ↑/↓ move focus between rows (across groups),
+  Space toggles the row checkbox, Shift+↑/↓ extends the selection, Delete removes (exists).
+- Group headers reachable by Tab; Enter toggles collapse.
+- Visible `focus-visible` rings on every interactive element of the plan, the files pane and
+  the settings panel; check the tab order of the whole window once.
+- `aria-live` on toasts and the Create progress; meaningful `aria-label`s on icon-only
+  buttons that appear at narrow widths (Phase 8c).
+
+**D. Mappings**
+- **Assign a mapping to the whole plan in one action** (owner request, 2026-10-10): one button
+  assigns the chosen mapping to every layer in every group. Today this takes a drop on each
+  group header (`assign-group`) or Auto-assign by name/resolution. Same rules as the group-header
+  drop: replaces existing mappings; toast "Mapping assigned to N layers in M groups" with an
+  Undo action that restores the previous mappings (like the remove / delete-group toasts).
+  Placement: an **"Assign to all"** button in the floating armed bar at the bottom of the
+  Layer Plan ("Assigning <mapping>: click layer slots | Done", `LayerPlan.vue`, the
+  `armedMapping` state of `.sel-bar`), before Done. The bar only shows while a mapping is
+  armed, so the action is in context and takes no room in the panel headers. The tooltip
+  gives the count ("Assign to all 24 layers in 3 groups"); disabled on an empty plan; the
+  mapping stays armed after the click. At narrow widths the bar text shortens
+  ("Assigning <mapping>") before the buttons do, and the bar never wraps (§9.5).
+
+**E. Settings panel**
+- **Timeline markers section: separate Split section from the tags** (owner request,
+  2026-10-10): a visual divider in `SettingsPanel` between the Split section row and the
+  TC / Cue / MIDI tag rows, so the two purposes read as separate blocks.
+
+**F. Visual consistency (§7, Q7)**
+- Sweep all components against the `disguise-css` palette: no stray hex values, 6px radius,
+  all four states (default, hover, focus, disabled) on every control.
+- Record in the `disguise-css` skill the colours the redesign actually uses and the owner
+  has seen: the override marker, the 12-colour mapping set (`utils/mappingColors.js`), the
+  toast variants; close Q7.
+- Timecodes and durations in tabular numbers everywhere (plan rows, chips, cards, footer).
+
+**G. Robustness**
+- Large plan check: 500 layers in 10 groups. Plan scrolling, chip folding and marquee stay
+  smooth; Create runs in chunks with progress and the final report (§10 risks).
+- Any error from Create, Refresh or metadata loading ends in a toast, never in a silent
+  console error; no `alert()` / `confirm()` left outside the agreed Create confirmation.
+
+**H. Docs and release**
+- Close the open questions Q4, Q6, Q7, Q8, Q11-Q13 with the owner (keep or change the
+  defaults) and move them to "Decided".
+- `CLAUDE.md`: architecture (plan components, `useLayerPlan`, `planSchema`, `planLayout`,
+  inheritance), data flow for Advanced Create, the new Python files.
+- `README.md`: Simple / Advanced modes, groups, mappings per layer, groups from folders,
+  drag and drop, screenshots.
+- `CHANGELOG.md` entry and version → 1.2.0 in `package.json`.
+- Full manual run of checklists §9.1-§9.6 at 900x560 and at a wide window before the release.
+- **Acceptance:** checklist §9.6 and §9.1.
 
 ---
 
@@ -1288,6 +1363,22 @@ framework, so acceptance is manual in Designer against checklists.
       checkbox appears in place of the folder icon; Simple mode shows the icon only.
 - [ ] Tree expand arrow looks and animates like the group header arrow (triangle, `#aaaaaa`,
       white on hover, 90° turn); leaf folders stay aligned with folders that have children.
+
+### 9.6. Polish (Phase 9)
+- [ ] Build a plan, reload the panel: groups, rows, overrides, mappings and Plan defaults come
+      back; the mapping type filter too. A plan saved with an older schema resets with a toast.
+- [ ] Delete a clip in Designer, Refresh: its rows show "missing", the footer counts them,
+      Create asks before skipping them. Delete a mapping, Refresh: it is cleared from its rows
+      with a toast.
+- [ ] Keyboard only: Tab into the plan, ↑/↓ across rows and groups, Space checks, Shift+↑/↓
+      extends, Delete removes, Enter on a group header collapses it; focus is always visible.
+- [ ] Arm a mapping, "Assign to all": every layer in every group gets it, toast with the count,
+      Undo restores the previous mappings; the mapping stays armed. Disabled on an empty plan.
+      The armed bar stays one row at 900x560.
+- [ ] Timeline markers: Split section is visually separated from the tag rows.
+- [ ] 500 layers in 10 groups: scrolling, chips and marquee stay smooth; Create finishes with
+      progress and a report.
+- [ ] Version 1.2.0 in `package.json` and `CHANGELOG.md`; README describes Advanced mode.
 
 ---
 
