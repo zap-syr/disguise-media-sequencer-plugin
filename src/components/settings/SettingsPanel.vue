@@ -228,6 +228,9 @@
             </label>
           </div>
 
+          <!-- Sections and tags are different markers: the tag rows read as their own block -->
+          <div class="mk-divider" role="separator"></div>
+
           <div class="mk-row">
             <span class="kv-lbl">Timecode tag <InfoTip :text="isAdvanced ? 'A TC tag at each placement; numbering continues across the plan' : 'A TC tag at every layer start: start time + increment per layer'" /></span>
             <label class="switch">
@@ -779,6 +782,7 @@ label {
 /* Timeline markers */
 .markers { display: flex; flex-direction: column; gap: 8px; }
 .mk-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 22px; }
+.mk-divider { height: 1px; margin: 4px 0; background: #2e2e2e; }
 .mk-preview { margin-top: 4px; padding-top: 10px; border-top: 1px solid #2e2e2e; display: flex; flex-direction: column; gap: 6px; }
 .mk-will { font-size: 12px; color: #dddddd; }
 .mk-hint { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; font-size: 11px; color: #888888; }
