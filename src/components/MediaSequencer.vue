@@ -269,7 +269,9 @@ const filteredMediaList = computed(() => folderFiles(library.fullHierarchy.value
   search: searchQuery.value
 }));
 
-const selection = useFileSelection(filteredMediaList);
+// Files whose media went missing cannot be selected, so they never reach Create or the plan
+const selection = useFileSelection(filteredMediaList, item => isMissingClip(item.path));
+watch(() => library.mediaDetails.value, () => selection.dropLocked());
 
 // --- Groups from folders (docs §2.3.2) ---
 const allFolderIds = computed(() => folderOrder(library.fullHierarchy.value));
@@ -283,7 +285,9 @@ const folderContent = computed({
   set: v => { storedFolderContent.value = v; }
 });
 const folderInsertAfter = ref('');
-const folderResult = computed(() => folderGroups(library.fullHierarchy.value, folderSelection.checked, folderContent.value));
+// Folder files whose media went missing are left out of the new groups
+const groupsFromFolders = folderIds => folderGroups(library.fullHierarchy.value, folderIds, folderContent.value, isMissingClip);
+const folderResult = computed(() => groupsFromFolders(folderSelection.checked));
 
 function folderGroupDefs(result) {
   return result.groups.map(g => ({ name: g.name, paths: g.paths, sourceFolder: { id: g.folderId, content: folderContent.value } }));
@@ -293,6 +297,7 @@ function skippedNote(result) {
   const parts = [];
   if (result.skippedNested) parts.push(`${result.skippedNested} nested skipped`);
   if (result.skippedEmpty) parts.push(`${result.skippedEmpty} empty skipped`);
+  if (result.skippedMissing) parts.push(`${result.skippedMissing} missing ${result.skippedMissing === 1 ? 'file' : 'files'} skipped`);
   return parts.length ? ` (${parts.join(', ')})` : '';
 }
 
@@ -319,13 +324,13 @@ function createFolderGroups() {
 }
 
 function onDropFolderGroups({ folderIds, index }) {
-  addFolderGroups(folderGroups(library.fullHierarchy.value, folderIds, folderContent.value), index);
+  addFolderGroups(groupsFromFolders(folderIds), index);
   folderSelection.clear();
 }
 
 /** Folders dropped onto a group add their files to it (tree order, content mode applies). */
 function onDropFolders({ folderIds, gid, targetId, pos }) {
-  const result = folderGroups(library.fullHierarchy.value, folderIds, folderContent.value);
+  const result = groupsFromFolders(folderIds);
   const paths = result.groups.flatMap(g => g.paths);
   if (!paths.length) {
     showToast('The dropped folders have no files for this content mode.', 'error');
@@ -424,13 +429,13 @@ const footerSummary = computed(() => {
     if (!plan.layerCount.value) return 'Layer plan is empty';
     const maps = Object.keys(plan.mappingUsage.value).length;
     const unmapped = plan.unmappedCount.value;
+    const missing = plan.missingCount.value;
     const parts = [
       `${g} ${g === 1 ? 'group' : 'groups'}`,
       `${createCount.value} layers`,
       missing ? `${missing} missing ${missing === 1 ? 'clip' : 'clips'}` : null,
       `${maps} ${maps === 1 ? 'mapping' : 'mappings'}`,
       unmapped ? `${unmapped} without mapping` : null,
-    const missing = plan.missingCount.value;
       `≈${formatDuration(planLayout.value.total) || '0s'}`,
       markersText.value
     ];

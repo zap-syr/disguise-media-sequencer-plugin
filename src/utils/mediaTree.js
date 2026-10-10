@@ -113,9 +113,10 @@ const directFiles = folder => (folder.children || []).filter(c => c.type === 'fi
  *                     with own files, named by the path relative to the checked folder
  * Groups follow tree order; files are sorted by name (numeric-aware). With 'deep' / 'split'
  * a checked folder inside another checked folder is skipped (its files are already covered).
- * Returns { groups: [{ folderId, name, paths }], files, skippedNested, skippedEmpty }.
+ * isSkipped(path): files left out (missing media), counted in skippedMissing.
+ * Returns { groups: [{ folderId, name, paths }], files, skippedNested, skippedEmpty, skippedMissing }.
  */
-export function folderGroups(hierarchy, folderIds, content) {
+export function folderGroups(hierarchy, folderIds, content, isSkipped = () => false) {
   const order = folderOrder(hierarchy);
   const ids = [...folderIds].filter(id => id !== 'all').sort((a, b) => order.indexOf(a) - order.indexOf(b));
   const covers = content !== 'direct';
@@ -124,6 +125,12 @@ export function folderGroups(hierarchy, folderIds, content) {
   const groups = [];
   let skippedNested = 0;
   let skippedEmpty = 0;
+  let skippedMissing = 0;
+  const keep = paths => paths.filter(p => {
+    if (!isSkipped(p)) return true;
+    skippedMissing++;
+    return false;
+  });
 
   ids.forEach(id => {
     if (isNested(id)) { skippedNested++; return; }
@@ -144,12 +151,12 @@ export function folderGroups(hierarchy, folderIds, content) {
     } else {
       made = [{ folderId: id, name: folder.name, paths: directFiles(folder).map(f => f.path) }];
     }
-    made = made.filter(g => g.paths.length);
+    made = made.map(g => ({ ...g, paths: keep(g.paths) })).filter(g => g.paths.length);
     if (!made.length) skippedEmpty++;
     groups.push(...made);
   });
 
-  return { groups, files: groups.reduce((n, g) => n + g.paths.length, 0), skippedNested, skippedEmpty };
+  return { groups, files: groups.reduce((n, g) => n + g.paths.length, 0), skippedNested, skippedEmpty, skippedMissing };
 }
 
 export function breadcrumbPath(hierarchy, folderId) {

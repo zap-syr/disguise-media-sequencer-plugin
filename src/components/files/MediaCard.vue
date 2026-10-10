@@ -1,7 +1,8 @@
 <template>
   <div
     class="media-card"
-    :class="{ 'is-card-selected': selected, 'is-list': viewMode === 'list', 'is-compact': compact }"
+    :class="{ 'is-card-selected': selected, 'is-list': viewMode === 'list', 'is-compact': compact, 'is-missing-media': missing }"
+    :title="missing ? 'Media file is missing in Designer: it cannot be selected or added to the plan' : null"
   >
     <div class="card-preview" :class="mediaType">
       <img v-if="thumbnailUrl && !thumbnailError" :src="thumbnailUrl" @error="thumbnailError = true" class="thumbnail-image" />
@@ -14,6 +15,7 @@
       <div v-if="showOrder && selected && viewMode !== 'list'" class="order-badge">{{ selectionOrder }}</div>
       <span v-if="viewMode !== 'list' && groupLabel" class="group-badge" :title="`In plan groups ${groupLabel}`">{{ groupLabel }}</span>
       <span v-if="viewMode !== 'list' && durationLabel" class="dur-chip" :class="{ 'is-live': kind === 'live' }">{{ durationLabel }}</span>
+      <span v-if="viewMode !== 'list' && missing" class="missing-badge">MISSING</span>
     </div>
     <div class="card-footer">
       <span v-if="showOrder && selected && viewMode === 'list'" class="order-pill">{{ selectionOrder }}</span>
@@ -21,6 +23,7 @@
         {{ item.name }}
         <span v-if="item.subfolderPath" class="file-subfolder">in {{ item.subfolderPath }}</span>
       </span>
+      <span v-if="viewMode === 'list' && missing" class="missing-pill">MISSING</span>
       <span v-if="viewMode === 'list' && groupLabel" class="group-pill" :title="`In plan groups ${groupLabel}`">{{ groupLabel }}</span>
       <span v-if="viewMode === 'list' && listMeta" class="list-meta">{{ listMeta }}</span>
       <span class="file-meta">
@@ -82,6 +85,9 @@ const props = defineProps({
 });
 
 const thumbnailError = ref(false);
+
+// Media deleted in Designer: the clip is still listed, flagged "in error" (media_details.py)
+const missing = computed(() => !!props.details?.missing);
 
 const thumbnailUrl = computed(() => {
   if (props.item && props.item.uid && props.directorEndpoint) {
@@ -339,6 +345,37 @@ const listMeta = computed(() => {
   font-weight: 600;
   pointer-events: none;
 }
+/* Missing media: dimmed, not selectable (the badge stays at full strength) */
+.media-card.is-missing-media { cursor: not-allowed; }
+.media-card.is-missing-media:hover { border-color: #333333; }
+.media-card.is-list.is-missing-media:hover { border-color: transparent; }
+.media-card.is-missing-media .thumbnail-image,
+.media-card.is-missing-media .card-preview > svg,
+.media-card.is-missing-media .card-footer > :not(.missing-pill) { opacity: 0.4; }
+.missing-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  pointer-events: none;
+}
+.missing-pill {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
 .group-pill {
   flex-shrink: 0;
   padding: 1px 6px;

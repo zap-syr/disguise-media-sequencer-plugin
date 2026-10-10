@@ -111,9 +111,9 @@
         :details="mediaDetails[item.path]"
         :compact="viewMode === 'grid' && gridSize === 'small'"
         :group-label="(groupLabels[item.path] || []).join(', ')"
-        :class="['media-card-item', { 'no-transition': isViewSwitching }]"
+        :class="['media-card-item', { 'no-transition': isViewSwitching, 'is-missing': isMissing(item) }]"
         :data-id="item.id"
-        :draggable="dragEnabled ? 'true' : null"
+        :draggable="dragEnabled && !isMissing(item) ? 'true' : null"
         @click.stop="selection.handleSelection(item, index, $event)"
         @dragstart="onFileDragStart($event, item)"
         @dragend="endDrag"
@@ -152,9 +152,12 @@ const includeSubfolders = defineModel('includeSubfolders', { type: Boolean, defa
 
 const gridRef = ref(null);
 
+// Media deleted in Designer: shown with a badge, cannot be selected or dragged into the plan
+const isMissing = item => !!props.mediaDetails[item.path]?.missing;
+
 /** Dragging a selected file drags the whole selection (in selection order), otherwise just this file. */
 function onFileDragStart(event, item) {
-  if (!props.dragEnabled) return;
+  if (!props.dragEnabled || isMissing(item)) return;
   const selected = props.selection.selectedItems;
   let paths = [item.path];
   if (selected.has(item.id)) {

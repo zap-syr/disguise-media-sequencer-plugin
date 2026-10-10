@@ -84,9 +84,10 @@ const createLabel = computed(() => {
 
 const notes = computed(() => {
   const parts = [];
-  const { skippedNested, skippedEmpty } = props.result;
+  const { skippedNested, skippedEmpty, skippedMissing } = props.result;
   if (skippedNested) parts.push(`${skippedNested} nested ${skippedNested === 1 ? 'folder' : 'folders'} skipped`);
   if (skippedEmpty) parts.push(`${skippedEmpty} empty ${skippedEmpty === 1 ? 'folder' : 'folders'} skipped`);
+  if (skippedMissing) parts.push(`${skippedMissing} missing ${skippedMissing === 1 ? 'file' : 'files'} skipped`);
   return parts.join(', ');
 });
 </script>

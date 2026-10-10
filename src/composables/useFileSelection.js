@@ -3,8 +3,9 @@ import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 /**
  * Selection of media files: click / Ctrl / Shift, select-all, and the marquee (rubber-band)
  * selection over the grid. `itemsRef` is the computed list of currently visible files.
+ * isLocked(item): true for files that cannot be selected (missing media, docs §6.3).
  */
-export function useFileSelection(itemsRef) {
+export function useFileSelection(itemsRef, isLocked = () => false) {
   const selectedItems = reactive(new Set());
   let lastSelectedIndex = -1;
 
@@ -16,8 +17,14 @@ export function useFileSelection(itemsRef) {
   let dragOrder = new Set();
   let gridEl = null;
 
-  const isAllSelected = computed(() => itemsRef.value.length > 0 && itemsRef.value.every(item => selectedItems.has(item.id)));
-  const isIndeterminate = computed(() => selectedItems.size > 0 && selectedItems.size < itemsRef.value.length);
+  const selectable = computed(() => itemsRef.value.filter(item => !isLocked(item)));
+  const isAllSelected = computed(() => selectable.value.length > 0 && selectable.value.every(item => selectedItems.has(item.id)));
+  const isIndeterminate = computed(() => selectedItems.size > 0 && selectedItems.size < selectable.value.length);
+
+  /** Drops files that became locked (e.g. their media went missing after a Refresh). */
+  function dropLocked() {
+    itemsRef.value.forEach(item => { if (isLocked(item)) selectedItems.delete(item.id); });
+  }
 
   const selectionOrderMap = computed(() => {
     const map = new Map();
@@ -31,6 +38,7 @@ export function useFileSelection(itemsRef) {
   }
 
   function handleSelection(item, index, event) {
+    if (isLocked(item)) return;
     const id = item.id;
     if (event.ctrlKey || event.metaKey) {
       if (selectedItems.has(id)) selectedItems.delete(id);
@@ -41,7 +49,7 @@ export function useFileSelection(itemsRef) {
       const step = index >= lastSelectedIndex ? 1 : -1;
       for (let i = lastSelectedIndex; i !== index + step; i += step) {
         const currentItem = itemsRef.value[i];
-        selectedItems.add(currentItem.id);
+        if (!isLocked(currentItem)) selectedItems.add(currentItem.id);
       }
     } else {
       selectedItems.clear();
@@ -64,6 +72,7 @@ export function useFileSelection(itemsRef) {
       clear();
     } else {
       itemsRef.value.forEach((item, index) => {
+        if (isLocked(item)) return;
         selectedItems.add(item.id);
         lastSelectedIndex = index;
       });
@@ -105,7 +114,7 @@ export function useFileSelection(itemsRef) {
     const boxTop = Math.min(selectionStart.y, selectionEnd.y);
     const boxRight = Math.max(selectionStart.x, selectionEnd.x);
     const boxBottom = Math.max(selectionStart.y, selectionEnd.y);
-    const cards = gridEl.querySelectorAll('.media-card-item');
+    const cards = gridEl.querySelectorAll('.media-card-item:not(.is-missing)');
     const currentlyIntersecting = new Set();
     cards.forEach(card => {
       const id = card.dataset.id;
@@ -170,6 +179,7 @@ export function useFileSelection(itemsRef) {
     selectionOrderMap,
     selectionFrameStyle,
     clear,
+    dropLocked,
     handleSelection,
     handleContainerClick,
     toggleSelectAll,
