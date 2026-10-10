@@ -166,6 +166,8 @@ so the separate "+ New group" button is not needed.
   4px radius, rotated 90° when expanded with a 0.18s transition, `aria-expanded` and an
   "Expand / Collapse <folder>" label. Rows without children keep an empty cell of the same
   width, so names stay aligned.
+- **Folder checkbox stands out from the icon** (owner follow-up, 2026-10-10): planned in
+  Phase 9, item E.
 
 #### 2.3.1. Alpha and audio indicators (owner request, not in the mockup)
 
@@ -1233,7 +1235,8 @@ popovers, the armed mapping and Delete on selected rows are done.
   runs on every load and Refresh (`useLayerPlan.clearUnknownMappings`), so it also covers a
   restored plan.
 
-**C. Accessibility and keyboard (§4.6)**
+**C. Accessibility and keyboard (§4.6)** - **deferred** (owner decision, 2026-10-10: not
+needed for this release; Esc, Delete and the armed mapping already work from the keyboard).
 - Plan rows: `role="row"` and `tabindex`, ↑/↓ move focus between rows (across groups),
   Space toggles the row checkbox, Shift+↑/↓ extends the selection, Delete removes (exists).
 - Group headers reachable by Tab; Enter toggles collapse.
@@ -1259,11 +1262,27 @@ popovers, the armed mapping and Delete on selected rows are done.
   at the narrowest bar, like the other bar buttons. Rows with a missing clip get the mapping
   too (they are skipped by Create anyway).
 
-**E. Settings panel**
+**E. Settings panel and folder tree**
 - **Timeline markers section: separate Split section from the tags** (owner request,
   2026-10-10): a visual divider in `SettingsPanel` between the Split section row and the
   TC / Cue / MIDI tag rows, so the two purposes read as separate blocks.
   Done: a 1px `#2e2e2e` line (the same as the preview's top border) under the Split row.
+- **Folder checkbox stands out from the folder icon** (owner request, 2026-10-10, follow-up
+  to §2.3.0). Today the checkbox that replaces the folder icon on hover (`.fcb` in
+  `FolderTree.vue`) has a `#777777` border on `#181818`, almost the same grey and size as the
+  `#666666` folder outline, so it is hard to see that the icon changed and that it is a
+  checkbox. Fix, palette colours only:
+  - the moment the pointer enters a folder row and the icon turns into the checkbox, the box
+    is blue: border `#0a84ff`, fill `rgba(10, 132, 255, 0.10)`, so the swap and the click
+    target are obvious (owner clarification: the problem is this swap, not hovering the box);
+  - pointer on the box itself: the fill gets stronger, `rgba(10, 132, 255, 0.20)`;
+  - unchecked boxes on the other rows while folders are checked: border `#aaaaaa`, fill
+    `#242424`, lighter and solid against the hollow folder icon but not blue, so the hovered
+    row still stands out;
+  - keyboard focus: a `0 0 0 2px #0a84ff` ring, like the plan row checkboxes;
+  - checked state unchanged (blue fill, white tick); size stays 14px in the 16px icon cell,
+    so names still do not move.
+  Done: `.fcb` styles in `FolderTree.vue`.
 
 **F. Visual consistency (§7, Q7)**
 - Sweep all components against the `disguise-css` palette: no stray hex values, 6px radius,
@@ -1386,12 +1405,16 @@ popovers, the armed mapping and Delete on selected rows are done.
 - [ ] Delete a clip in Designer, Refresh: its rows show "missing", the footer counts them,
       Create asks before skipping them. Delete a mapping, Refresh: it is cleared from its rows
       with a toast.
-- [ ] Keyboard only: Tab into the plan, ↑/↓ across rows and groups, Space checks, Shift+↑/↓
-      extends, Delete removes, Enter on a group header collapses it; focus is always visible.
+- (deferred with item C) Keyboard only: Tab into the plan, ↑/↓ across rows and groups, Space
+  checks, Shift+↑/↓ extends, Delete removes, Enter on a group header collapses it.
 - [ ] Arm a mapping, "Assign to all": every layer in every group gets it, toast with the count,
       Undo restores the previous mappings; the mapping stays armed. Disabled on an empty plan.
       The armed bar stays one row at 900x560.
 - [ ] Timeline markers: Split section is visually separated from the tag rows.
+- [ ] Folder tree (Advanced): hovering a row swaps the icon for a blue-outlined checkbox that
+      is clearly not the folder icon; hovering the box itself tints it stronger; while folders
+      are checked the other rows show light grey boxes; Tab focus shows a blue ring; names
+      do not move.
 - [ ] 500 layers in 10 groups: scrolling, chips and marquee stay smooth; Create finishes with
       progress and a report.
 - [ ] Version 1.2.0 in `package.json` and `CHANGELOG.md`; README describes Advanced mode.
