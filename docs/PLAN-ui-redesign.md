@@ -1306,8 +1306,20 @@ needed for this release; Esc, Delete and the armed mapping already work from the
 **G. Robustness**
 - Large plan check: 500 layers in 10 groups. Plan scrolling, chip folding and marquee stay
   smooth; Create runs in chunks with progress and the final report (§10 risks).
+  - Measured (2026-10-10, live session, read-only): `plan_prepare.py` for 500 layers with
+    TC + cue + MIDI tags and a split at every file: ~140 ms round trip (1500 tags,
+    501 splits). Well inside the ~1 s limit, so prepare stays one call.
+  - Markers were one call; ~2000 writes are too close to the limit (no rollback), so
+    `createLayerPlan` now places splits, then tags, in chunks of ≤300
+    (`MARKER_CHUNK_SIZE`). A failure says how many markers were placed.
+  - UI check: a 500-layer saved plan is loaded through localStorage (snippet generated from
+    the project's clips), then scrolled, edited and created on a test track by the owner.
 - Any error from Create, Refresh or metadata loading ends in a toast, never in a silent
   console error; no `alert()` / `confirm()` left outside the agreed Create confirmation.
+  Done: there were no `alert()` / `confirm()` left. Silent before: a failed Refresh, failed
+  media details and a failed Create track (console only); all three now end in an error
+  toast (`useMediaLibrary(…, onError)`, `SettingsPanel` `error` event). A track name with
+  `"` or `\` is rejected, because `createTrack` puts it into a Python string literal.
 
 **H. Docs and release**
 - Close the open questions Q4, Q6, Q8, Q11-Q13 (Q7 closed in F) with the owner (keep or change the
