@@ -1,16 +1,16 @@
 <template>
   <div class="segmented-control" role="group" aria-label="Workspace layout">
-    <button type="button" class="segment" :class="{ active: workspace === 'files' }" :aria-pressed="workspace === 'files'" title="Files only" @click.stop="workspace = 'files'">
+    <button type="button" class="segment" :class="{ active: workspace === 'files' }" :aria-pressed="workspace === 'files'" aria-label="Files" title="Files only" @click.stop="workspace = 'files'">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-      Files
+      <span class="seg-label">Files</span>
     </button>
-    <button type="button" class="segment" :class="{ active: workspace === 'split' }" :aria-pressed="workspace === 'split'" title="Files and layer plan side by side" @click.stop="workspace = 'split'">
+    <button type="button" class="segment" :class="{ active: workspace === 'split' }" :aria-pressed="workspace === 'split'" aria-label="Split" title="Files and layer plan side by side" @click.stop="workspace = 'split'">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M10 3v18"/></svg>
-      Split
+      <span class="seg-label">Split</span>
     </button>
-    <button type="button" class="segment" :class="{ active: workspace === 'plan' }" :aria-pressed="workspace === 'plan'" title="Layer plan only" @click.stop="workspace = 'plan'">
+    <button type="button" class="segment" :class="{ active: workspace === 'plan' }" :aria-pressed="workspace === 'plan'" aria-label="Plan" title="Layer plan only" @click.stop="workspace = 'plan'">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/></svg>
-      Plan
+      <span class="seg-label">Plan</span>
     </button>
   </div>
 </template>
@@ -48,5 +48,11 @@ const workspace = defineModel({ type: String, default: 'split' });
   background: #3a3a3a;
   color: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* Narrow pane (the plan pane or the files pane is the container): icons only, names in the tooltips */
+@container (max-width: 540px) {
+  .seg-label { display: none; }
+  .segment { padding: 5px 8px; }
 }
 </style>
