@@ -132,7 +132,7 @@ const visibleMappings = computed(() => {
 .mtext { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; line-height: 1.3; }
 .mname { font-size: 12px; font-weight: 600; color: #dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mtype { font-size: 11px; color: #888888; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.uses { font-size: 11px; color: #cccccc; background: #333333; border-radius: 6px; padding: 1px 6px; flex-shrink: 0; }
+.uses { font-size: 11px; color: #cccccc; background: #333333; border-radius: 6px; padding: 1px 6px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .uses.zero { color: #666666; background: transparent; }
 .empty { font-size: 11px; color: #777777; padding: 8px 2px; }
 </style>

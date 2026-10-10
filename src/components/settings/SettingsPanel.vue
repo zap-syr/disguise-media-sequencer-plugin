@@ -142,7 +142,7 @@
           <input
             type="text"
             v-model="options.startTime"
-            class="standard-input"
+            class="standard-input tc-input"
             placeholder="00:00:00:00"
             aria-label="Start time"
             :class="{ invalid: isSpecific && !isStartTimeValid }"
@@ -244,7 +244,7 @@
               <input
                 type="text"
                 v-model="options.timecodeStart"
-                class="standard-input"
+                class="standard-input tc-input"
                 placeholder="00:00:00:00"
                 aria-label="Timecode start"
                 :class="{ invalid: !isTimecodeStartValid && options.timecodeStart !== '' }"
@@ -255,7 +255,7 @@
               <input
                 type="text"
                 v-model="options.timecodeIncrement"
-                class="standard-input"
+                class="standard-input tc-input"
                 placeholder="00:00:00:00"
                 aria-label="Timecode increment"
                 :class="{ invalid: !isTimecodeIncrementValid && options.timecodeIncrement !== '' }"
@@ -726,7 +726,10 @@ defineExpose({ revealSection });
   color: #888888;
   margin-bottom: 10px;
   line-height: 1.4;
+  font-variant-numeric: tabular-nums;
 }
+/* Timecodes, durations and counts: equal-width digits, so values line up and don't jitter */
+.tc-input { font-variant-numeric: tabular-nums; }
 
 .settings-sidebar-content {
   flex: 1;
@@ -964,6 +967,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
   color: #ffffff;
   font-weight: 700;
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;

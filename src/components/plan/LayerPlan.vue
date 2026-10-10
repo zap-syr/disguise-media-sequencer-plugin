@@ -393,7 +393,7 @@ defineExpose({ jump, openDefaults });
   flex-shrink: 0;
 }
 .ph-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #0a84ff; white-space: nowrap; flex-shrink: 0; }
-.ph-sum { flex: 1 1 0; font-size: 12px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ph-sum { flex: 1 1 0; font-size: 12px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; font-variant-numeric: tabular-nums; }
 .ph-spacer { flex: 1; }
 .plan-pane { container-type: inline-size; }
 @container (max-width: 760px) {
@@ -530,7 +530,7 @@ defineExpose({ jump, openDefaults });
 }
 .chip:hover { border-color: #555555; color: #ffffff; }
 .chip-label { color: #0a84ff; }
-.chip-count { color: #888888; font-weight: 500; }
+.chip-count { color: #888888; font-weight: 500; font-variant-numeric: tabular-nums; }
 
 /* Constant bottom room, so the last group can always be scrolled above the floating bar */
 .plan { flex: 1; overflow-y: auto; padding-bottom: 76px; }
