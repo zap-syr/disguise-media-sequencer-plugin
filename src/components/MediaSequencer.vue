@@ -58,17 +58,21 @@
           <WorkspaceSwitch v-model="workspace" />
         </template>
         <template v-if="isAdvanced" #selection-actions>
+          <!-- "New group" lives in the select: the keyboard / Files-layout way next to dropping files on the plan -->
           <div class="plan-actions" @click.stop>
             <select
               class="add-sel"
-              aria-label="Add selected files to a group"
-              :disabled="!selection.selectedItems.size || !plan.state.groups.length"
+              aria-label="Add selected files to a new or existing group"
+              title="Add the selected files to a new or existing group, or drag them onto the plan"
+              :disabled="!selection.selectedItems.size"
               @change="onAddToGroup"
             >
               <option value="">Add to group…</option>
-              <option v-for="(g, gi) in plan.state.groups" :key="g.id" :value="g.id">G{{ gi + 1 }}: {{ g.name }} ({{ g.items.length }})</option>
+              <option :value="NEW_GROUP">New group</option>
+              <optgroup v-if="plan.state.groups.length" label="Existing groups">
+                <option v-for="(g, gi) in plan.state.groups" :key="g.id" :value="g.id">G{{ gi + 1 }}: {{ g.name }} ({{ g.items.length }})</option>
+              </optgroup>
             </select>
-            <button type="button" class="primary-sm" :disabled="!selection.selectedItems.size" @click="onNewGroup">+ New group</button>
           </div>
         </template>
       </FilesPane>
@@ -425,6 +429,8 @@ async function revealGroup(gid) {
   layerPlanRef.value?.jump(gid);
 }
 
+const NEW_GROUP = '__new';
+
 function onNewGroup() {
   const paths = selectedClipPaths();
   if (!paths.length) return;
@@ -436,6 +442,10 @@ function onNewGroup() {
 function onAddToGroup(event) {
   const gid = event.target.value;
   event.target.value = '';
+  if (gid === NEW_GROUP) {
+    onNewGroup();
+    return;
+  }
   const paths = selectedClipPaths();
   if (!gid || !paths.length) return;
   plan.addToGroup(gid, paths);
@@ -580,20 +590,20 @@ async function handleCreateLayers(requestOptions) {
   min-width: 220px;
   border-right: 1px solid #2a2a2a;
 }
-/* Compact the narrow side pane: tighter paddings, flexible search, wrapping toolbar */
-.files-side :deep(.top-nav-bar) { padding: 0 12px; gap: 10px; }
-.files-side :deep(.breadcrumb) { min-width: 0; overflow: hidden; white-space: nowrap; }
-.files-side :deep(.top-nav-right) { flex: 1 1 0; min-width: 0; justify-content: flex-end; }
-.files-side :deep(.search-bar) { width: auto; flex: 1 1 70px; min-width: 0; max-width: 220px; }
-.files-side :deep(.search-bar input) { min-width: 0; }
-.files-side :deep(.breadcrumb) { flex: 0 1 auto; }
-.files-side :deep(.action-toolbar) { flex-wrap: wrap; height: auto; min-height: 40px; padding: 6px 12px; row-gap: 6px; }
+/* The top bar and toolbar adapt to the pane width themselves (FilesPane container queries) */
 .files-side :deep(.media-grid) { padding: 12px; }
 
-.plan-actions { display: flex; align-items: center; gap: 8px; }
+/* Shrinks before the toolbar would wrap; the label ends with an ellipsis */
+.plan-actions { display: flex; align-items: center; gap: 8px; flex: 0 1 180px; min-width: 110px; }
+/* Narrowest files pane (FilesPane is the container) */
+@container (max-width: 340px) {
+  .plan-actions { min-width: 92px; }
+}
 .add-sel {
   height: 28px;
-  max-width: 180px;
+  width: 100%;
+  min-width: 0;
+  text-overflow: ellipsis;
   background: #181818;
   border: 1px solid #3a3a3a;
   color: #eeeeee;
@@ -605,21 +615,6 @@ async function handleCreateLayers(requestOptions) {
 }
 .add-sel:focus { border-color: #0a84ff; }
 .add-sel:disabled { opacity: 0.4; cursor: not-allowed; }
-.primary-sm {
-  height: 28px;
-  background: #0a84ff;
-  border: none;
-  color: #ffffff;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 0 10px;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.2s ease;
-}
-.primary-sm:hover:not(:disabled) { background: #0060d1; }
-.primary-sm:disabled { background: #3a3a3a; color: #777777; cursor: not-allowed; }
 
 .loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
 </style>

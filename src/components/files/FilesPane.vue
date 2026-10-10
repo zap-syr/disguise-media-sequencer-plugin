@@ -1,7 +1,8 @@
 <template>
   <main class="main-content">
-    <header class="top-nav-bar">
-      <div class="breadcrumb">
+    <!-- One row; a narrow pane puts search + refresh on a second row under the title -->
+    <header class="top-nav-bar" :class="{ 'has-extra': !!$slots['nav-extra'] }">
+      <div class="breadcrumb" :title="breadcrumb.map(c => c.name).join(' / ')">
         <template v-for="(crumb, index) in breadcrumb" :key="crumb.id">
           <span class="crumb-text" @click="$emit('select-folder', crumb.id)">{{ crumb.name }}</span>
           <span v-if="index < breadcrumb.length - 1" class="crumb-divider">/</span>
@@ -9,21 +10,23 @@
       </div>
 
       <div class="top-nav-right">
-        <slot name="nav-extra"></slot>
-        <div class="search-bar">
-          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <input type="text" v-model="searchQuery" :placeholder="selectedFolderId === 'all' ? 'Search all files...' : 'Search current folder...'" />
-        </div>
+        <div v-if="$slots['nav-extra']" class="nav-extra"><slot name="nav-extra"></slot></div>
+        <div class="search-row">
+          <div class="search-bar">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" v-model="searchQuery" :placeholder="selectedFolderId === 'all' ? 'Search all files...' : 'Search current folder...'" />
+          </div>
 
-        <button
-          class="refresh-btn"
-          :class="{ 'is-refreshing': isRefreshing }"
-          :disabled="isRefreshing"
-          title="Refresh media, mappings and tracks"
-          @click="$emit('refresh')"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-        </button>
+          <button
+            class="refresh-btn"
+            :class="{ 'is-refreshing': isRefreshing }"
+            :disabled="isRefreshing"
+            title="Refresh media, mappings and tracks"
+            @click="$emit('refresh')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -40,12 +43,12 @@
           <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="3"/></svg>
         </button>
 
-        <span class="status-text">
+        <span class="status-text" :title="selection.selectedItems.size > 0 ? `${selection.selectedItems.size} of ${items.length} selected` : `${items.length} item(s)`">
           <template v-if="selection.selectedItems.size > 0">
-            <span class="highlight">{{ selection.selectedItems.size }}</span> of {{ items.length }} selected
+            <span class="highlight">{{ selection.selectedItems.size }}</span><span class="status-long"> of {{ items.length }} selected</span><span class="status-short">/{{ items.length }}</span>
           </template>
           <template v-else>
-            {{ items.length }} item(s)
+            {{ items.length }}<span class="status-long"> item(s)</span>
           </template>
         </span>
       </div>
@@ -203,13 +206,47 @@ watch(viewMode, () => {
   border-bottom: 1px solid #222222;
   flex-shrink: 0;
 }
-.breadcrumb { display: flex; align-items: center; font-size: 14px; text-transform: uppercase; font-weight: 600;}
+.top-nav-bar { gap: 12px; }
+.breadcrumb { display: flex; align-items: center; font-size: 14px; text-transform: uppercase; font-weight: 600; min-width: 0; overflow: hidden; white-space: nowrap; flex: 0 1 auto; }
 .crumb-text { cursor: pointer; color: #888888; transition: color 0.2s; }
 .crumb-text:hover { color: #ffffff; }
 .crumb-text:last-child { color: #dddddd; cursor: default; }
 .crumb-divider { margin: 0 8px; color: #444444; font-weight: 400;}
-.top-nav-right { display: flex; align-items: center; gap: 8px; }
-.search-bar { display: flex; align-items: center; background: #151515; border: 1px solid #333333; border-radius: 6px; padding: 6px 12px; width: 260px; }
+.top-nav-right { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 1 1 0; min-width: 0; }
+.nav-extra { display: flex; flex-shrink: 0; }
+.search-row { display: flex; align-items: center; gap: 8px; flex: 0 1 300px; min-width: 0; }
+/* In one row the search keeps a usable width and the path ends with an ellipsis instead */
+.search-bar { display: flex; align-items: center; background: #151515; border: 1px solid #333333; border-radius: 6px; padding: 6px 12px; flex: 1 1 auto; min-width: 120px; }
+.search-bar input { min-width: 0; }
+
+/*
+ * Narrow pane: title on the first row (with the workspace switch in the Files layout), search
+ * and refresh on a second row at full width. The switch needs room too, so a bar with it
+ * switches earlier.
+ */
+@container (max-width: 500px) {
+  .top-nav-bar { padding: 0 12px; }
+}
+@container (max-width: 380px) {
+  .top-nav-bar {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "crumb extra" "search search";
+    align-items: center; row-gap: 8px; column-gap: 8px; height: auto; min-height: 52px; padding: 10px 12px;
+  }
+  .top-nav-right { display: contents; }
+  .breadcrumb { grid-area: crumb; }
+  .nav-extra { grid-area: extra; }
+  .search-row { grid-area: search; }
+}
+@container (max-width: 480px) {
+  .top-nav-bar.has-extra {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "crumb extra" "search search";
+    align-items: center; row-gap: 8px; column-gap: 8px; height: auto; min-height: 52px; padding: 10px 12px;
+  }
+  .has-extra .top-nav-right { display: contents; }
+  .has-extra .breadcrumb { grid-area: crumb; }
+  .has-extra .nav-extra { grid-area: extra; }
+  .has-extra .search-row { grid-area: search; }
+}
 .search-bar:focus-within { border-color: #666666; }
 .search-icon { color: #666666; margin-right: 8px; }
 .search-bar input { background: transparent; border: none; color: #cccccc; outline: none; width: 100%; font-size: 12px; }
@@ -249,8 +286,26 @@ watch(viewMode, () => {
 .master-checkbox-btn:hover:not(:disabled) { background: #2a2a2a; color: #ffffff; }
 .master-checkbox-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-.status-text { font-size: 12px; color: #888888; }
+.status-text { font-size: 12px; color: #888888; white-space: nowrap; }
 .highlight { color: #ffffff; font-weight: 600; }
+.status-short { display: none; }
+
+/* The toolbar stays one row in a narrow pane: the size toggle goes first, then the counter shortens */
+.main-content { container-type: inline-size; }
+.selection-group { flex-shrink: 0; }
+.view-controls { flex-shrink: 0; }
+@container (max-width: 500px) {
+  .action-toolbar { padding: 0 12px; }
+  .view-controls .segmented-control.grid-size-control { display: none; }
+}
+@container (max-width: 340px) {
+  .status-long { display: none; }
+  .status-short { display: inline; }
+  .action-toolbar, .selection-group { gap: 8px; }
+  .action-toolbar { padding: 0 8px; }
+  .view-controls .segmented-control.compact .segment.icon-segment { padding: 5px 5px; }
+  .view-controls .subfolder-segment { margin-left: 4px; }
+}
 
 /* --- View controls --- */
 .view-controls { display: flex; align-items: center; gap: 8px; margin-left: auto; }
