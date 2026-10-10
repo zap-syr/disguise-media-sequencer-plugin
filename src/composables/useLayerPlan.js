@@ -1,5 +1,5 @@
 import { reactive, computed } from 'vue';
-import { PLAN_DEFAULTS, coerce, effectiveGroup, pruneOverrides, hasOverrides } from '../utils/planSchema';
+import { PLAN_DEFAULTS, CHIPS, coerce, effectiveGroup, effectiveLayer, pruneOverrides, hasOverrides } from '../utils/planSchema';
 
 /**
  * Advanced-mode layer plan: ordered groups of entries (one entry = one future layer).
@@ -205,11 +205,42 @@ export function useLayerPlan() {
     setPlan(Object.fromEntries(keys.map(k => [k, eg[k]])), keys);
   }
 
-  /** { groupValues, layers } currently overriding the Plan defaults (for the defaults panel). */
+  /** "Apply to whole group": the layers' value becomes the group value and leaves all its layers. */
+  function applyLayerValueToGroup(gid, entryIds, keys) {
+    const group = state.groups.find(g => g.id === gid);
+    const entry = state.entries[entryIds[0]];
+    if (!group || !entry) return;
+    const values = effectiveLayer(effectiveGroup(state.plan, group), entry);
+    applyPatch(group.ov, Object.fromEntries(keys.map(k => [k, values[k]])));
+    group.items.forEach(id => keys.forEach(k => { if (state.entries[id]) delete state.entries[id].ov[k]; }));
+    normalize();
+  }
+
+  /** Plan defaults back to the built-in values for `keys`. */
+  function resetPlanKeys(keys) {
+    setPlan(Object.fromEntries(keys.map(k => [k, PLAN_DEFAULTS[k]])));
+  }
+
+  /** "Clear N overrides": removes `keys` from every group and layer. */
+  function clearOverrides(keys) {
+    state.groups.forEach(g => {
+      keys.forEach(k => delete g.ov[k]);
+      g.items.forEach(id => keys.forEach(k => { if (state.entries[id]) delete state.entries[id].ov[k]; }));
+    });
+  }
+
+  /** { groupValues, layers } currently overriding the Plan defaults (for the defaults panel); linked keys count once. */
   const overrideStats = computed(() => ({
-    groupValues: state.groups.reduce((n, g) => n + Object.keys(g.ov).length, 0),
+    groupValues: state.groups.reduce((n, g) => n + CHIPS.filter(c => c.keys.some(k => k in g.ov)).length, 0),
     layers: state.groups.reduce((n, g) => n + g.items.filter(id => hasOverrides(state.entries[id])).length, 0)
   }));
+
+  /** chip key -> number of groups and layers that set their own value for it ("◆ N" in Plan defaults). */
+  const overrideCounts = computed(() => {
+    const sets = (ov, keys) => keys.some(k => k in (ov || {}));
+    return Object.fromEntries(CHIPS.map(c => [c.key, state.groups.reduce((n, g) =>
+      n + (sets(g.ov, c.keys) ? 1 : 0) + g.items.filter(id => sets(state.entries[id]?.ov, c.keys)).length, 0)]));
+  });
 
   // --- Mappings (Phase 5) ---
 
@@ -273,6 +304,7 @@ export function useLayerPlan() {
     addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
     removeGroup, updateGroup, setAllOpen,
     assign, assignGroup, clearMappings, applyAutoAssign,
-    overrideStats, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides, applyGroupValueToAll
+    overrideStats, overrideCounts, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides,
+    applyGroupValueToAll, applyLayerValueToGroup, resetPlanKeys, clearOverrides
   };
 }

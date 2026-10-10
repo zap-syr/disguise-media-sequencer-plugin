@@ -55,3 +55,48 @@ export function computePlanLayout(groups, entries, details, defaults) {
   });
   return { groups: out, total };
 }
+
+/**
+ * Marker times of one layout group, same placement rules as plan_prepare.py:
+ * split 'file' = every start + the closing split, 'group' = the group start;
+ * tag 'file' = every unique start, 'group' = the group start. Empty groups place nothing.
+ */
+export function groupMarkerTimes(group) {
+  if (!group.rows.length) return { splits: [], tags: [] };
+  const { start, starts, closing, values } = group;
+  return {
+    splits: values.split === 'file' ? [...new Set([...starts, closing])] : [start],
+    tags: values.tag === 'file' ? starts : [start]
+  };
+}
+
+/**
+ * What Create will place on the timeline: { splits, tags: { tc, cue, midi } } counts.
+ * Splits are deduplicated across groups (a group start can close the previous group);
+ * tags are not (plan_prepare.py places one per position per tag type).
+ * `on` = { split, tc, cue, midi } global switches from the settings panel.
+ */
+export function countMarkers(layout, on) {
+  const splitTimes = new Set();
+  let tagCount = 0;
+  layout.groups.forEach(g => {
+    const m = groupMarkerTimes(g);
+    m.splits.forEach(t => splitTimes.add(Math.round(t * 1000)));
+    tagCount += m.tags.length;
+  });
+  return {
+    splits: on.split ? splitTimes.size : 0,
+    tags: { tc: on.tc ? tagCount : 0, cue: on.cue ? tagCount : 0, midi: on.midi ? tagCount : 0 }
+  };
+}
+
+/** "3 splits, 5 cue tags" parts of countMarkers(); empty when nothing is placed. */
+export function describeMarkers(m) {
+  const n = (count, one, many) => `${count} ${count === 1 ? one : many}`;
+  return [
+    m.splits ? n(m.splits, 'split', 'splits') : null,
+    m.tags.tc ? n(m.tags.tc, 'TC tag', 'TC tags') : null,
+    m.tags.cue ? n(m.tags.cue, 'cue tag', 'cue tags') : null,
+    m.tags.midi ? n(m.tags.midi, 'MIDI tag', 'MIDI tags') : null
+  ].filter(Boolean);
+}
