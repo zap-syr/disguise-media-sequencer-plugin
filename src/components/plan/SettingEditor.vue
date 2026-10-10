@@ -1,83 +1,102 @@
 <template>
-  <div class="editor">
-    <div class="seg" role="group" :aria-label="chip.title">
-      <button
-        v-for="opt in spec.options"
-        :key="String(opt.value)"
-        type="button"
-        :class="{ on: isOn(spec.key, opt.value) }"
-        :aria-pressed="isOn(spec.key, opt.value)"
-        @click="emitPatch(spec.key, opt.value)"
-      >{{ opt.label }}</button>
+  <div class="editor" :class="{ dim }">
+    <div class="opts" role="radiogroup" :aria-label="chip.title" @keydown="onArrows">
+      <div v-for="(opt, i) in spec.options" :key="String(opt.value)" class="opt-wrap">
+        <button
+          :ref="el => { optEls[i] = el; }"
+          type="button"
+          role="radio"
+          class="opt"
+          :class="{ on: isOn(opt.value) }"
+          :aria-checked="isOn(opt.value)"
+          :tabindex="i === focusIndex ? 0 : -1"
+          @click="emitPatch(spec.key, opt.value)"
+        >
+          <span class="radio" aria-hidden="true"></span>
+          <span class="opt-label">{{ opt.label }}</span>
+          <span v-if="opt.hint" class="opt-hint">{{ opt.hint }}</span>
+        </button>
+        <!-- A number belongs to its option: shown inside the selected option only -->
+        <div v-if="opt.number && isOn(opt.value)" class="nested">
+          <span class="nested-lbl">{{ opt.number.label }}</span>
+          <NumStepper
+            :model-value="numValue(opt.number.key)"
+            :label="opt.number.label"
+            @update:model-value="v => emitPatch(opt.number.key, v)"
+          />
+        </div>
+      </div>
     </div>
-    <label v-for="num in spec.numbers" :key="num.key" class="num" :class="{ disabled: num.disabled() }">
-      <span class="num-lbl">{{ num.label }}</span>
-      <span class="num-in">
-        <input
-          type="number"
-          min="0"
-          step="0.5"
-          :value="mixed.has(num.key) ? '' : values[num.key]"
-          :placeholder="mixed.has(num.key) ? 'Mixed' : ''"
-          :disabled="num.disabled()"
-          :aria-label="num.label"
-          @change="emitPatch(num.key, $event.target.value)"
-        />
-        <span class="unit">s</span>
-      </span>
-    </label>
-    <div v-if="note" class="note">{{ note }}</div>
+    <!-- A value that always applies gets its own subsection -->
+    <div v-for="sub in spec.always || []" :key="sub.key" class="sub">
+      <div class="sub-title">{{ sub.title }}</div>
+      <div class="sub-row">
+        <span class="nested-lbl">{{ sub.label }}</span>
+        <NumStepper :model-value="numValue(sub.key)" :label="`${sub.title} ${sub.label}`" @update:model-value="v => emitPatch(sub.key, v)" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { CHIPS, sameValue } from '../../utils/planSchema';
+import NumStepper from './NumStepper.vue';
 
 const props = defineProps({
   chipKey: { type: String, required: true },
   values: { type: Object, required: true },               // effective values (any of the keys may be mixed)
   mixed: { type: Set, default: () => new Set() },         // keys whose value differs across the selection
-  globals: { type: Object, default: () => ({ tagsOn: true, splitOn: true }) }
+  dim: { type: Boolean, default: false }                  // the global switch for this setting is off
 });
 const emit = defineEmits(['patch']);
 
 const chip = computed(() => CHIPS.find(c => c.key === props.chipKey));
-const known = key => !props.mixed.has(key);
-const isOn = (key, value) => known(key) && sameValue(key, props.values[key], value);
 
 const SPECS = {
   start: {
     key: 'timing',
-    options: [{ value: 'seq', label: 'One after another' }, { value: 'same', label: 'All at once' }],
-    numbers: [{ key: 'overlap', label: 'Overlap', disabled: () => known('timing') && props.values.timing === 'same' }]
+    options: [
+      { value: 'seq', label: 'In order', number: { key: 'overlap', label: 'Overlap' } },
+      { value: 'same', label: 'All at once' }
+    ]
   },
-  tags: { key: 'tag', options: [{ value: 'file', label: 'Each file' }, { value: 'group', label: 'Group start' }], numbers: [] },
-  split: { key: 'split', options: [{ value: 'file', label: 'Each file' }, { value: 'group', label: 'Group start' }], numbers: [] },
-  mode: { key: 'mode', options: [{ value: 'Normal', label: 'Normal' }, { value: 'Locked', label: 'Locked' }], numbers: [] },
-  end: { key: 'end', options: [{ value: 'Loop', label: 'Loop' }, { value: 'Ping-Pong', label: 'Ping-Pong' }, { value: 'Pause', label: 'Pause' }], numbers: [] },
+  tags: { key: 'tag', options: [{ value: 'file', label: 'Each file' }, { value: 'group', label: 'Group start' }] },
+  split: { key: 'split', options: [{ value: 'file', label: 'Each file', hint: '+ end' }, { value: 'group', label: 'Group start' }] },
+  mode: { key: 'mode', options: [{ value: 'Normal', label: 'Normal' }, { value: 'Locked', label: 'Locked' }] },
+  end: { key: 'end', options: [{ value: 'Loop', label: 'Loop' }, { value: 'Ping-Pong', label: 'Ping-Pong' }, { value: 'Pause', label: 'Pause' }] },
   fade: {
     key: 'bright',
-    options: [{ value: false, label: 'Off' }, { value: true, label: 'Fade in' }],
-    numbers: [{ key: 'brightT', label: 'Fade time', disabled: () => known('bright') && !props.values.bright }]
+    options: [{ value: false, label: 'Off' }, { value: true, label: 'Fade in', number: { key: 'brightT', label: 'Duration' } }]
   },
   length: {
     key: 'fit',
-    options: [{ value: true, label: 'Fit to contents' }, { value: false, label: 'Fixed length' }],
-    numbers: [
-      { key: 'movieDur', label: 'Movie', disabled: () => known('fit') && !!props.values.fit },
-      { key: 'stillDur', label: 'Still image', disabled: () => false }
-    ]
+    options: [
+      { value: true, label: 'Fit to contents' },
+      { value: false, label: 'Fixed length', number: { key: 'movieDur', label: 'Duration' } }
+    ],
+    always: [{ key: 'stillDur', title: 'Still images', label: 'Duration' }]
   }
 };
 
 const spec = computed(() => SPECS[props.chipKey]);
+const isOn = value => !props.mixed.has(spec.value.key) && sameValue(spec.value.key, props.values[spec.value.key], value);
+const numValue = key => (props.mixed.has(key) ? null : Number(props.values[key]) || 0);
 
-const note = computed(() => {
-  if (props.chipKey === 'tags' && !props.globals.tagsOn) return 'Tags are off in the Tags settings on the right. This placement is used once they are on.';
-  if (props.chipKey === 'split' && !props.globals.splitOn) return 'Split section is off in Insert settings. This placement is used once it is on.';
-  return '';
-});
+// Roving tabindex: Tab enters the group on the selected option, arrows move and select
+const optEls = [];
+const focusIndex = computed(() => Math.max(0, spec.value.options.findIndex(o => isOn(o.value))));
+
+function onArrows(event) {
+  const dir = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[event.key];
+  if (!dir || !event.target.matches('.opt')) return;
+  event.preventDefault();
+  const opts = spec.value.options;
+  const at = optEls.indexOf(event.target);
+  const next = (at + dir + opts.length) % opts.length;
+  emitPatch(spec.value.key, opts[next].value);
+  optEls[next]?.focus();
+}
 
 function emitPatch(key, value) {
   emit('patch', { [key]: value });
@@ -87,30 +106,46 @@ function emitPatch(key, value) {
 <style scoped>
 * { box-sizing: border-box; }
 
-.editor { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+.editor { display: flex; flex-direction: column; gap: 10px; transition: opacity 0.2s ease; }
+.editor.dim .opts, .editor.dim .sub { opacity: 0.45; }
 
-.seg { display: inline-flex; background: #181818; border: 1px solid #3a3a3a; border-radius: 6px; padding: 2px; }
-.seg button {
-  border: none; background: transparent; color: #888888;
-  padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer;
-  white-space: nowrap; transition: all 0.2s ease;
+.opts { border: 1px solid #333333; border-radius: 6px; background: #181818; overflow: hidden; }
+.opt-wrap + .opt-wrap { border-top: 1px solid #262626; }
+.opt-wrap:has(.opt.on) { background: rgba(10, 132, 255, 0.08); }
+
+.opt {
+  width: 100%; height: 36px; padding: 0 10px;
+  display: flex; align-items: center; gap: 10px;
+  border: none; background: transparent; cursor: pointer; text-align: left;
+  font: inherit; font-size: 12px; color: #cccccc;
+  transition: background 0.15s ease, color 0.15s ease;
 }
-.seg button:hover { color: #cccccc; }
-.seg button.on { background: #3a3a3a; color: #ffffff; }
-.seg button:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
-
-.num { display: inline-flex; align-items: center; gap: 6px; margin: 0; transition: opacity 0.2s ease; }
-.num.disabled { opacity: 0.4; }
-.num-lbl { font-size: 11px; color: #888888; font-weight: 500; }
-.num-in { position: relative; width: 70px; }
-.num-in input {
-  width: 100%; background: #181818; border: 1px solid #3a3a3a; color: #eeeeee;
-  padding: 5px 20px 5px 8px; border-radius: 6px; font-size: 12px; outline: none; transition: border-color 0.2s ease;
+.opt:hover { background: #222222; color: #ffffff; }
+.opt-wrap:has(.opt.on) .opt:hover { background: transparent; }
+.opt:focus-visible { outline: none; box-shadow: inset 0 0 0 1px #0a84ff; }
+.opt.on { color: #ffffff; font-weight: 600; }
+.radio {
+  width: 14px; height: 14px; flex-shrink: 0; border-radius: 50%;
+  border: 1.5px solid #666666; background: transparent; transition: all 0.15s ease;
 }
-.num-in input:focus { border-color: #0a84ff; }
-.num-in input::placeholder { color: #777777; font-style: italic; }
-.num-in input:disabled { cursor: not-allowed; }
-.unit { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; color: #777777; pointer-events: none; }
+.opt:hover .radio { border-color: #aaaaaa; }
+.opt.on .radio { border-color: #0a84ff; background: #0a84ff; box-shadow: inset 0 0 0 3px #181818; }
+.opt-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.opt-hint { font-size: 11px; font-weight: 400; color: #777777; }
 
-.note { flex-basis: 100%; font-size: 11px; color: #888888; }
+/* Number inside the selected option: indented to the option text, set off by a thin divider */
+.nested {
+  height: 36px; margin-left: 34px; padding-right: 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  border-top: 1px solid #262626;
+}
+.nested-lbl { font-size: 12px; color: #cccccc; }
+
+.sub { display: flex; flex-direction: column; gap: 6px; }
+.sub-title { font-size: 12px; font-weight: 600; color: #ffffff; }
+.sub-row {
+  height: 36px; padding: 0 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  border: 1px solid #333333; border-radius: 6px; background: #181818;
+}
 </style>
