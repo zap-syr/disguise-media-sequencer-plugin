@@ -33,7 +33,10 @@
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         <span class="btn-label">Plan defaults</span>
       </button>
-      <button type="button" class="ghost" @click="$emit('add-group')">+ Group</button>
+      <button type="button" class="ghost icon-text" title="Add an empty group" aria-label="Add group" @click="$emit('add-group')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="btn-label">Group</span>
+      </button>
       </div>
     </header>
 
@@ -109,16 +112,16 @@
       </button>
     </div>
 
-    <div v-if="planState.groups.length" ref="listRef" class="plan" @dragover="autoScroll">
+    <div v-if="planState.groups.length" ref="listRef" class="plan" @dragover="onListOver" @drop="onListDrop">
       <template v-for="(g, gi) in planState.groups" :key="g.id">
       <div
-        v-if="draggingFolders"
+        v-if="draggingNew"
         class="gap-drop"
         :class="{ over: gapOver === gi }"
         @dragover.prevent="gapOver = gi"
         @dragleave="gapOver = null"
-        @drop.prevent="onGapDrop(gi)"
-      >Drop to create groups here</div>
+        @drop.prevent.stop="onGapDrop(gi)"
+      >{{ draggingFolders ? 'Drop to create groups here' : 'Drop to create a new group here' }}</div>
       <PlanGroup
         :group="g"
         :index="gi"
@@ -159,23 +162,26 @@
         @drop-folders="d => $emit('drop-folders', { ...d, gid: g.id })"
       />
       </template>
+      <!-- The free space under the last group (and the list background) creates a group at the end -->
       <div
-        v-if="draggingFolders"
-        class="gap-drop"
+        v-if="draggingNew"
+        class="gap-drop gap-end"
         :class="{ over: gapOver === planState.groups.length }"
         @dragover.prevent="gapOver = planState.groups.length"
         @dragleave="gapOver = null"
-        @drop.prevent="onGapDrop(planState.groups.length)"
-      >Drop to create groups at the end</div>
+        @drop.prevent.stop="onGapDrop(planState.groups.length)"
+      >{{ draggingFolders ? 'Drop to create groups at the end' : 'Drop to create a new group' }}</div>
     </div>
     <div
       v-else
       class="empty"
-      :class="{ 'is-drop': draggingFolders && gapOver === 0 }"
-      @dragover="draggingFolders && ($event.preventDefault(), gapOver = 0)"
+      :class="{ 'is-drop': draggingNew && gapOver === 0 }"
+      @dragover="draggingNew && ($event.preventDefault(), gapOver = 0)"
       @dragleave="gapOver = null"
-      @drop.prevent="draggingFolders && onGapDrop(0)"
-    >Select files and press "New group", or select folders in the tree. Repeat to build Group 2, Group 3 and so on.</div>
+      @drop.prevent="draggingNew && onGapDrop(0)"
+    >{{ draggingNew
+      ? (draggingFolders ? 'Drop to create groups' : 'Drop to create a new group')
+      : 'Drag files here to create a group, or select folders in the tree. Repeat to build Group 2, Group 3 and so on.' }}</div>
   </section>
 </template>
 
@@ -208,7 +214,7 @@ const props = defineProps({
 const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
   'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
-  'drop-folders', 'drop-folder-groups',
+  'drop-folders', 'drop-folder-groups', 'drop-file-group',
   'set-plan', 'reset-plan-keys', 'clear-overrides', 'reset-all-overrides', 'auto-assign',
   'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group']);
 
@@ -254,13 +260,36 @@ watch(() => !!openPanel.value, open => {
   window.removeEventListener('keydown', onPdEsc, true);
 });
 
-// Folders dragged from the tree: drop between groups creates groups there (docs §2.3.2)
+// Folders or files dropped between groups, under the last one or on the empty plan create
+// groups there (docs §2.3.0, §2.3.2); a drop onto a group or a row adds to that group instead
 const draggingFolders = computed(() => dragPayload.kind === 'folders');
+const draggingNew = computed(() => dragPayload.kind === 'folders' || dragPayload.kind === 'files');
 const gapOver = ref(null);
+watch(draggingNew, () => { gapOver.value = null; });
 function onGapDrop(index) {
-  emit('drop-folder-groups', { folderIds: [...dragPayload.ids], index });
+  if (!draggingNew.value) return;
+  const ids = [...dragPayload.ids];
+  if (draggingFolders.value) emit('drop-folder-groups', { folderIds: ids, index });
+  else emit('drop-file-group', { paths: ids, index });
   gapOver.value = null;
   endDrag();
+}
+
+/** List background (outside any group): auto-scroll, and a drop target for a group at the end. */
+function onListOver(event) {
+  autoScroll(event);
+  if (!draggingNew.value) return;
+  if (event.target === listRef.value) {
+    event.preventDefault();
+    gapOver.value = props.planState.groups.length;
+  } else if (!event.target.closest('.gap-drop')) {
+    gapOver.value = null;   // over a group: it adds to that group
+  }
+}
+function onListDrop(event) {
+  if (!draggingNew.value || event.target !== listRef.value) return;
+  event.preventDefault();
+  onGapDrop(props.planState.groups.length);
 }
 
 /** Delete / Backspace removes the selected rows (not while typing in an input). */
@@ -337,26 +366,33 @@ defineExpose({ jump, openDefaults });
   background: #1a1a1a;
 }
 
+/*
+ * The header is always one row. As the plan pane narrows: the summary ellipsizes away, the
+ * Auto-assign / Plan defaults / Group buttons become icons, then the workspace switch does
+ * (WorkspaceSwitch.vue), then paddings and gaps tighten.
+ */
 .ph {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 10px;
-  min-height: 52px;
-  padding: 8px 16px;
+  gap: 10px;
+  height: 52px;
+  padding: 0 16px;
   border-bottom: 1px solid #222222;
   flex-shrink: 0;
 }
-.ph-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #0a84ff; white-space: nowrap; }
-.ph-sum { font-size: 12px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ph-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #0a84ff; white-space: nowrap; flex-shrink: 0; }
+.ph-sum { flex: 1 1 0; font-size: 12px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .ph-spacer { flex: 1; }
-/* Narrow plan pane: header panel buttons become icons (the title keeps the name) */
 .plan-pane { container-type: inline-size; }
-@container (max-width: 440px) {
+@container (max-width: 760px) {
   .btn-label { display: none; }
   .ghost.icon-text { padding: 6px 8px; }
 }
-.ph-actions { margin-left: auto; display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+@container (max-width: 360px) {
+  .ph { padding: 0 12px; gap: 8px; }
+  .ph .ph-actions { gap: 6px; }
+}
+.ph-actions { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
 
 .pd-anchor { position: relative; height: 0; z-index: 20; }
 .pd-drop {
@@ -441,7 +477,7 @@ defineExpose({ jump, openDefaults });
 .bar-x:hover { background: #333333; color: #ffffff; }
 .armed-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 /* Narrow pane: the bar keeps its actions and drops the labels */
-@container (max-width: 520px) {
+@container (max-width: 620px) {
   .bar-lbl, .sel-bar .bar-text { display: none; }
 }
 @container (max-width: 400px) {
@@ -497,4 +533,6 @@ defineExpose({ jump, openDefaults });
   transition: all 0.2s ease;
 }
 .gap-drop.over { border-color: #0a84ff; border-style: solid; color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
+/* A big target under the last group (the list's bottom padding stays below it) */
+.gap-end { min-height: 64px; display: flex; align-items: center; justify-content: center; }
 </style>

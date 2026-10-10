@@ -115,6 +115,7 @@
         @remove-selected="onRemoveSelected"
         @drop-folders="onDropFolders"
         @drop-folder-groups="onDropFolderGroups"
+        @drop-file-group="onDropFileGroup"
         @deselect="planSelection.clear"
         @add-group="onAddEmptyGroup"
         @update-group="plan.updateGroup"
@@ -446,6 +447,16 @@ function onAddToGroup(event) {
 
 function onDropRows({ ids, gid, targetId, pos }) {
   plan.moveEntries(ids, gid, targetId, pos);
+}
+
+/** Files dropped on empty plan space or between groups: a new group there, in drag order (docs §2.3.0). */
+function onDropFileGroup({ paths, index }) {
+  if (!paths.length) return;
+  const [gid] = plan.insertGroups([{ name: `Group ${plan.state.groups.length + 1}`, paths }], index);
+  selection.clear();
+  const gi = plan.state.groups.findIndex(g => g.id === gid);
+  showToast(`G${gi + 1} created, ${paths.length} ${paths.length === 1 ? 'file' : 'files'}`);
+  revealGroup(gid);
 }
 
 function onDropFiles({ paths, gid, targetId, pos }) {
