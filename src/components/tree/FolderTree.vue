@@ -289,15 +289,19 @@ function stopResize() {
 .tree-item.is-checked { background: rgba(10, 132, 255, 0.15); color: #ffffff; }
 .tree-item.is-checked:hover { background: rgba(10, 132, 255, 0.2); }
 
-/* Folder checkbox: replaces the icon on hover, keyboard focus, and on every row while folders are checked */
+/* Folder checkbox: replaces the icon on hover, keyboard focus, and on every row while folders are checked.
+   Lighter and filled, so it reads as a checkbox next to the hollow #666666 folder icon. */
 .fcb {
   display: none;
   width: 14px; height: 14px; padding: 0; flex-shrink: 0;
-  border: 1.5px solid #777777; border-radius: 4px; background: #181818; color: transparent;
+  border: 1.5px solid #aaaaaa; border-radius: 4px; background: #242424; color: transparent;
   align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
 }
-.fcb:hover { border-color: #cccccc; }
-.fcb.on { background: #0a84ff; border-color: #0a84ff; color: #ffffff; }
+/* Row under the pointer: the box that replaced the icon turns blue, so the swap is obvious */
+.tree-item:hover .fcb { border-color: #0a84ff; background: rgba(10, 132, 255, 0.10); }
+.tree-item:hover .fcb:hover { background: rgba(10, 132, 255, 0.20); }
+.fcb:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
+.fcb.on, .tree-item:hover .fcb.on { background: #0a84ff; border-color: #0a84ff; color: #ffffff; }
 .tree-item:hover .checkable .fcb,
 .tree-item:focus-visible .checkable .fcb,
 .tree-container.has-checked .checkable .fcb { display: flex; }
