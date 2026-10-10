@@ -1255,11 +1255,15 @@ popovers, the armed mapping and Delete on selected rows are done.
   gives the count ("Assign to all 24 layers in 3 groups"); disabled on an empty plan; the
   mapping stays armed after the click. At narrow widths the bar text shortens
   ("Assigning <mapping>") before the buttons do, and the bar never wraps (§9.5).
+  Done: `useLayerPlan.assignAll()` returns the restore for Undo; the button shows an icon only
+  at the narrowest bar, like the other bar buttons. Rows with a missing clip get the mapping
+  too (they are skipped by Create anyway).
 
 **E. Settings panel**
 - **Timeline markers section: separate Split section from the tags** (owner request,
   2026-10-10): a visual divider in `SettingsPanel` between the Split section row and the
   TC / Cue / MIDI tag rows, so the two purposes read as separate blocks.
+  Done: a 1px `#2e2e2e` line (the same as the preview's top border) under the Split row.
 
 **F. Visual consistency (§7, Q7)**
 - Sweep all components against the `disguise-css` palette: no stray hex values, 6px radius,
