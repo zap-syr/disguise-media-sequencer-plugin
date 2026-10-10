@@ -1,41 +1,83 @@
 <template>
-  <div class="pdbox" role="region" aria-label="Plan defaults">
+  <div class="pdbox" role="dialog" aria-label="Plan defaults">
     <div class="pd-head">
-      <span class="pd-title">PLAN DEFAULTS</span>
-      <span class="hint">Every group inherits these values. Values changed on a group or a layer are marked ◆.</span>
+      <span class="pd-title">Plan defaults</span>
+      <span class="pd-tag">All groups</span>
+      <span class="hint">Every group starts from these values</span>
+      <button type="button" class="pd-x" aria-label="Close Plan defaults" title="Close (Esc)" @click="$emit('close')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
-    <div class="pd-grid">
-      <div v-for="chip in CHIPS" :key="chip.key" class="pd-item">
-        <span class="pd-lbl">{{ chip.title }}</span>
-        <SettingEditor :chip-key="chip.key" :values="plan" :globals="globals" @patch="p => $emit('patch', p)" />
-      </div>
+    <div class="pd-body">
+      <ChipRow ref="chipRow" :chips="chips" :open-key="openChip" @open="toggleChip" />
     </div>
     <div class="pd-foot">
-      <span class="hint">{{ statsText }}</span>
-      <div class="spacer"></div>
-      <button type="button" class="ghost" :disabled="!stats.groupValues && !stats.layers" @click="$emit('reset-all')">Reset all overrides</button>
-      <button type="button" class="primary" @click="$emit('close')">Done</button>
+      <span class="hint" :class="{ warm: total }">{{ statsText }}</span>
+      <button type="button" class="quiet" :disabled="!total" @click="$emit('reset-all')">Reset all overrides</button>
     </div>
+
+    <ChipPopover
+      v-if="openSpec"
+      :anchor="chipRow?.anchorOf(openChip)"
+      :keep-open-on="chipRow?.rowEl"
+      :chip-key="openSpec.key"
+      :values="plan"
+      :globals="globals"
+      tag="All groups"
+      :reset="{ enabled: !isBuiltIn(openSpec), tip: 'Back to the built-in value' }"
+      :secondary="{
+        label: openSpec.count ? `Clear ${openSpec.count} ${openSpec.count === 1 ? 'override' : 'overrides'}` : 'No overrides',
+        disabled: !openSpec.count,
+        icon: 'clear',
+        tip: 'Removes this setting from every group and layer that sets its own value, so they all use the Plan default'
+      }"
+      @patch="p => $emit('patch', p)"
+      @reset="$emit('reset-keys', openSpec.keys)"
+      @secondary="$emit('clear-overrides', openSpec.keys)"
+      @close="openChip = null"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { CHIPS } from '../../utils/planSchema';
-import SettingEditor from './SettingEditor.vue';
+import { computed, ref } from 'vue';
+import { CHIPS, PLAN_DEFAULTS, chipValue, chipLongValue, chipWarning, sameValue } from '../../utils/planSchema';
+import ChipRow from './ChipRow.vue';
+import ChipPopover from './ChipPopover.vue';
 
 const props = defineProps({
   plan: { type: Object, required: true },     // useLayerPlan().state.plan
   stats: { type: Object, required: true },    // useLayerPlan().overrideStats
+  counts: { type: Object, required: true },   // useLayerPlan().overrideCounts (chip key -> N)
   globals: { type: Object, default: () => ({ tagsOn: true, splitOn: true }) }
 });
-defineEmits(['patch', 'reset-all', 'close']);
+defineEmits(['patch', 'reset-keys', 'clear-overrides', 'reset-all', 'close']);
 
+const isBuiltIn = c => c.keys.every(k => sameValue(k, props.plan[k], PLAN_DEFAULTS[k]));
+
+const chips = computed(() => CHIPS.map(c => {
+  const count = props.counts[c.key] || 0;
+  const off = (c.key === 'tags' && !props.globals.tagsOn) || (c.key === 'split' && !props.globals.splitOn);
+  const warn = chipWarning(c.key, props.plan);
+  const long = off ? `${chipLongValue(c.key, props.plan, { tagsOn: true, splitOn: true })}, off for the whole plan` : chipLongValue(c.key, props.plan, props.globals);
+  const tail = count ? `. ${count} ${count === 1 ? 'group or layer sets' : 'groups and layers set'} their own value` : '';
+  return { ...c, count, off, warn, value: chipValue(c.key, props.plan, props.globals), tip: `${c.title}: ${long}${tail}${warn ? `. ${warn}` : ''}` };
+}));
+
+const chipRow = ref(null);
+const openChip = ref(null);
+const openSpec = computed(() => chips.value.find(c => c.key === openChip.value) || null);
+function toggleChip(key) {
+  openChip.value = openChip.value === key ? null : key;
+}
+
+const total = computed(() => props.stats.groupValues + props.stats.layers);
 const statsText = computed(() => {
   const g = props.stats.groupValues;
   const l = props.stats.layers;
-  if (!g && !l) return 'No group or layer overrides these defaults.';
-  return `${g} group ${g === 1 ? 'value' : 'values'} and ${l} ${l === 1 ? 'layer' : 'layers'} currently override these defaults.`;
+  if (!g && !l) return 'Every group uses these values';
+  const parts = [g ? `${g} group ${g === 1 ? 'value' : 'values'}` : null, l ? `${l} ${l === 1 ? 'layer' : 'layers'}` : null].filter(Boolean);
+  return `◆ ${parts.join(' and ')} set their own values`;
 });
 </script>
 
@@ -44,33 +86,41 @@ const statsText = computed(() => {
 
 .pdbox {
   margin: 10px 14px 0;
-  padding: 12px 14px;
-  border: 1px solid #333333;
+  border: 1px solid #3a3a3a;
   border-radius: 6px;
-  background: #242424;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex-shrink: 0;
+  background: #1e1e1e;
+  overflow: hidden;
 }
-.pd-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
-.pd-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #0a84ff; }
-.hint { font-size: 11px; color: #888888; }
-.pd-grid { display: flex; flex-wrap: wrap; gap: 12px 24px; }
-.pd-item { display: flex; flex-direction: column; gap: 6px; }
-.pd-lbl { font-size: 11px; color: #aaaaaa; font-weight: 600; }
-.pd-foot { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid #333333; }
-.spacer { flex: 1; }
+.pd-head { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 12px; border-bottom: 1px solid #2e2e2e; }
+.pd-title { font-size: 12px; font-weight: 700; color: #ffffff; white-space: nowrap; }
+.pd-tag {
+  flex-shrink: 0; height: 18px; padding: 0 6px; border-radius: 4px;
+  display: inline-flex; align-items: center;
+  background: #0a84ff; color: #ffffff; font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.hint { flex: 1; min-width: 0; font-size: 11px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hint.warm { color: #ffd60a; }
+/* The footer summary wraps instead of being cut in a narrow pane */
+.pd-foot .hint { white-space: normal; line-height: 1.4; }
+.pd-x {
+  width: 24px; height: 24px; flex-shrink: 0; border: none; border-radius: 4px;
+  background: transparent; color: #888888; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+}
+.pd-x:hover { background: #2a2a2a; color: #ffffff; }
+.pd-x:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 
-.ghost {
-  background: transparent; border: 1px solid #333333; color: #aaaaaa;
-  border-radius: 6px; padding: 6px 10px; font-size: 12px; cursor: pointer; transition: all 0.2s ease;
+.pd-body { display: flex; padding: 10px 12px; }
+.pd-foot {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px 6px 12px; background: #1a1a1a; border-top: 1px solid #2e2e2e;
 }
-.ghost:hover:not(:disabled) { border-color: #555555; color: #ffffff; background: #1f1f1f; }
-.ghost:disabled { opacity: 0.35; cursor: not-allowed; }
-.primary {
-  background: #0a84ff; border: none; color: #ffffff; border-radius: 6px;
-  padding: 6px 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s ease;
+.quiet {
+  flex-shrink: 0; height: 26px; padding: 0 10px; border-radius: 6px;
+  border: 1px solid transparent; background: transparent; color: #aaaaaa;
+  font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
 }
-.primary:hover { background: #0060d1; }
+.quiet:hover:not(:disabled) { border-color: #555555; background: #2a2a2a; color: #ffffff; }
+.quiet:disabled { opacity: 0.4; cursor: not-allowed; }
+.quiet:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 </style>

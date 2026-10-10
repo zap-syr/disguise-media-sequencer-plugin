@@ -27,6 +27,9 @@
       </div>
       <span class="g-meta" :class="{ 'is-drop': headOver }">{{ headOver ? `Assign to all ${group.items.length}` : meta }}</span>
       <div class="g-actions">
+        <button type="button" class="icon-btn" title="Group and its layers back to Plan defaults" aria-label="Reset group settings to Plan defaults" :disabled="!groupHasOverrides" @click="$emit('reset-group')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
         <button type="button" class="icon-btn" title="Clear mappings in this group" aria-label="Clear mappings in this group" :disabled="!hasMappings" @click="$emit('clear-group')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H9L4 15l10-10 7 7-6 6"/><path d="m9 10 6 6"/></svg>
         </button>
@@ -54,67 +57,31 @@
             <svg v-else-if="someChecked" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 12h12"/></svg>
           </button>
         </span>
-        <div ref="chipsEl" class="chips">
-          <!-- Scope switch sits inline, so selecting rows doesn't push the list down -->
-          <div v-if="selInGroup.length" class="scope-seg" role="group" aria-label="Settings apply to">
-            <button type="button" :class="{ on: !selScope }" :aria-pressed="!selScope" title="Edit the whole group" @click="setScope('group')">Group</button>
-            <button type="button" :class="{ on: selScope }" :aria-pressed="selScope" title="Edit only the selected layers" @click="setScope('auto')">{{ selInGroup.length }} selected</button>
-          </div>
-          <button
-            v-for="c in chips"
-            :key="c.key"
-            :ref="el => { chipEls[c.key] = el; }"
-            type="button"
-            class="schip"
-            :class="{ ov: c.ov, mixed: c.mixed, open: openChip === c.key, off: c.off }"
-            :title="c.tip"
-            aria-haspopup="dialog"
-            :aria-expanded="openChip === c.key"
-            @click="toggleChip(c.key)"
-          >
-            <span class="schip-k">{{ c.label }}</span>
-            <span class="schip-v">{{ c.value }}</span>
-            <span v-if="c.ov" class="schip-d" aria-hidden="true">◆</span>
-            <span v-if="c.layerCount" class="schip-n" :aria-label="`${c.layerCount} layers override it`">{{ c.layerCount }}</span>
-          </button>
-          <button v-if="selScope && selWithOv.length" type="button" class="schip reset" title="Selected layers back to the group settings" @click="$emit('set-layer-ov', selWithOv, null, LAYER_KEYS)">
-            ↺ Reset {{ selWithOv.length }} {{ selWithOv.length === 1 ? 'layer' : 'layers' }}
-          </button>
-          <button v-else-if="!selScope && groupHasOverrides" type="button" class="schip reset" title="Group and its layers back to Plan defaults" @click="$emit('reset-group')">↺ Reset to defaults</button>
-        </div>
+        <ChipRow ref="chipRow" :chips="chips" :open-key="openChip" :scope="selScope" @open="toggleChip" />
       </div>
 
-      <!-- Chip popover floats over the plan (teleported, fixed position), so nothing below moves -->
-      <Teleport to="body">
-        <div
-          v-if="openSpec"
-          ref="popEl"
-          class="pop"
-          :class="{ above: popPos.above }"
-          :style="{ top: popPos.top + 'px', left: popPos.left + 'px', '--arrow-x': popPos.arrow + 'px' }"
-          role="dialog"
-          :aria-label="`${openSpec.title}, ${label}`"
-        >
-          <div class="pop-head">
-            <span class="pop-title">{{ openSpec.title }}, {{ label }}</span>
-            <span class="pop-scope">{{ selScope ? `${selInGroup.length} selected ${selInGroup.length === 1 ? 'layer' : 'layers'}` : 'Whole group' }}</span>
-          </div>
-          <SettingEditor :chip-key="openSpec.key" :values="scopeValues.values" :mixed="scopeValues.mixed" :globals="globals" @patch="onPatch" />
-          <div class="pop-foot">
-            <div class="pop-links">
-              <button v-if="!selScope" type="button" class="link" :disabled="!openChipInfo.ov" @click="$emit('set-group-ov', {}, openSpec.keys)">↺ Use plan default</button>
-              <button v-else type="button" class="link" :disabled="!openChipInfo.ov" @click="$emit('set-layer-ov', selInGroup, null, openSpec.keys)">↺ Use group value</button>
-              <button v-if="!selScope && openChipInfo.layerCount" type="button" class="link" @click="$emit('set-layer-ov', layerIdsOverriding(openSpec.keys), null, openSpec.keys)">
-                {{ openChipInfo.layerCount }} {{ openChipInfo.layerCount === 1 ? 'layer overrides' : 'layers override' }} this, Reset
-              </button>
-            </div>
-            <div class="pop-btns">
-              <button v-if="!selScope" type="button" class="ghost" title="Make this the Plan default and remove it from every group" @click="$emit('apply-to-all', openSpec.keys)">Apply to all groups</button>
-              <button type="button" class="primary" @click="closePop">Done</button>
-            </div>
-          </div>
-        </div>
-      </Teleport>
+      <ChipPopover
+        v-if="openSpec"
+        :anchor="chipRow?.anchorOf(openChip)"
+        :keep-open-on="chipRow?.rowEl"
+        :chip-key="openSpec.key"
+        :values="popValues.values"
+        :mixed="popValues.mixed"
+        :globals="globals"
+        :tag="popLayers ? `${selInGroup.length} ${selInGroup.length === 1 ? 'layer' : 'layers'}` : label"
+        :reset="popLayers
+          ? { enabled: openSpec.ov, tip: 'Selected layers back to the group value' }
+          : { enabled: openSpec.ov, tip: 'Back to the Plan default' }"
+        :secondary="popLayers
+          ? { label: 'Apply to whole group', disabled: openSpec.mixed, tip: openSpec.mixed ? 'The selected layers have different values' : 'The value goes to the group and is removed from its layers' }
+          : { label: 'Apply to all groups', tip: 'The value becomes the Plan default and is removed from every group' }"
+        :layer-note="popLayers ? 0 : openSpec.layerCount"
+        @patch="onPatch"
+        @reset="onReset"
+        @secondary="onSecondary"
+        @reset-layers="$emit('set-layer-ov', layerIdsOverriding(openSpec.keys), null, openSpec.keys)"
+        @close="closePop"
+      />
 
       <div v-if="rows.length" class="rows" :class="{ 'has-sel': anySelected }">
         <div
@@ -200,12 +167,14 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch, nextTick, onBeforeUnmount } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { formatClock, formatDuration } from '../../utils/format';
 import { mappingColor } from '../../utils/mappingColors';
 import { dragPayload, startDrag, endDrag } from '../../composables/useDragPayload';
-import { CHIPS, LAYER_KEYS, chipValue, effectiveLayer, describeOverrides, sameValue } from '../../utils/planSchema';
-import SettingEditor from './SettingEditor.vue';
+import { CHIPS, LAYER_KEYS, chipValue, chipLongValue, chipWarning, effectiveLayer, describeOverrides, sameValue } from '../../utils/planSchema';
+import { groupMarkerTimes } from '../../utils/planLayout';
+import ChipRow from './ChipRow.vue';
+import ChipPopover from './ChipPopover.vue';
 
 const props = defineProps({
   group: { type: Object, required: true },
@@ -230,19 +199,14 @@ const props = defineProps({
 const emit = defineEmits(['toggle', 'rename', 'remove', 'remove-entry',
   'assign', 'clear-entries', 'assign-group', 'clear-group',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'drop-folders',
-  'set-scope', 'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all']);
+  'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group']);
 
-// --- Settings chips (Phase 7, docs §2.4 / §2.6) ---
+// --- Settings chips (Phase 7 / 8b, docs §2.4 / §2.5.1 / §2.6) ---
 const selInGroup = computed(() => props.group.items.filter(id => props.checked.has(id)));
-/** Selection scope: rows of this group are selected and the group was not switched to "Edit group instead". */
+/** Selection scope: rows of this group are selected and the selection bar is not on "Group". */
 const selScope = computed(() => selInGroup.value.length > 0 && props.group.scope !== 'group');
-const selWithOv = computed(() => selInGroup.value.filter(id => hasOv(id)));
 const hasOv = id => Object.keys(props.entries[id]?.ov || {}).length > 0;
 const layerValues = id => effectiveLayer(props.layout.values, props.entries[id]);
-
-function setScope(scope) {
-  emit('set-scope', scope);
-}
 
 /** Values the editor shows: the group's effective values, or the selection's with mixed keys. */
 const scopeValues = computed(() => {
@@ -256,92 +220,46 @@ function layerIdsOverriding(keys) {
   return props.group.items.filter(id => keys.some(k => k in (props.entries[id]?.ov || {})));
 }
 
+/** A chip edits the selected layers in selection scope; group-only chips (Start / Tags / Split) always edit the group. */
+const editsLayers = c => selScope.value && !c.groupOnly;
+
 function chipInfo(c) {
-  const layerCount = layerIdsOverriding(c.keys).length;
-  const { values, mixed } = scopeValues.value;
-  if (selScope.value) {
+  const { values, mixed } = editsLayers(c) ? scopeValues.value : { values: props.layout.values, mixed: new Set() };
+  const warn = chipWarning(c.key, values);
+  if (editsLayers(c)) {
     const isMixed = c.keys.some(k => mixed.has(k));
     const ov = selInGroup.value.some(id => c.keys.some(k => k in (props.entries[id]?.ov || {})));
+    const long = isMixed ? 'Mixed' : chipLongValue(c.key, values, props.globals);
     return {
-      ...c, layerCount: 0, ov, mixed: isMixed, off: false,
+      ...c, layerCount: 0, ov, mixed: isMixed, off: false, warn: isMixed ? '' : warn,
       value: isMixed ? 'Mixed' : chipValue(c.key, values, props.globals),
-      tip: ov ? `${c.title}: set on selected layers` : `${c.title}: inherited from the group`
+      tip: `${c.title}: ${long}. ${ov ? 'Set on selected layers' : 'Inherited from the group'}${warn && !isMixed ? `. ${warn}` : ''}`
     };
   }
+  const layerCount = layerIdsOverriding(c.keys).length;
   const ov = c.keys.some(k => k in props.group.ov);
   const off = (c.key === 'tags' && !props.globals.tagsOn) || (c.key === 'split' && !props.globals.splitOn);
-  const from = ov ? 'set on this group' : 'inherited from plan defaults';
+  const long = off ? `${chipLongValue(c.key, values, { tagsOn: true, splitOn: true })}, off for the whole plan` : chipLongValue(c.key, values, props.globals);
+  const from = ov ? 'Set on this group' : 'Inherited from Plan defaults';
   const tail = layerCount ? `, ${layerCount} ${layerCount === 1 ? 'layer overrides' : 'layers override'} it` : '';
-  return { ...c, layerCount, ov, mixed: false, off, value: chipValue(c.key, values, props.globals), tip: `${c.title}: ${from}${tail}` };
+  return {
+    ...c, layerCount, ov, mixed: false, off, warn,
+    value: chipValue(c.key, values, props.globals),
+    tip: `${c.title}: ${long}. ${from}${tail}${warn ? `. ${warn}` : ''}`
+  };
 }
 
-const chips = computed(() => CHIPS.filter(c => !(selScope.value && c.groupOnly)).map(chipInfo));
+const chips = computed(() => CHIPS.map(chipInfo));
+const chipRow = ref(null);
 const openChip = ref(null);
 const openSpec = computed(() => chips.value.find(c => c.key === openChip.value) || null);
-const openChipInfo = computed(() => openSpec.value || { ov: false, layerCount: 0 });
+/** The open popover edits the selected layers (otherwise the group). */
+const popLayers = computed(() => !!openSpec.value && editsLayers(openSpec.value));
+const popValues = computed(() => (popLayers.value ? scopeValues.value : { values: props.layout.values, mixed: new Set() }));
 const groupHasOverrides = computed(() => Object.keys(props.group.ov).length > 0 || props.group.items.some(hasOv));
 
-// --- Floating popover: below the chip, flipped above when there is no room, kept on screen ---
-const chipsEl = ref(null);
-const chipEls = {};
-const popEl = ref(null);
-const popPos = reactive({ top: 0, left: 0, arrow: 16, above: false });
-const GAP = 6;
-const EDGE = 8;
-
-function placePop() {
-  const chip = chipEls[openChip.value];
-  const pop = popEl.value;
-  if (!chip || !pop) return;
-  const c = chip.getBoundingClientRect();
-  // The chip scrolled out of the plan list: the popover would float detached, so close it
-  const list = chip.closest('.plan')?.getBoundingClientRect();
-  if (list && (c.bottom < list.top || c.top > list.bottom)) { closePop(); return; }
-  const vw = document.documentElement.clientWidth;
-  const vh = document.documentElement.clientHeight;
-  const w = pop.offsetWidth;
-  const h = pop.offsetHeight;
-  const left = Math.max(EDGE, Math.min(c.left, vw - w - EDGE));
-  const roomBelow = vh - c.bottom - GAP - EDGE;
-  const roomAbove = c.top - GAP - EDGE;
-  const above = h > roomBelow && roomAbove > roomBelow;
-  let top = above ? c.top - GAP - h : c.bottom + GAP;
-  top = Math.max(EDGE, Math.min(top, vh - h - EDGE));
-  Object.assign(popPos, { top, left, above, arrow: Math.max(12, Math.min(c.left + 16 - left, w - 16)) });
-}
-
-function onOutside(event) {
-  if (popEl.value?.contains(event.target) || chipsEl.value?.contains(event.target)) return;
-  closePop();
-}
-/** Esc closes the popover before the plan's own Esc (disarm / deselect) runs. */
-function onEsc(event) {
-  if (event.key !== 'Escape') return;
-  event.stopPropagation();
-  const chip = chipEls[openChip.value];
-  closePop();
-  chip?.focus();
-}
-function listen(on) {
-  const fn = on ? 'addEventListener' : 'removeEventListener';
-  window[fn]('pointerdown', onOutside, true);
-  window[fn]('keydown', onEsc, true);
-  window[fn]('resize', placePop);
-  window[fn]('scroll', placePop, true);
-}
-
-watch(openChip, async (key, prev) => {
-  if (key && !prev) listen(true);
-  if (!key && prev) listen(false);
-  if (!key) return;
-  await nextTick();
-  placePop();
-});
-// Content changes (Mixed, scope, notes) can change the popover height
-watch(() => [openSpec.value?.key, selScope.value, scopeValues.value, props.layout], () => nextTick(placePop));
-// The chip disappears (selection scope hides Start/Tags/Split, group collapsed): close
+// The group collapsed (or the chip is gone): close
 watch([openSpec, () => props.group.open], ([spec, open]) => { if ((!spec || !open) && openChip.value) closePop(); });
-onBeforeUnmount(() => { if (openChip.value) listen(false); });
 
 function closePop() {
   openChip.value = null;
@@ -350,8 +268,18 @@ function toggleChip(key) {
   openChip.value = openChip.value === key ? null : key;
 }
 function onPatch(patch) {
-  if (selScope.value) emit('set-layer-ov', selInGroup.value, patch);
+  if (popLayers.value) emit('set-layer-ov', selInGroup.value, patch);
   else emit('set-group-ov', patch);
+}
+function onReset() {
+  const keys = openSpec.value.keys;
+  if (popLayers.value) emit('set-layer-ov', selInGroup.value, null, keys);
+  else emit('set-group-ov', {}, keys);
+}
+function onSecondary() {
+  const keys = openSpec.value.keys;
+  if (popLayers.value) emit('apply-to-group', selInGroup.value, keys);
+  else emit('apply-to-all', keys);
 }
 /** ◆ on a row: select that layer, which puts the group into selection scope. */
 function onOvMark(id) {
@@ -483,18 +411,10 @@ const spanStyle = computed(() => ({
   left: pct(props.layout.start) + '%',
   width: Math.max(0.8, pct(props.layout.end - props.layout.start)) + '%'
 }));
-const hasRows = computed(() => props.layout.rows.length > 0);
-// Same placement rules as plan_prepare.py: 'file' = every start (+ a closing split), 'group' = the group start
-const splitMarks = computed(() => {
-  if (!props.showSplits || !hasRows.value) return [];
-  const { start, starts, closing, values } = props.layout;
-  return (values.split === 'file' ? [...new Set([...starts, closing])] : [start]).map(pct);
-});
-const tagMarks = computed(() => {
-  if (!props.showTags || !hasRows.value) return [];
-  const { start, starts, values } = props.layout;
-  return (values.tag === 'file' ? starts : [start]).map(pct);
-});
+// Same placement rules as plan_prepare.py (utils/planLayout.js)
+const markerTimes = computed(() => groupMarkerTimes(props.layout));
+const splitMarks = computed(() => (props.showSplits ? markerTimes.value.splits.map(pct) : []));
+const tagMarks = computed(() => (props.showTags ? markerTimes.value.tags.map(pct) : []));
 
 const meta = computed(() => {
   const n = props.group.items.length;
@@ -597,95 +517,11 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .icon-btn:hover { background: #333333; color: #ffffff; }
 
 .g-set {
-  display: flex; align-items: flex-start; gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   /* left padding matches .row so the select-all lines up with the row checkboxes */
   padding: 8px 12px 8px 10px; border-top: 1px solid #2a2a2a; background: #1e1e1e;
 }
 .selall-cell { width: 26px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-.link {
-  border: none; background: transparent; padding: 0; color: #0a84ff;
-  font-size: 11px; font-weight: 600; cursor: pointer; text-align: left;
-}
-.link:hover:not(:disabled) { text-decoration: underline; }
-.link:disabled { color: #555555; cursor: not-allowed; }
-
-.chips { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.scope-seg {
-  display: inline-flex; height: 24px; padding: 2px; flex-shrink: 0;
-  border: 1px solid #0a84ff; border-radius: 6px; background: #181818;
-}
-.scope-seg button {
-  border: none; background: transparent; color: #888888;
-  padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer;
-  white-space: nowrap; transition: all 0.2s ease;
-}
-.scope-seg button:hover { color: #cccccc; }
-.scope-seg button.on { background: #0a84ff; color: #ffffff; }
-.scope-seg button:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
-.schip {
-  position: relative;
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 24px; padding: 0 8px; max-width: 100%; min-width: 0;
-  border: 1px solid #333333; border-radius: 6px; background: #181818;
-  font-size: 11px; cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
-}
-.schip-v { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.schip:hover { border-color: #555555; }
-.schip:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
-.schip-k { color: #777777; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; }
-.schip-v { color: #cccccc; font-weight: 500; }
-.schip-d { color: #ffd60a; font-size: 10px; }
-.schip-n {
-  min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px;
-  background: #3a3a3a; color: #dddddd; font-size: 10px; font-weight: 700;
-  display: inline-flex; align-items: center; justify-content: center;
-}
-.schip.ov { border-color: rgba(255, 214, 10, 0.55); background: rgba(255, 214, 10, 0.08); }
-.schip.ov .schip-v { color: #ffd60a; }
-.schip.mixed .schip-v { font-style: italic; color: #888888; }
-.schip.off .schip-v { color: #555555; text-decoration: line-through; }
-.schip.open { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
-.schip.reset { color: #aaaaaa; border-style: dashed; }
-.schip.reset:hover { color: #ffffff; }
-
-/* Teleported to <body>: fixed, above everything, sized to its content but never wider than the window */
-.pop {
-  position: fixed; z-index: 1000;
-  width: max-content; max-width: min(440px, calc(100vw - 16px));
-  max-height: calc(100vh - 16px); overflow-y: auto;
-  padding: 10px 12px;
-  border: 1px solid #0a84ff; border-radius: 6px; background: #242424;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  display: flex; flex-direction: column; gap: 10px;
-  font-family: inherit; color: #cccccc;
-}
-/* Small notch pointing at the chip */
-.pop::before {
-  content: ''; position: absolute; left: var(--arrow-x); top: -5px;
-  width: 8px; height: 8px; background: #242424;
-  border-left: 1px solid #0a84ff; border-top: 1px solid #0a84ff;
-  transform: translateX(-50%) rotate(45deg);
-}
-.pop.above::before { top: auto; bottom: -5px; transform: translateX(-50%) rotate(225deg); }
-.pop-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; }
-.pop-title { font-size: 12px; font-weight: 700; color: #ffffff; }
-.pop-scope { font-size: 11px; color: #888888; }
-.pop-foot {
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px;
-  padding-top: 8px; border-top: 1px solid #333333;
-}
-.pop-links { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
-.pop-btns { display: flex; gap: 8px; margin-left: auto; }
-.ghost {
-  background: transparent; border: 1px solid #333333; color: #aaaaaa;
-  border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer; transition: all 0.2s ease;
-}
-.ghost:hover { border-color: #555555; color: #ffffff; background: #1f1f1f; }
-.primary {
-  background: #0a84ff; border: none; color: #ffffff; border-radius: 6px;
-  padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.2s ease;
-}
-.primary:hover { background: #0060d1; }
 
 .ov-mark {
   border: none; background: transparent; padding: 0 5px 0 0;
@@ -706,8 +542,9 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .row:last-child { border-bottom: none; }
 .row { cursor: default; user-select: none; position: relative; }
 .row:hover { background: #242424; }
-.row.is-checked { background: rgba(10, 132, 255, 0.15); box-shadow: inset 0 0 0 1px rgba(10, 132, 255, 0.5); }
-.row.is-checked:hover { background: rgba(10, 132, 255, 0.2); }
+/* Selection is colour only: nothing changes size when rows are checked */
+.row.is-checked { background: rgba(10, 132, 255, 0.10); }
+.row.is-checked:hover { background: rgba(10, 132, 255, 0.15); }
 .row.is-dragging { opacity: 0.4; }
 .row.drop-before { box-shadow: inset 0 2px 0 #0a84ff; }
 .row.drop-after { box-shadow: inset 0 -2px 0 #0a84ff; }
@@ -766,6 +603,10 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   .row { grid-template-columns: 26px minmax(0, 1fr) minmax(84px, 38%) 24px; gap: 8px; padding: 0 8px; }
   .thumb { display: none; }
   .g-set { padding: 8px 8px; gap: 8px; }
+}
+/* Minimum plan width: the name needs the room more than "6 files, 1m 51s" (the gnav chip has the count) */
+@container (max-width: 300px) {
+  .g-meta { display: none; }
 }
 
 .g-empty { padding: 14px; text-align: center; color: #666666; font-size: 12px; border-top: 1px solid #2a2a2a; }

@@ -45,8 +45,11 @@
         class="pd-drop"
         :plan="planState.plan"
         :stats="overrideStats"
+        :counts="overrideCounts"
         :globals="globals"
         @patch="p => $emit('set-plan', p)"
+        @reset-keys="keys => $emit('reset-plan-keys', keys)"
+        @clear-overrides="keys => $emit('clear-overrides', keys)"
         @reset-all="$emit('reset-all-overrides')"
         @close="closePanel"
       />
@@ -76,19 +79,34 @@
       <button type="button" class="ghost" @click="$emit('set-all-open', !anyOpen)">{{ anyOpen ? 'Collapse all' : 'Expand all' }}</button>
     </div>
 
-    <div v-if="selectedIds.length" class="sel-strip" role="status">
-      <span><strong>{{ selectedIds.length }}</strong> {{ selectedIds.length === 1 ? 'layer' : 'layers' }} selected. Drag to move, drop a mapping on one to assign all.</span>
-      <div class="ph-spacer"></div>
-      <button type="button" class="ghost" @click="$emit('clear-entries', selectedIds)">Clear mappings</button>
-      <button type="button" class="ghost danger" @click="$emit('remove-selected')">Remove</button>
-      <button type="button" class="ghost" @click="$emit('deselect')">Deselect</button>
-    </div>
-
-    <div v-if="armedMapping" class="armed-strip" role="status">
+    <!-- Floating bar over the list: checking layers or arming a mapping moves nothing -->
+    <div v-if="armedMapping" class="sel-bar" role="status">
       <span class="armed-dot" :style="{ background: armedColor }"></span>
-      <span>Assigning <strong>{{ armedMapping.name }}</strong>: click layer slots. Esc to cancel.</span>
-      <div class="ph-spacer"></div>
-      <button type="button" class="ghost" @click="$emit('disarm')">Done</button>
+      <span class="bar-text">Assigning <strong>{{ armedMapping.name }}</strong>: click layer slots</span>
+      <span class="bar-sep"></span>
+      <button type="button" class="bar-btn" title="Stop assigning (Esc)" @click="$emit('disarm')">Done</button>
+    </div>
+    <div v-else-if="selectedIds.length" class="sel-bar" role="status" title="Drag rows to move them, drop a mapping on a selected row to assign it to all">
+      <span class="sel-count">{{ selectedIds.length }}</span>
+      <span class="bar-text">{{ selectedIds.length === 1 ? 'layer' : 'layers' }} selected</span>
+      <span class="bar-sep"></span>
+      <span class="bar-lbl">Chips edit</span>
+      <div class="bar-seg" role="group" aria-label="Chips edit">
+        <button type="button" :class="{ on: selScopeMode === 'selected' }" :aria-pressed="selScopeMode === 'selected'" title="Group chips edit the selected layers" @click="setSelScope('selected')">Selected</button>
+        <button type="button" :class="{ on: selScopeMode === 'group' }" :aria-pressed="selScopeMode === 'group'" title="Group chips edit the whole group" @click="setSelScope('group')">Group</button>
+      </div>
+      <span class="bar-sep"></span>
+      <button type="button" class="bar-btn" title="Clear mappings of the selected layers" aria-label="Clear mappings" @click="$emit('clear-entries', selectedIds)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H9L4 15l10-10 7 7-6 6"/><path d="m9 10 6 6"/></svg>
+        <span class="bar-btn-lbl">Clear mappings</span>
+      </button>
+      <button type="button" class="bar-btn danger" title="Remove the selected layers (Delete)" aria-label="Remove" @click="$emit('remove-selected')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+        <span class="bar-btn-lbl">Remove</span>
+      </button>
+      <button type="button" class="bar-x" aria-label="Deselect" title="Deselect (Esc)" @click="$emit('deselect')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
     </div>
 
     <div v-if="planState.groups.length" ref="listRef" class="plan" @dragover="autoScroll">
@@ -131,11 +149,11 @@
         @toggle="$emit('update-group', g.id, { open: !g.open })"
         @rename="name => $emit('update-group', g.id, { name })"
         :globals="globals"
-        @set-scope="scope => $emit('update-group', g.id, { scope })"
         @set-group-ov="(patch, removeKeys) => $emit('set-group-ov', g.id, patch, removeKeys)"
         @set-layer-ov="(ids, patch, keys) => $emit('set-layer-ov', ids, patch, keys)"
         @reset-group="$emit('reset-group', g.id)"
         @apply-to-all="keys => $emit('apply-to-all', g.id, keys)"
+        @apply-to-group="(ids, keys) => $emit('apply-to-group', g.id, ids, keys)"
         @remove="$emit('remove-group', g.id)"
         @remove-entry="eid => $emit('remove-entry', g.id, eid)"
         @drop-folders="d => $emit('drop-folders', { ...d, gid: g.id })"
@@ -183,6 +201,7 @@ const props = defineProps({
   checked: { type: Set, default: () => new Set() },  // usePlanSelection().checked
   selectedIds: { type: Array, default: () => [] },   // selected ids in plan order
   overrideStats: { type: Object, required: true },   // useLayerPlan().overrideStats
+  overrideCounts: { type: Object, required: true },  // useLayerPlan().overrideCounts
   mappings: { type: Array, default: () => [] },      // getMappingList() result (auto-assign)
   globals: { type: Object, default: () => ({ tagsOn: true, splitOn: true }) }
 });
@@ -190,7 +209,8 @@ const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-e
   'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
   'drop-folders', 'drop-folder-groups',
-  'set-plan', 'reset-all-overrides', 'auto-assign', 'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all']);
+  'set-plan', 'reset-plan-keys', 'clear-overrides', 'reset-all-overrides', 'auto-assign',
+  'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group']);
 
 // Header drop-down panels: 'defaults' | 'auto' | null (one at a time)
 const openPanel = ref(null);
@@ -205,14 +225,21 @@ function togglePanel(name) {
 function closePanel() {
   openPanel.value = null;
 }
+/** Opens Plan defaults (the settings panel's "Open Plan defaults" button). */
+function openDefaults() {
+  openPanel.value = 'defaults';
+}
+// A chip popover or "+N" list floats above the panel (teleported): it handles its own clicks and Esc
+const floatingOpen = () => !!document.querySelector('.chip-pop, .chip-overflow');
 // Close on a click outside the panel (not on its toggle button) and on Esc
 function onPdOutside(event) {
   const el = panelRef.value?.$el;
   if (el?.contains(event.target) || panelBtn()?.contains(event.target)) return;
+  if (event.target.closest?.('.chip-pop, .chip-overflow')) return;
   closePanel();
 }
 function onPdEsc(event) {
-  if (event.key !== 'Escape') return;
+  if (event.key !== 'Escape' || floatingOpen()) return;
   event.stopPropagation();
   const btn = panelBtn();
   closePanel();
@@ -254,6 +281,13 @@ function autoScroll(event) {
   else if (event.clientY > rect.bottom - edge) el.scrollTop += 12;
 }
 
+// "Chips edit" in the selection bar: the groups that hold selected rows edit them or the whole group
+const selGroups = computed(() => props.planState.groups.filter(g => g.items.some(id => props.checked.has(id))));
+const selScopeMode = computed(() => (selGroups.value.some(g => g.scope === 'group') ? 'group' : 'selected'));
+function setSelScope(mode) {
+  selGroups.value.forEach(g => emit('update-group', g.id, { scope: mode === 'group' ? 'group' : 'auto' }));
+}
+
 const hasAnyMapping = computed(() => Object.values(props.planState.entries).some(e => e.mappingPath));
 const armedMapping = computed(() => (props.armed ? props.mappingsByPath[props.armed] : null));
 const armedColor = computed(() => mappingColor(props.armed));
@@ -286,13 +320,14 @@ async function jump(gid) {
   flashTimer = setTimeout(() => { if (flashId.value === gid) flashId.value = null; }, 1400);
 }
 
-defineExpose({ jump });
+defineExpose({ jump, openDefaults });
 </script>
 
 <style scoped>
 * { box-sizing: border-box; }
 
 .plan-pane {
+  position: relative;
   flex: 1 0 320px;
   min-width: 320px;
   display: flex;
@@ -328,7 +363,6 @@ defineExpose({ jump });
   position: absolute; top: 0; left: 0; right: 0;
   max-height: min(70vh, 560px); overflow-y: auto;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
-  border-color: #0a84ff;
 }
 
 .ghost {
@@ -352,33 +386,69 @@ defineExpose({ jump });
 .plan-pane:focus { outline: none; }
 .ghost.danger:hover:not(:disabled) { border-color: #ef4444; color: #ef4444; }
 
-.sel-strip {
+/* Floating selection / armed-mapping bar at the bottom centre of the pane */
+.sel-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 15;
+  max-width: calc(100% - 24px);
+  height: 44px;
+  padding: 0 6px 0 10px;
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 10px;
-  padding: 8px 16px;
+  gap: 8px;
   background: #242424;
-  border-bottom: 1px solid #333333;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
   font-size: 12px;
   color: #cccccc;
-  flex-shrink: 0;
+  white-space: nowrap;
 }
-.sel-strip strong { color: #ffffff; }
-
-.armed-strip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  background: rgba(10, 132, 255, 0.15);
-  border-bottom: 1px solid #0a84ff;
-  font-size: 12px;
-  color: #dddddd;
-  flex-shrink: 0;
+.sel-bar strong { color: #ffffff; }
+.bar-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.sel-count {
+  min-width: 22px; height: 20px; padding: 0 6px; border-radius: 10px; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #0a84ff; color: #ffffff; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
 }
-.armed-strip strong { color: #ffffff; }
+.bar-sep { width: 1px; height: 20px; background: #3a3a3a; flex-shrink: 0; }
+.bar-lbl { font-size: 11px; color: #888888; flex-shrink: 0; }
+.bar-seg { display: inline-flex; height: 28px; padding: 2px; flex-shrink: 0; border: 1px solid #3a3a3a; border-radius: 6px; background: #181818; }
+.bar-seg button {
+  border: none; background: transparent; color: #888888;
+  padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+}
+.bar-seg button:hover { color: #cccccc; }
+.bar-seg button.on { background: #3a3a3a; color: #ffffff; }
+.bar-seg button:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
+.bar-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  flex-shrink: 0; height: 28px; padding: 0 10px; border-radius: 6px;
+  border: 1px solid #3a3a3a; background: transparent; color: #cccccc;
+  font-size: 12px; cursor: pointer; transition: all 0.2s ease;
+}
+.bar-btn:hover { border-color: #555555; background: #2a2a2a; color: #ffffff; }
+.bar-btn.danger:hover { border-color: #ef4444; color: #ef4444; background: transparent; }
+.bar-btn:focus-visible, .bar-x:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
+.bar-x {
+  width: 28px; height: 28px; flex-shrink: 0; border: none; border-radius: 6px;
+  background: transparent; color: #888888; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
+}
+.bar-x:hover { background: #333333; color: #ffffff; }
 .armed-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+/* Narrow pane: the bar keeps its actions and drops the labels */
+@container (max-width: 520px) {
+  .bar-lbl, .sel-bar .bar-text { display: none; }
+}
+@container (max-width: 400px) {
+  .sel-bar { gap: 6px; padding-left: 8px; }
+  .bar-btn { padding: 0 7px; }
+  .bar-btn-lbl { display: none; }
+}
 
 .gnav-wrap {
   display: flex;
@@ -410,7 +480,8 @@ defineExpose({ jump });
 .chip-label { color: #0a84ff; }
 .chip-count { color: #888888; font-weight: 500; }
 
-.plan { flex: 1; overflow-y: auto; padding-bottom: 24px; }
+/* Constant bottom room, so the last group can always be scrolled above the floating bar */
+.plan { flex: 1; overflow-y: auto; padding-bottom: 76px; }
 
 .empty { padding: 40px 18px; text-align: center; color: #555555; font-size: 13px; border: 1px dashed transparent; margin: 10px 14px; border-radius: 6px; }
 .empty.is-drop { border-color: #0a84ff; color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
