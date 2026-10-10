@@ -1220,6 +1220,18 @@ popovers, the armed mapping and Delete on selected rows are done.
 - A mapping that no longer exists is cleared from its rows with a toast
   "2 mappings no longer exist"; the red slot border stays only for the moment before Refresh.
 - Plan layout and marker counts treat missing clips as zero length.
+- Done: a clip is missing when the loaded hierarchy has no file with its path, or when
+  `getMediaDetails` flags it `missing` (`isMissingClip` in `MediaSequencer`). Verified on a
+  live session: a clip whose media was deleted in Designer stays in `allResources` with its old
+  metadata, only `VideoClip.isInError` turns True (`probes/10_missing_media.py`).
+- Files pane (owner request, 2026-10-10): such a card gets a red "MISSING" badge (a pill in
+  list view) and is dimmed; it cannot be selected (click, Shift, select all, marquee) or
+  dragged, so it reaches neither Simple Create nor the plan. Groups from folders leave
+  missing files out ("1 missing file skipped"). Missing rows do not move the cursor and place no
+  markers, like `plan_prepare.py` skipping a clip it cannot load; they are not counted as
+  "without mapping" and are left out of the payload (`buildAdvancedPlan`). The mapping check
+  runs on every load and Refresh (`useLayerPlan.clearUnknownMappings`), so it also covers a
+  restored plan.
 
 **C. Accessibility and keyboard (§4.6)**
 - Plan rows: `role="row"` and `tabindex`, ↑/↓ move focus between rows (across groups),
