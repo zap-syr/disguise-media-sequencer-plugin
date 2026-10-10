@@ -171,8 +171,11 @@
         @remove="$emit('remove-group', g.id)"
         @remove-entry="eid => $emit('remove-entry', g.id, eid)"
         @drop-folders="d => $emit('drop-folders', { ...d, gid: g.id })"
+        @drop-group="d => $emit('drop-group', { ...d, targetGid: g.id })"
       />
       </template>
+      <!-- A group dragged over the space under the last group moves to the end -->
+      <div v-if="groupEndOver" class="group-end-line"></div>
       <!-- The free space under the last group (and the list background) creates a group at the end -->
       <div
         v-if="draggingNew"
@@ -225,7 +228,7 @@ const props = defineProps({
 const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
   'assign', 'clear-entries', 'assign-group', 'assign-all', 'clear-group', 'clear-all-mappings', 'disarm',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
-  'drop-folders', 'drop-folder-groups', 'drop-file-group',
+  'drop-folders', 'drop-folder-groups', 'drop-file-group', 'drop-group',
   'set-plan', 'reset-plan-keys', 'clear-overrides', 'reset-all-overrides', 'auto-assign',
   'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group']);
 
@@ -286,9 +289,21 @@ function onGapDrop(index) {
   endDrag();
 }
 
+// A dragged group over the list background (under the last group) goes to the end (Phase 10)
+const draggingGroup = computed(() => dragPayload.kind === 'group');
+const groupEndOver = ref(false);
+watch(draggingGroup, () => { groupEndOver.value = false; });
+
 /** List background (outside any group): auto-scroll, and a drop target for a group at the end. */
 function onListOver(event) {
   autoScroll(event);
+  if (draggingGroup.value) {
+    // Only below the last group: the gaps between groups are not targets
+    const last = [...listRef.value.querySelectorAll('.group')].pop();
+    groupEndOver.value = !!last && event.clientY > last.getBoundingClientRect().bottom;
+    if (groupEndOver.value) event.preventDefault();
+    return;
+  }
   if (!draggingNew.value) return;
   if (event.target === listRef.value) {
     event.preventDefault();
@@ -298,6 +313,14 @@ function onListOver(event) {
   }
 }
 function onListDrop(event) {
+  if (draggingGroup.value) {
+    if (!groupEndOver.value) return;
+    event.preventDefault();
+    emit('drop-group', { gid: dragPayload.ids[0], targetGid: null, pos: 'after' });
+    groupEndOver.value = false;
+    endDrag();
+    return;
+  }
   if (!draggingNew.value || event.target !== listRef.value) return;
   event.preventDefault();
   onGapDrop(props.planState.groups.length);
@@ -549,6 +572,8 @@ defineExpose({ jump, openDefaults });
   transition: all 0.2s ease;
 }
 .gap-drop.over { border-color: #0a84ff; border-style: solid; color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
+/* Insert line under the last group while a group is dragged to the end (same as the group insert line) */
+.group-end-line { height: 2px; margin: -6px 14px 4px; background: #0a84ff; border-radius: 1px; pointer-events: none; }
 /* A big target under the last group (the list's bottom padding stays below it) */
 .gap-end { min-height: 64px; display: flex; align-items: center; justify-content: center; }
 </style>

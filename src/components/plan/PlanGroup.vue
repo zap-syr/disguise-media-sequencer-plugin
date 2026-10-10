@@ -1,16 +1,27 @@
 <template>
   <section
     class="group"
-    :class="{ 'is-flash': flash, 'is-drop': groupOver }"
+    :class="{
+      'is-flash': flash,
+      'is-drop': groupOver,
+      'is-dragging-group': isDraggedGroup,
+      'g-drop-before': groupInsert === 'before',
+      'g-drop-after': groupInsert === 'after'
+    }"
     :id="`plan-group-${group.id}`"
     @dragover="onGroupOver"
     @dragleave="onGroupLeave"
     @drop="onGroupDrop"
   >
+    <!-- The header is the grab handle for reordering groups (Phase 10); its controls never start a drag -->
     <header
       class="g-head"
       :class="{ 'map-over': headOver }"
-      title="Drop a mapping here to assign it to every layer in this group"
+      draggable="true"
+      title="Drag to move the group; drop a mapping here to assign it to every layer in this group"
+      @pointerdown="onHeadDown"
+      @dragstart="onGroupDragStart"
+      @dragend="onDragEnd"
       @dragover="onHeadOver"
       @dragleave="onHeadLeave"
       @drop="onHeadDrop"
@@ -19,7 +30,7 @@
         <svg width="10" height="10" viewBox="0 0 10 10"><path d="M3 1.5 L8 5 L3 8.5 Z" fill="currentColor"/></svg>
       </button>
       <span class="g-label">{{ label }}</span>
-      <input class="g-name" type="text" :value="group.name" aria-label="Group name" @change="$emit('rename', $event.target.value)" />
+      <input class="g-name" type="text" draggable="false" :value="group.name" aria-label="Group name" @change="$emit('rename', $event.target.value)" />
       <div class="g-span" title="Group position on the plan timeline">
         <span class="span" :style="spanStyle"></span>
         <span v-for="(p, i) in splitMarks" :key="'s' + i" class="mk-split" :style="{ left: p + '%' }"></span>
@@ -199,7 +210,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['toggle', 'rename', 'remove', 'remove-entry',
   'assign', 'clear-entries', 'assign-group', 'clear-group',
-  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'drop-folders',
+  'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'drop-folders', 'drop-group',
   'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group']);
 
 // --- Settings chips (Phase 7 / 8b, docs §2.4 / §2.5.1 / §2.6) ---
@@ -308,7 +319,28 @@ function onRowDragStart(event, row) {
 function onDragEnd() {
   rowOver.value = null;
   groupOver.value = false;
+  groupInsert.value = null;
   endDrag();
+}
+
+// --- Group reordering (Phase 10) ---
+const draggingGroup = computed(() => dragPayload.kind === 'group');
+const isDraggedGroup = computed(() => draggingGroup.value && dragPayload.ids[0] === props.group.id);
+const groupInsert = ref(null);   // 'before' | 'after' while another group is dragged over this one
+let headDownTarget = null;
+function onHeadDown(event) {
+  headDownTarget = event.target;
+}
+// A cancelled drag (Esc, dropped outside) leaves no insert line behind
+watch(() => dragPayload.kind, kind => { if (!kind) groupInsert.value = null; });
+
+function onGroupDragStart(event) {
+  // The name field, the arrow and the header buttons keep their own clicks and text selection
+  if (headDownTarget?.closest?.('input, button')) {
+    event.preventDefault();
+    return;
+  }
+  startDrag(event, 'group', [props.group.id]);
 }
 function onRowOver(event, row) {
   if (!draggingMovable.value) return;
@@ -330,6 +362,15 @@ function onRowDrop(event, row) {
   emitDrop(row.id, rowOver.value?.pos || 'after');
 }
 function onGroupOver(event) {
+  if (draggingGroup.value) {
+    // Another group: upper half inserts before this one, lower half after; on itself, no target
+    if (isDraggedGroup.value) return;
+    event.preventDefault();
+    const rect = event.currentTarget.getBoundingClientRect();
+    const pos = event.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+    if (groupInsert.value !== pos) groupInsert.value = pos;
+    return;
+  }
   if (!draggingMovable.value) return;
   event.preventDefault();
   groupOver.value = true;
@@ -337,8 +378,17 @@ function onGroupOver(event) {
 function onGroupLeave(event) {
   if (event.relatedTarget && event.currentTarget.contains(event.relatedTarget)) return;
   groupOver.value = false;
+  groupInsert.value = null;
 }
 function onGroupDrop(event) {
+  if (draggingGroup.value) {
+    if (isDraggedGroup.value) return;
+    event.preventDefault();
+    emit('drop-group', { gid: dragPayload.ids[0], pos: groupInsert.value || 'after' });
+    groupInsert.value = null;
+    endDrag();
+    return;
+  }
   if (!draggingMovable.value) return;
   event.preventDefault();
   emitDrop(null, 'after');
@@ -462,7 +512,21 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   margin: 10px 14px;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
+.group { position: relative; }
 .group.is-flash { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
+/* Group reordering: the dragged group is dimmed, the insert line sits in the 10px gap above / below */
+.group.is-dragging-group { opacity: 0.4; }
+.group.g-drop-before::before,
+.group.g-drop-after::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 2px;
+  background: #0a84ff; border-radius: 1px; pointer-events: none;
+}
+.group.g-drop-before::before { top: -7px; }
+.group.g-drop-after::after { bottom: -7px; }
+.g-head[draggable="true"] { cursor: grab; }
+.g-head[draggable="true"]:active { cursor: grabbing; }
+.g-head .g-name { cursor: text; }
+.g-head button { cursor: pointer; }
 .group.is-drop { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
 
 .g-head {

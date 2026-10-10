@@ -121,6 +121,7 @@
         @drop-folders="onDropFolders"
         @drop-folder-groups="onDropFolderGroups"
         @drop-file-group="onDropFileGroup"
+        @drop-group="onDropGroup"
         @deselect="planSelection.clear"
         @add-group="onAddEmptyGroup"
         @update-group="plan.updateGroup"
@@ -484,6 +485,11 @@ function onAddToGroup(event) {
 
 function onDropRows({ ids, gid, targetId, pos }) {
   plan.moveEntries(ids, gid, targetId, pos);
+}
+
+/** A group dragged by its header before / after another group, or to the end (Phase 10). */
+function onDropGroup({ gid, targetGid, pos }) {
+  if (plan.moveGroup(gid, targetGid, pos)) layerPlanRef.value?.jump(gid);
 }
 
 /** Files dropped on empty plan space or between groups: a new group there, in drag order (docs §2.3.0). */

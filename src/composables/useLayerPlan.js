@@ -133,6 +133,19 @@ export function useLayerPlan(isMissing = () => false) {
     };
   }
 
+  /** Moves group `gid` before / after `targetGid` (null = to the end). Returns true when the order changed. */
+  function moveGroup(gid, targetGid, pos) {
+    if (gid === targetGid) return false;
+    const from = state.groups.findIndex(g => g.id === gid);
+    if (from < 0) return false;
+    const [group] = state.groups.splice(from, 1);
+    let at = targetGid ? state.groups.findIndex(g => g.id === targetGid) : -1;
+    if (at < 0) at = state.groups.length;
+    else if (pos === 'after') at++;
+    state.groups.splice(at, 0, group);
+    return at !== from;
+  }
+
   function updateGroup(gid, patch) {
     const group = state.groups.find(g => g.id === gid);
     if (group) Object.assign(group, patch);
@@ -341,7 +354,7 @@ export function useLayerPlan(isMissing = () => false) {
   return {
     state, layerCount, missingCount, groupLabelsByMedia, unmappedCount, mappingUsage,
     clearUnknownMappings, addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
-    removeGroup, updateGroup, setAllOpen, load,
+    removeGroup, moveGroup, updateGroup, setAllOpen, load,
     assign, assignGroup, assignAll, clearMappings, applyAutoAssign,
     overrideStats, overrideCounts, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides,
     applyGroupValueToAll, applyLayerValueToGroup, resetPlanKeys, clearOverrides
