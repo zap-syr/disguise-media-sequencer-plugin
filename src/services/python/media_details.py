@@ -4,6 +4,7 @@
 # Verified against the media files on disk with tools/designer-probes/verify_media.mjs.
 # Alpha: videos use VideoAsset.hasAlpha; stills read their own file header, because
 # VideoAsset.hasAlpha is a default setting that is wrong for stills (see 09_alpha_resolved.py).
+# missing: the clip is in error (its media was deleted or cannot be loaded), see 10_missing_media.py.
 import os.path
 import struct
 
@@ -48,7 +49,7 @@ def run():
         f = c.file
         path = str(c.path)
         if not f:
-            out[path] = {"kind": "missing"}
+            out[path] = {"kind": "missing", "missing": True}
             continue
         codec = str(f.codec)
         live = bool(c.isVideoIn)
@@ -80,6 +81,9 @@ def run():
             "hasAudio": bool(c.hasAudio),
             "bitDepth": f.bitDepth,
             "source": src,
+            # A clip whose media was deleted stays in allResources with its old metadata;
+            # Designer flags it "in error" (bad, incomplete or not found locally, 10_missing_media.py)
+            "missing": bool(c.isInError),
         }
     return out
 return run()

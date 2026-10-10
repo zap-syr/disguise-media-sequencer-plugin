@@ -362,6 +362,7 @@ parent.saveOnDelete()
 | Bit depth | `clip.file.bitDepth` | Enum index: 8 = "8 Bits", 9 = "10 Bits", 11 = "12 Bits", 13 = "16 Bits", 15 = "32 Bits" (0 = unknown) |
 | ⚠ Not audio | `clip.file.audioSampleRate` | 44100 even on silent videos. Use `hasAudio` |
 | Codec | `clip.file.codec` | e.g. `hap`, `NotchLC`, `rle`, `jpeg` (= **Motion-JPEG video**, not a still), `still_image:PNG`, `still_image:JPEG`, `still_image:EXR`. Detect stills by the `still_image:` prefix |
+| Deleted / broken media | `clip.isInError` | **Verified:** a clip whose media file was deleted in Designer **stays in `allResources`** with its old metadata (frames, fps, size, `file` not None); only `isInError` (and `isIncomplete`) turn True and the source file is gone from disk. `isInError` = "bad, incomplete or not found locally". Reference: `tools/designer-probes/probes/10_missing_media.py` |
 | Reference implementation | `src/services/python/media_details.py` | All per-clip fields the UI needs. Verified against the files on disk with `tools/designer-probes/verify_media.mjs` (99/99 match) |
 
 `Projection` (all mapping types) has `resolution` (`Vec2`), `proxyCanvasResolution`,
