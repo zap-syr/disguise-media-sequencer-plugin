@@ -27,28 +27,36 @@
         @dragstart="onDragStart(node, $event)"
         @dragend="endDrag"
       >
+        <!-- Same expand arrow as the plan group header -->
         <button
-          v-if="selectEnabled && node.id !== 'all'"
           type="button"
-          class="fcb"
-          :class="{ on: checkedFolders.has(node.id) }"
-          :aria-pressed="checkedFolders.has(node.id)"
-          :aria-label="(checkedFolders.has(node.id) ? 'Unselect folder ' : 'Select folder ') + node.name"
-          tabindex="-1"
-          @click.stop="$emit('folder-check', node.id)"
-        >
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
-        </button>
-        <button
           class="chevron-btn"
           :class="{ 'is-expanded': expandedFolders.has(node.id), 'is-hidden': !node.hasChildren }"
+          :aria-expanded="node.hasChildren ? expandedFolders.has(node.id) : null"
+          :aria-label="node.hasChildren ? (expandedFolders.has(node.id) ? 'Collapse ' : 'Expand ') + node.name : null"
+          :tabindex="node.hasChildren ? 0 : -1"
           @click.stop="$emit('toggle', node.id)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1.5 L8 5 L3 8.5 Z" fill="currentColor"/></svg>
         </button>
 
-        <svg v-if="node.id === 'all'" class="folder-icon special-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-        <svg v-else class="folder-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+        <!-- Fixed cell: the checkbox takes the folder icon's place, so names never move -->
+        <span class="icon-cell" :class="{ checkable: selectEnabled && node.id !== 'all' }">
+          <svg v-if="node.id === 'all'" class="folder-icon special-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          <svg v-else class="folder-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+          <button
+            v-if="selectEnabled && node.id !== 'all'"
+            type="button"
+            class="fcb"
+            :class="{ on: checkedFolders.has(node.id) }"
+            :aria-pressed="checkedFolders.has(node.id)"
+            :aria-label="(checkedFolders.has(node.id) ? 'Unselect folder ' : 'Select folder ') + node.name"
+            tabindex="-1"
+            @click.stop="$emit('folder-check', node.id)"
+          >
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>
+          </button>
+        </span>
 
         <span class="folder-name">{{ node.name }}</span>
         <span
@@ -230,21 +238,37 @@ function stopResize() {
 .tree-item:hover { background: #1f1f1f; }
 .tree-item.is-selected { background: rgba(10, 132, 255, 0.1); border-left: 3px solid #0a84ff; color: #ffffff; padding-left: calc(var(--padding-left) - 3px); }
 
+/* Expand arrow: the plan group header's .chev */
 .chevron-btn {
-  background: transparent;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  padding: 0;
   border: none;
-  color: #555555;
-  width: 20px;
-  height: 20px;
+  border-radius: 4px;
+  background: transparent;
+  color: #aaaaaa;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
-.chevron-btn.is-expanded { transform: rotate(90deg); }
+.chevron-btn svg { transition: transform 0.18s ease; }
+.chevron-btn.is-expanded svg { transform: rotate(90deg); }
+.chevron-btn:hover { color: #ffffff; }
+.chevron-btn:focus-visible { outline: none; box-shadow: 0 0 0 1px #0a84ff; }
 .chevron-btn.is-hidden { visibility: hidden; }
 
-.folder-icon { margin: 0 8px 0 2px; color: #666666; }
+.icon-cell {
+  width: 16px;
+  height: 16px;
+  margin: 0 8px 0 2px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.folder-icon { color: #666666; }
 .tree-item.is-selected .folder-icon { color: #aaaaaa; }
 
 .folder-name {
@@ -265,16 +289,21 @@ function stopResize() {
 .tree-item.is-checked { background: rgba(10, 132, 255, 0.15); color: #ffffff; }
 .tree-item.is-checked:hover { background: rgba(10, 132, 255, 0.2); }
 
-/* Folder checkbox: shown on hover, and on every row while folders are checked */
+/* Folder checkbox: replaces the icon on hover, keyboard focus, and on every row while folders are checked */
 .fcb {
   display: none;
-  width: 14px; height: 14px; margin-right: 4px; padding: 0; flex-shrink: 0;
+  width: 14px; height: 14px; padding: 0; flex-shrink: 0;
   border: 1.5px solid #777777; border-radius: 4px; background: #181818; color: transparent;
   align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;
 }
 .fcb:hover { border-color: #cccccc; }
 .fcb.on { background: #0a84ff; border-color: #0a84ff; color: #ffffff; }
-.tree-item:hover .fcb, .tree-container.has-checked .fcb { display: flex; }
+.tree-item:hover .checkable .fcb,
+.tree-item:focus-visible .checkable .fcb,
+.tree-container.has-checked .checkable .fcb { display: flex; }
+.tree-item:hover .checkable .folder-icon,
+.tree-item:focus-visible .checkable .folder-icon,
+.tree-container.has-checked .checkable .folder-icon { display: none; }
 
 .checked-badge {
   margin-left: 8px;
