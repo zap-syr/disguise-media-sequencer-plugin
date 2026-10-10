@@ -363,7 +363,7 @@ const props = defineProps({
   isCreating: { type: Boolean, default: false },
   createProgress: { type: Object, default: null } // { created, total }
 });
-const emit = defineEmits(['create', 'track-created', 'open-plan-defaults']);
+const emit = defineEmits(['create', 'track-created', 'open-plan-defaults', 'error']);
 const creationMode = defineModel('creationMode', { type: String, default: 'simple' });
 const options = props.options;
 const isAdvanced = computed(() => creationMode.value === 'advanced');
@@ -421,6 +421,8 @@ const isTimecodeIncrementValid = computed(() => !options.addTimecodeTag || TIMEC
 const newTrackNameError = computed(() => {
   const name = newTrackName.value.trim();
   if (!name) return 'Name is required';
+  // The name goes into a Python string literal in createTrack()
+  if (/["\\]/.test(name)) return 'Name cannot contain " or \\';
   if (props.tracks.some(t => t.name.toLowerCase() === name.toLowerCase())) return 'Name already exists';
   return null;
 });
@@ -589,6 +591,7 @@ async function confirmCreateTrack() {
     selectTrack(newTrack);
   } catch (err) {
     console.error('Failed to create track:', err);
+    emit('error', `Failed to create track: ${err.message}`);
   } finally {
     isCreatingTrackLoading.value = false;
   }

@@ -1,8 +1,12 @@
 import { ref } from 'vue';
 import { getMediaList, getMediaDetails, getMappingList, getTrackList } from '../services/disguiseService';
 
-/** Media hierarchy, per-clip details, mappings and tracks loaded from Designer, with initial load and refresh. */
-export function useMediaLibrary(directorEndpoint) {
+/**
+ * Media hierarchy, per-clip details, mappings and tracks loaded from Designer, with initial load and refresh.
+ * onError(message): failures that do not block the plugin (Refresh, media details) are reported
+ * through it, so they end in a toast instead of only the console.
+ */
+export function useMediaLibrary(directorEndpoint, onError = () => {}) {
   const fullHierarchy = ref([]);
   // { [clipPath]: { kind, duration, res, hasAlpha, hasAudio, ... } }. Optional enrichment:
   // a failure here must not block the plugin, cards fall back to extension-based types.
@@ -18,6 +22,7 @@ export function useMediaLibrary(directorEndpoint) {
       getMediaList(directorEndpoint),
       getMediaDetails(directorEndpoint).catch(err => {
         console.error('Media details unavailable:', err);
+        onError(`Media details unavailable (durations, badges and missing files are not shown): ${err.message}`);
         return null;
       }),
       getMappingList(directorEndpoint),
@@ -48,6 +53,7 @@ export function useMediaLibrary(directorEndpoint) {
       await fetchAll();
     } catch (err) {
       console.error('Refresh failed:', err);
+      onError(`Refresh failed: ${err.message}`);
     } finally {
       isRefreshing.value = false;
     }

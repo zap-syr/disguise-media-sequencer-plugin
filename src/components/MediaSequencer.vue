@@ -151,6 +151,7 @@
         :create-progress="createProgress"
         @create="handleCreateLayers"
         @track-created="library.addTrack"
+        @error="message => showToast(message, 'error')"
         @open-plan-defaults="openPlanDefaults"
       >
         <template v-if="isAdvanced" #mappings>
@@ -197,8 +198,8 @@ const props = defineProps({
   directorEndpoint: { type: String, required: true }
 });
 
-const library = useMediaLibrary(props.directorEndpoint);
 const { toast, show: showToast, dismiss: dismissToast } = useToast();
+const library = useMediaLibrary(props.directorEndpoint, message => showToast(message, 'error'));
 
 const layerOptions = useLayerOptions();
 const isCreating = ref(false);
