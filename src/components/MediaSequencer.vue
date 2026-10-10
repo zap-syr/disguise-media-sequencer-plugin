@@ -92,6 +92,7 @@
         @assign="plan.assign"
         @clear-entries="plan.clearMappings"
         @assign-group="plan.assignGroup"
+        @assign-all="onAssignAll"
         @clear-group="plan.clearMappings"
         @clear-all-mappings="plan.clearMappings('all')"
         @disarm="armedMapping = null"
@@ -507,6 +508,15 @@ function onRemoveSelected() {
   const restore = plan.removeEntries(ids);
   planSelection.clear();
   showToast(`${ids.length} ${ids.length === 1 ? 'layer' : 'layers'} removed from the plan`, 'info', { label: 'Undo', fn: restore });
+}
+
+/** "Assign to all" in the armed bar: the armed mapping on every layer; it stays armed. */
+function onAssignAll(mappingPath) {
+  const n = plan.layerCount.value;
+  if (!mappingPath || !n) return;
+  const g = plan.state.groups.filter(gr => gr.items.length).length;
+  const restore = plan.assignAll(mappingPath);
+  showToast(`Mapping assigned to ${n} ${n === 1 ? 'layer' : 'layers'} in ${g} ${g === 1 ? 'group' : 'groups'}`, 'info', { label: 'Undo', fn: restore });
 }
 
 function onAddEmptyGroup() {

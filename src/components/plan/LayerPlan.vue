@@ -85,8 +85,19 @@
     <!-- Floating bar over the list: checking layers or arming a mapping moves nothing -->
     <div v-if="armedMapping" class="sel-bar" role="status">
       <span class="armed-dot" :style="{ background: armedColor }"></span>
-      <span class="bar-text">Assigning <strong>{{ armedMapping.name }}</strong>: click layer slots</span>
+      <span class="bar-text">Assigning <strong>{{ armedMapping.name }}</strong><span class="bar-hint">: click layer slots</span></span>
       <span class="bar-sep"></span>
+      <button
+        type="button"
+        class="bar-btn"
+        :title="layerCount ? `Assign to all ${layerCount} ${layerCount === 1 ? 'layer' : 'layers'} in ${placedGroups} ${placedGroups === 1 ? 'group' : 'groups'}` : 'The plan has no layers'"
+        aria-label="Assign to all layers"
+        :disabled="!layerCount"
+        @click="$emit('assign-all', armed)"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 12 10 5 10-5"/><path d="m2 17 10 5 10-5"/></svg>
+        <span class="bar-btn-lbl">Assign to all</span>
+      </button>
       <button type="button" class="bar-btn" title="Stop assigning (Esc)" @click="$emit('disarm')">Done</button>
     </div>
     <div v-else-if="selectedIds.length" class="sel-bar" role="status" title="Drag rows to move them, drop a mapping on a selected row to assign it to all">
@@ -212,7 +223,7 @@ const props = defineProps({
   globals: { type: Object, default: () => ({ tagsOn: true, splitOn: true }) }
 });
 const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
-  'assign', 'clear-entries', 'assign-group', 'clear-group', 'clear-all-mappings', 'disarm',
+  'assign', 'clear-entries', 'assign-group', 'assign-all', 'clear-group', 'clear-all-mappings', 'disarm',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
   'drop-folders', 'drop-folder-groups', 'drop-file-group',
   'set-plan', 'reset-plan-keys', 'clear-overrides', 'reset-all-overrides', 'auto-assign',
@@ -326,6 +337,7 @@ const flashId = ref(null);
 let flashTimer = null;
 
 const layerCount = computed(() => props.planState.groups.reduce((n, g) => n + g.items.length, 0));
+const placedGroups = computed(() => props.planState.groups.filter(g => g.items.length).length);
 // The plan emptied while Auto-assign was open
 watch(layerCount, n => { if (!n && openPanel.value === 'auto') closePanel(); });
 const anyOpen = computed(() => props.planState.groups.some(g => g.open));
@@ -466,7 +478,8 @@ defineExpose({ jump, openDefaults });
   border: 1px solid #3a3a3a; background: transparent; color: #cccccc;
   font-size: 12px; cursor: pointer; transition: all 0.2s ease;
 }
-.bar-btn:hover { border-color: #555555; background: #2a2a2a; color: #ffffff; }
+.bar-btn:hover:not(:disabled) { border-color: #555555; background: #2a2a2a; color: #ffffff; }
+.bar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .bar-btn.danger:hover { border-color: #ef4444; color: #ef4444; background: transparent; }
 .bar-btn:focus-visible, .bar-x:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 .bar-x {
@@ -476,7 +489,10 @@ defineExpose({ jump, openDefaults });
 }
 .bar-x:hover { background: #333333; color: #ffffff; }
 .armed-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
-/* Narrow pane: the bar keeps its actions and drops the labels */
+/* Narrow pane: the bar keeps its actions and drops the labels; the armed text shortens first */
+@container (max-width: 760px) {
+  .bar-hint { display: none; }
+}
 @container (max-width: 620px) {
   .bar-lbl, .sel-bar .bar-text { display: none; }
 }
