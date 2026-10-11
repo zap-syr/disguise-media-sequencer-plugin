@@ -20,35 +20,8 @@
         </template>
         <!-- Advanced: per-layer mappings panel -->
         <slot v-if="isAdvanced" name="mappings"></slot>
-        <div v-else class="kv">
-          <span class="kv-lbl">Mapping</span>
-          <div class="searchable-select" ref="mappingRef">
-            <input
-              type="text"
-              v-model="mappingSearchQuery"
-              @focus="toggleMappingMenu(true)"
-              :placeholder="selectedMapping ? selectedMapping.name : 'Search Mapping...'"
-              class="standard-input dropdown-input"
-              aria-label="Mapping"
-            />
-            <span class="dropdown-arrow">▼</span>
-
-            <ul v-if="isMappingMenuOpen" class="dropdown-list">
-              <li
-                v-for="m in filteredMappings"
-                :key="m.uid"
-                class="dropdown-item"
-                :class="{ selected: selectedMapping?.uid === m.uid }"
-                @click="selectMapping(m)"
-              >
-                {{ m.name }}
-              </li>
-              <li v-if="filteredMappings.length === 0" class="dropdown-empty">
-                No results found
-              </li>
-            </ul>
-          </div>
-        </div>
+        <!-- Simple: one mapping for every layer, same list and filters as Advanced (docs Phase 11) -->
+        <MappingsPanel v-else :mappings="mappings" pick v-model:picked="selectedMappingPath" />
       </SettingsSection>
 
       <!-- WHERE (insert location) -->
@@ -340,6 +313,7 @@ import { TIMECODE_RE } from '../../utils/timecode';
 import { describeMarkers } from '../../utils/planLayout';
 import { maskCueValue, isCueValueValid, maskMidiValue, isMidiValueValid } from '../../utils/tagInputs';
 import SettingsSection from './SettingsSection.vue';
+import MappingsPanel from './MappingsPanel.vue';
 import NumStepper from '../plan/NumStepper.vue';
 import InfoTip from '../common/InfoTip.vue';
 
@@ -370,18 +344,17 @@ const isAdvanced = computed(() => creationMode.value === 'advanced');
 const isSpecific = computed(() => options.insertMode === 'Specific location');
 
 
-const selectedMapping = ref(null);
+// Simple: the picked mapping, by path. A mapping gone after a Refresh is cleared (watch below).
+const selectedMappingPath = ref(null);
+const selectedMapping = computed(() => props.mappings.find(m => m.path === selectedMappingPath.value) || null);
 const selectedTrack = ref(null);
 
-const isMappingMenuOpen = ref(false);
 const isTrackMenuOpen = ref(false);
 const isModeMenuOpen = ref(false);
 const isAtEndPointMenuOpen = ref(false);
 
-const mappingSearchQuery = ref('');
 const trackSearchQuery = ref('');
 
-const mappingRef = ref(null);
 const trackRef = ref(null);
 const modeRef = ref(null);
 const atEndPointRef = ref(null);
@@ -394,12 +367,6 @@ const newTrackName = ref('');
 const isCreatingTrackLoading = ref(false);
 
 // --- Computed Properties ---
-
-const filteredMappings = computed(() => {
-  if (!mappingSearchQuery.value) return props.mappings;
-  const query = mappingSearchQuery.value.toLowerCase();
-  return props.mappings.filter(m => m.name.toLowerCase().includes(query));
-});
 
 const filteredTracks = computed(() => {
   if (!trackSearchQuery.value) return props.tracks;
@@ -451,7 +418,10 @@ const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 const sec = v => `${Number(v) || 0}s`;
 
 const mappingsSummary = computed(() => {
-  if (!isAdvanced.value) return selectedMapping.value ? selectedMapping.value.name : 'None selected';
+  if (!isAdvanced.value) {
+    const m = selectedMapping.value;
+    return m ? [m.name, m.typeLabel || m.type, m.res].filter(Boolean).join(', ') : 'None selected';
+  }
   const parts = [`${props.mappingsUsed} used`];
   if (props.unmappedCount) parts.push(`${plural(props.unmappedCount, 'layer', 'layers')} without mapping`);
   return parts.join(', ');
@@ -513,22 +483,6 @@ function handleMidiNoteInput(event) {
 
 // --- Dropdowns ---
 
-const toggleMappingMenu = (forceOpen = false) => {
-  if (forceOpen) {
-    isMappingMenuOpen.value = true;
-    mappingSearchQuery.value = '';
-  } else {
-    isMappingMenuOpen.value = !isMappingMenuOpen.value;
-    if (!isMappingMenuOpen.value) mappingSearchQuery.value = selectedMapping.value ? selectedMapping.value.name : '';
-  }
-  isTrackMenuOpen.value = false;
-};
-const selectMapping = (m) => {
-  selectedMapping.value = m;
-  isMappingMenuOpen.value = false;
-  mappingSearchQuery.value = m.name;
-};
-
 const toggleTrackMenu = (forceOpen = false) => {
   if (options.insertMode !== 'Specific location') return;
   if (forceOpen) {
@@ -544,7 +498,6 @@ const toggleTrackMenu = (forceOpen = false) => {
       newTrackName.value = '';
     }
   }
-  isMappingMenuOpen.value = false;
 };
 const selectTrack = (t) => {
   selectedTrack.value = t;
@@ -557,7 +510,6 @@ const selectTrack = (t) => {
 const toggleModeMenu = () => {
   isModeMenuOpen.value = !isModeMenuOpen.value;
   isAtEndPointMenuOpen.value = false;
-  isMappingMenuOpen.value = false;
   isTrackMenuOpen.value = false;
 };
 const selectMode = (val) => {
@@ -567,7 +519,6 @@ const selectMode = (val) => {
 const toggleAtEndPointMenu = () => {
   isAtEndPointMenuOpen.value = !isAtEndPointMenuOpen.value;
   isModeMenuOpen.value = false;
-  isMappingMenuOpen.value = false;
   isTrackMenuOpen.value = false;
 };
 const selectAtEndPoint = (val) => {
@@ -603,10 +554,6 @@ function cancelCreateTrack() {
 }
 
 const handleClickOutside = (e) => {
-  if (mappingRef.value && !mappingRef.value.contains(e.target)) {
-    isMappingMenuOpen.value = false;
-    mappingSearchQuery.value = selectedMapping.value ? selectedMapping.value.name : '';
-  }
   if (trackRef.value && !trackRef.value.contains(e.target)) {
     isTrackMenuOpen.value = false;
     trackSearchQuery.value = selectedTrack.value ? selectedTrack.value.name : '';
@@ -648,6 +595,11 @@ function emitCreate() {
 }
 
 // --- Watchers & Lifecycle ---
+
+// Refresh: a picked mapping deleted in Designer is cleared, so Create can't send it
+watch(() => props.mappings, list => {
+  if (selectedMappingPath.value && !list.some(m => m.path === selectedMappingPath.value)) selectedMappingPath.value = null;
+});
 
 watch(isCreatingTrack, async (val) => {
   if (val) {
@@ -900,7 +852,7 @@ label {
   overflow: hidden;
 }
 
-/* Plain list dropdowns (e.g. mapping) scroll the whole list */
+/* Plain list dropdowns (e.g. mode, at end) scroll the whole list */
 ul.dropdown-list {
   max-height: 150px;
   overflow-y: auto;

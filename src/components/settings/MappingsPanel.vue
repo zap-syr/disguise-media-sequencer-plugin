@@ -1,7 +1,7 @@
 <template>
-  <!-- Body of the settings panel's Mappings section -->
+  <!-- Body of the settings panel's Mappings section: assign (Advanced) or pick one (Simple) -->
   <div class="maps-panel">
-    <div class="hint">Drag onto layers, or click to arm</div>
+    <div v-if="!pick" class="hint">Drag onto layers, or click to arm</div>
 
     <div class="search-bar">
       <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -20,7 +20,42 @@
       >{{ t.label }} <span class="cnt">{{ t.count }}</span></button>
     </div>
 
-    <div class="maps">
+    <!-- Simple: a fixed-height radio list, so the sections below never move -->
+    <div v-if="pick" class="maps pick" role="radiogroup" aria-label="Mapping">
+      <!-- The picked mapping outside the filter stays on top as a picked row -->
+      <div v-if="pickedHidden" class="pinned">
+        <div class="prow on" role="radio" aria-checked="true" title="Selected; not in the current filter">
+          <span class="radio"></span>
+          <span class="mtext">
+            <span class="mname">{{ pickedMapping.name }}</span>
+            <span class="mtype">{{ typeOf(pickedMapping) }}, {{ pickedMapping.res }}</span>
+          </span>
+          <span class="nf">Not in filter</span>
+        </div>
+      </div>
+      <button
+        v-for="m in visibleMappings"
+        :key="m.path"
+        type="button"
+        class="prow"
+        :class="{ on: picked === m.path }"
+        role="radio"
+        :aria-checked="picked === m.path"
+        @click="picked = m.path"
+      >
+        <span class="radio"></span>
+        <span class="mtext">
+          <span class="mname">{{ m.name }}</span>
+          <span class="mtype">{{ typeOf(m) }}, {{ m.res }}</span>
+        </span>
+      </button>
+      <div v-if="!visibleMappings.length" class="empty">
+        No mappings match the filter.
+        <button type="button" class="link" @click="clearFilter">Clear filter</button>
+      </div>
+    </div>
+
+    <div v-else class="maps">
       <button
         v-for="m in visibleMappings"
         :key="m.path"
@@ -38,7 +73,7 @@
         <span class="mtag" :style="{ background: mappingColor(m.path) }"></span>
         <span class="mtext">
           <span class="mname">{{ m.name }}</span>
-          <span class="mtype">{{ m.typeLabel || m.type }}, {{ m.res }}</span>
+          <span class="mtype">{{ typeOf(m) }}, {{ m.res }}</span>
         </span>
         <span class="uses" :class="{ zero: !usage[m.path] }">{{ usage[m.path] ? `${usage[m.path]} ${usage[m.path] === 1 ? 'layer' : 'layers'}` : 'unused' }}</span>
       </button>
@@ -54,11 +89,17 @@ import { startDrag, endDrag } from '../../composables/useDragPayload';
 import { usePersistedRef } from '../../composables/usePersistedRef';
 
 const props = defineProps({
-  mappings: { type: Array, required: true },   // getMappingList()
-  usage: { type: Object, default: () => ({}) } // mappingPath -> layers using it
+  mappings: { type: Array, required: true },    // getMappingList()
+  usage: { type: Object, default: () => ({}) }, // mappingPath -> layers using it
+  // Simple: pick one mapping (radio rows, no colour tags, no drag / arm / usage)
+  pick: { type: Boolean, default: false }
 });
 // Path of the mapping armed for click-to-assign (keyboard/mouse alternative to drag & drop)
 const armed = defineModel('armed', { type: String, default: null });
+// Pick mode: path of the picked mapping
+const picked = defineModel('picked', { type: String, default: null });
+
+const typeOf = m => m.typeLabel || m.type || 'Other';
 
 const query = ref('');
 // Remembered per viewer; a type missing from this project counts as "All"
@@ -72,7 +113,7 @@ const typeFilter = computed({
 const typeChips = computed(() => {
   const counts = new Map();
   props.mappings.forEach(m => {
-    const label = m.typeLabel || m.type || 'Other';
+    const label = typeOf(m);
     counts.set(label, (counts.get(label) || 0) + 1);
   });
   return [
@@ -84,9 +125,17 @@ const typeChips = computed(() => {
 const visibleMappings = computed(() => {
   const q = query.value.toLowerCase();
   return props.mappings.filter(m =>
-    (typeFilter.value === 'all' || (m.typeLabel || m.type || 'Other') === typeFilter.value) &&
+    (typeFilter.value === 'all' || typeOf(m) === typeFilter.value) &&
     (!q || m.name.toLowerCase().includes(q)));
 });
+
+const pickedMapping = computed(() => props.mappings.find(m => m.path === picked.value) || null);
+const pickedHidden = computed(() => !!pickedMapping.value && !visibleMappings.value.includes(pickedMapping.value));
+
+function clearFilter() {
+  query.value = '';
+  typeFilter.value = 'all';
+}
 </script>
 
 <style scoped>
@@ -135,4 +184,41 @@ const visibleMappings = computed(() => {
 .uses { font-size: 11px; color: #cccccc; background: #333333; border-radius: 6px; padding: 1px 6px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .uses.zero { color: #666666; background: transparent; }
 .empty { font-size: 11px; color: #777777; padding: 8px 2px; }
+
+/* Pick mode (Simple): constant height whatever the filter, about 5 rows */
+.maps.pick { height: 218px; max-height: none; padding: 4px; gap: 2px; }
+.maps.pick .empty { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 6px; }
+.prow {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  width: 100%; height: 40px; padding: 0 8px;
+  border: 1px solid transparent; background: transparent; border-radius: 6px;
+  text-align: left; cursor: pointer; transition: all 0.2s ease;
+}
+button.prow:hover { border-color: #555555; background: #242424; }
+.prow:focus-visible { outline: none; border-color: #0a84ff; }
+.prow.on, button.prow.on:hover { border-color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
+.prow.on .mname { color: #ffffff; }
+.radio {
+  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid #777777; background: #181818;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+button.prow:hover .radio { border-color: #cccccc; }
+.prow.on .radio, button.prow.on:hover .radio { border-color: #0a84ff; background: #0a84ff; }
+.prow.on .radio::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #ffffff; }
+/* Opaque and sticky: the filtered rows scroll under it */
+.pinned {
+  position: sticky; top: -4px; z-index: 1; flex-shrink: 0;
+  margin: -4px -4px 2px; padding: 4px 4px 5px;
+  background: #181818; border-bottom: 1px solid #333333;
+}
+.pinned .prow { cursor: default; }
+.nf {
+  font-size: 10px; font-weight: 600; color: #0a84ff; white-space: nowrap; flex-shrink: 0;
+  border: 1px solid rgba(10, 132, 255, 0.45); border-radius: 4px; padding: 1px 6px;
+}
+.link { background: transparent; border: none; padding: 2px 4px; color: #0a84ff; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s ease; }
+.link:hover { color: #ffffff; }
+.link:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; border-radius: 4px; }
 </style>
