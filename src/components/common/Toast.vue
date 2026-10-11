@@ -1,5 +1,5 @@
 <template>
-  <div v-if="toast" class="toast" :class="{ 'is-error': toast.kind === 'error' }" role="status" @click="$emit('dismiss')">
+  <div v-if="toast" class="toast" :class="{ 'is-error': toast.kind === 'error', lifted }" role="status" @click="$emit('dismiss')">
     <span>{{ toast.text }}</span>
     <button v-if="toast.action" type="button" class="toast-action" @click.stop="runAction">{{ toast.action.label }}</button>
   </div>
@@ -8,7 +8,9 @@
 <script setup>
 const props = defineProps({
   // { text, kind: 'info'|'error', action?: { label, fn } }
-  toast: { type: Object, default: null }
+  toast: { type: Object, default: null },
+  // A floating bar sits at the bottom of the plan: show the toast above it
+  lifted: { type: Boolean, default: false }
 });
 const emit = defineEmits(['dismiss']);
 
@@ -37,7 +39,10 @@ function runAction() {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   cursor: pointer;
+  transition: bottom 0.2s ease;
 }
+/* The plan bar: 16px from the pane bottom, 44px tall, plus a gap */
+.toast.lifted { bottom: 72px; }
 .toast.is-error {
   border-color: #ef4444;
 }

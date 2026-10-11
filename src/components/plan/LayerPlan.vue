@@ -471,9 +471,10 @@ defineExpose({ jump, openDefaults });
   align-items: center;
   gap: 8px;
   background: #242424;
-  border: 1px solid #3a3a3a;
+  /* Blue edge and glow, so the bar stands apart from the plan background under it */
+  border: 1px solid rgba(10, 132, 255, 0.55);
   border-radius: 6px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55);
   font-size: 12px;
   color: #cccccc;
   white-space: nowrap;

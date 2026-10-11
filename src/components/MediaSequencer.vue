@@ -162,7 +162,7 @@
       </SettingsPanel>
     </div>
 
-    <Toast :toast="toast" @dismiss="dismissToast" />
+    <Toast :toast="toast" :lifted="planBarShown" @dismiss="dismissToast" />
   </div>
 </template>
 
@@ -257,6 +257,9 @@ function onKeydown(event) {
   else planSelection.clear();
 }
 onMounted(() => window.addEventListener('keydown', onKeydown));
+// The plan's floating selection / armed-mapping bar is up: toasts rise above it instead of covering it
+const planBarShown = computed(() =>
+  showPlan.value && (!!armedMapping.value || planSelection.selectedIds.value.length > 0));
 onUnmounted(() => window.removeEventListener('keydown', onKeydown));
 
 // Navigation state
