@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.0] - 2026-10-11
+
+### Added
+- **Simple / Advanced modes** - Simple keeps the 1.1.x workflow (one mapping, layers one after another). Advanced builds a **Layer Plan**.
+- **Layer Plan** - groups of layers, each group with its own timing, tags, splits and layer settings. Settings inherit Plan defaults, then group, then layer.
+- **Mappings per layer** - drag a mapping onto a layer, or click it to arm and click layer slots. Assign to selected, Assign to all (with Undo) and Auto-assign by file name or resolution.
+- **Groups from folders** - check folders in the tree and create one group per folder (folder only, with subfolders, or split subfolders).
+- **Drag and drop** - files, folders and mappings onto the plan; reorder layers and groups.
+- **Workspace layouts** - Files, Split and Plan.
+- **Media badges** - alpha and audio icons, the media type and the plan groups on each card.
+- **Missing clips** - clips whose media was deleted in Designer are marked MISSING and skipped by Create.
+- **Simple mapping picker** - search, type filter and a list showing each mapping's type and resolution.
+- The layer plan and the mapping type filter are kept across panel reloads.
+
+### Changed
+- Settings panel grouped into collapsible sections (Mappings, Where, Layers, Timeline markers).
+- Layer creation runs in chunks, so large plans don't hit Designer's script timeout. The track is extended when the layers run past its end.
+- Styled dropdowns replace the native selects; slim dark scrollbars.
+- Minimum plugin window width is 900px.
+
+### Fixed
+- A failed Refresh, media details load or track creation now shows an error toast.
+- Mappings deleted in Designer are cleared from the plan on Refresh.
+
 ## [1.1.2] - 2026-08-12
 
 ### Added
