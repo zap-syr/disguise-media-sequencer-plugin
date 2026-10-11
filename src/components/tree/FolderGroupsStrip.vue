@@ -39,10 +39,7 @@
     </div>
     <div class="seg-caption">{{ currentMode.label }}</div>
 
-    <select v-model="insertAfter" class="sel" aria-label="Where to insert the new groups" title="Where to insert the new groups">
-      <option value="">At the end</option>
-      <option v-for="(g, gi) in groups" :key="g.id" :value="g.id">After G{{ gi + 1 }}: {{ g.name }}</option>
-    </select>
+    <MenuSelect v-model="insertAfter" :items="insertItems" placeholder="At the end" aria-label="Where to insert the new groups" title="Where to insert the new groups" />
 
     <div class="strip-actions">
       <button type="button" class="btn-secondary" title="Clear the folder selection (Esc)" aria-label="Clear the folder selection" @click="$emit('clear')">
@@ -59,6 +56,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import MenuSelect from '../common/MenuSelect.vue';
 
 const props = defineProps({
   folderCount: { type: Number, required: true },
@@ -75,6 +73,11 @@ const MODES = [
   { value: 'deep', label: 'With subfolders', tip: 'each folder with all its subfolders, as one group' },
   { value: 'split', label: 'Split subfolders', tip: 'one group per folder and per subfolder with files' }
 ];
+const insertItems = computed(() => [
+  { value: '', label: 'At the end' },
+  ...props.groups.map((g, gi) => ({ value: g.id, label: `After G${gi + 1}: ${g.name}` }))
+]);
+
 const currentMode = computed(() => MODES.find(m => m.value === content.value) || MODES[0]);
 
 const createLabel = computed(() => {
@@ -121,14 +124,6 @@ const notes = computed(() => {
 .seg-icon { display: none; flex-shrink: 0; }
 .seg-label { overflow: hidden; text-overflow: ellipsis; }
 .seg-caption { display: none; font-size: 11px; color: #888888; margin-top: -2px; }
-
-.sel {
-  width: 100%; height: 28px;
-  background: #181818; border: 1px solid #3a3a3a; border-radius: 6px;
-  color: #eeeeee; font-size: 12px; padding: 0 8px; outline: none; cursor: pointer;
-  text-overflow: ellipsis;
-}
-.sel:focus { border-color: #0a84ff; }
 
 .strip-actions { display: flex; gap: 8px; }
 .btn-primary, .btn-secondary {

@@ -60,19 +60,16 @@
         <template v-if="isAdvanced" #selection-actions>
           <!-- "New group" lives in the select: the keyboard / Files-layout way next to dropping files on the plan -->
           <div class="plan-actions" @click.stop>
-            <select
-              class="add-sel"
+            <MenuSelect
+              :items="addToGroupItems"
+              :create="NEW_GROUP_ITEM"
+              empty="No groups yet"
+              placeholder="Add to group…"
               aria-label="Add selected files to a new or existing group"
               title="Add the selected files to a new or existing group, or drag them onto the plan"
               :disabled="!selection.selectedItems.size"
-              @change="onAddToGroup"
-            >
-              <option value="">Add to group…</option>
-              <option :value="NEW_GROUP">New group</option>
-              <optgroup v-if="plan.state.groups.length" label="Existing groups">
-                <option v-for="(g, gi) in plan.state.groups" :key="g.id" :value="g.id">G{{ gi + 1 }}: {{ g.name }} ({{ g.items.length }})</option>
-              </optgroup>
-            </select>
+              @select="onAddToGroup"
+            />
           </div>
         </template>
       </FilesPane>
@@ -192,6 +189,7 @@ import FilesPane from './files/FilesPane.vue';
 import SettingsPanel from './settings/SettingsPanel.vue';
 import LayerPlan from './plan/LayerPlan.vue';
 import WorkspaceSwitch from './common/WorkspaceSwitch.vue';
+import MenuSelect from './common/MenuSelect.vue';
 import MappingsPanel from './settings/MappingsPanel.vue';
 import Toast from './common/Toast.vue';
 
@@ -467,9 +465,12 @@ function onNewGroup() {
   revealGroup(gid);
 }
 
-function onAddToGroup(event) {
-  const gid = event.target.value;
-  event.target.value = '';
+// Existing groups, then "+ New group" pinned under them (the Track menu layout)
+const addToGroupItems = computed(() =>
+  plan.state.groups.map((g, gi) => ({ value: g.id, label: `G${gi + 1}: ${g.name} (${g.items.length})` })));
+const NEW_GROUP_ITEM = { value: NEW_GROUP, label: 'New group' };
+
+function onAddToGroup(gid) {
   if (gid === NEW_GROUP) {
     onNewGroup();
     return;
@@ -642,22 +643,6 @@ async function handleCreateLayers(requestOptions) {
 @container (max-width: 340px) {
   .plan-actions { min-width: 92px; }
 }
-.add-sel {
-  height: 28px;
-  width: 100%;
-  min-width: 0;
-  text-overflow: ellipsis;
-  background: #181818;
-  border: 1px solid #3a3a3a;
-  color: #eeeeee;
-  border-radius: 6px;
-  font-size: 12px;
-  padding: 0 8px;
-  cursor: pointer;
-  outline: none;
-}
-.add-sel:focus { border-color: #0a84ff; }
-.add-sel:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
 </style>
