@@ -1080,6 +1080,7 @@ framework, so acceptance is manual in Designer against checklists.
 | 8c - One-row files toolbar, drop files to create groups, folder tree fixes (§2.3.0, owner request) | ✅ done (owner-reviewed). "+ New group" removed; "New group" is the first option of "Add to group…" (existing groups under an "Existing groups" optgroup; the select is enabled with any selection). Files toolbar is one row: `FilesPane` is a size container; at ≤500px the S/M/L toggle hides and the padding tightens, at ≤340px the counter becomes "N/M" and the view icons and select (min 92px) shrink. Checked: one row at 420px and at 270px (the files pane at the 900x560 minimum window); below ~300px it can no longer fit, so the §2.3.0 "down to 220px" is not reached (only windows under 900px get there). Files dragged onto the empty plan, the space under the last group (a 64px "Drop to create a new group" zone plus the list background) or a gap between groups create a group there (`drop-file-group`), toast "G2 created, 1 file", selection cleared; a drop onto a group still adds to it. Tree: the checkbox replaces the folder icon in a fixed 16px cell (names keep their x through hover / check / expand), the arrow is the group-header triangle. Groups-from-folders strip (owner bug report): a size container; under ~290px the content modes become icon radio buttons with tooltips and a caption naming the selected mode, Clear becomes an icon, "Create N groups" stays on one line ("Create N" at the 150px minimum), the insert select reads "At the end"; checked at 150 / 220 / 260 / 300px. Plan header at 900px wide (owner bug report): "+ Group" and the Files / Split / Plan switch become icons in a narrow pane like Auto-assign and Plan defaults, so the header actions stay on one row; the plugin's minimum window width (`disguise-plugin-window-min-size` in `index.html`) is now 900. Follow-up (owner report at 1245px): the plan header never wraps; by plan pane width the summary ellipsizes, the header buttons become icons at ≤760px, the workspace switch at ≤540px, paddings tighten at ≤360px; the files top bar's search shrinks (min 90px) instead of overflowing; the selection bar drops its labels at ≤620px. Files top bar (owner report): in a narrow files pane the title takes the first row (with the workspace switch in the Files layout) and search + refresh a second, full-width row: at ≤380px, or ≤480px when the switch is in the bar; in one row the search keeps 120px and the path ends with an ellipsis. The old Split-only overrides in `MediaSequencer.vue` are removed. Swept every 40px from 900 to 1900 in Files / Split / Plan (Advanced, with a checked layer) and Simple: no toolbar overflows or wraps. Checked in the browser with real `DragEvent`s (end zone, list background, gap, onto a group, empty plan with a reverse-order selection) |
 | 9 - Polish | ⏳ in progress: A, B, D, E, F, G done (owner-reviewed); C (keyboard) deferred; H (docs and release) in progress |
 | 10 - Reorder groups by drag and drop (owner request) | ✅ done (owner-reviewed, `cd5f96c`) |
+| 11 - Simple mapping picker with type filter (owner request) | ⏳ planned (design approved on the mockup canvas) |
 
 ### Phase 0 - API discovery (no UI changes)
 - Run queries Q-A…Q-D (§5.1). Record mapping type names, the source of mapping and clip
@@ -1380,6 +1381,63 @@ pointer-down target is remembered), so those controls keep working.
 
 - **Acceptance:** checklist §9.7 and §9.1.
 
+### Phase 11 - Simple mapping picker with type filter (owner request, 2026-10-11)
+
+**Why.** In Simple the mapping is picked from a searchable dropdown that shows names only: no
+type, no resolution and no type filter. Advanced already has a Mappings list with search and
+type chips. Before the release Simple should use the same list, so both modes look and filter
+the same way. Mockup: artboard "Simple: mapping picker with type filter" on the design canvas
+(variant A, "pinned row"; the "pinned note" and B columns are kept there for reference only).
+
+**Design** (variant A, inline pick list):
+- The Mappings section body in Simple replaces the dropdown with: the search field
+  ("Filter mappings..."), the type chips with counts, and a list of mappings in a framed well,
+  all the same components and styles as the Advanced Mappings panel.
+- **One click picks.** Each row is a radio: a round radio mark, the name, and
+  `type, res` below it. The picked row uses the Advanced armed look (`#0a84ff` border,
+  `rgba(10, 132, 255, 0.15)` fill) with a filled radio mark.
+- **No colour tags in Simple** (owner decision): one mapping goes to every layer, so the
+  per-mapping colour has nothing to tell apart. Also no grip, no drag, no arming and no
+  "N layers / unused" badge. Advanced keeps all of them unchanged.
+- **Fixed-height list** (owner decision): the well has a constant height (about 5 rows, 218px
+  in the mockup) whatever the filter, the search or the result count, so the Where, Layers
+  and Timeline markers sections below never jump. Extra rows scroll inside the well; "No
+  mappings match the filter." with a "Clear filter" link shows inside it too.
+- **Picked mapping hidden by the filter** (owner decision, "pinned row"): it stays in the list
+  as a normal picked row (same radio, name and `type, res` columns, so it lines up with the
+  other rows), pinned at the top of the well (`position: sticky`, opaque background) with a
+  small "Not in filter" badge on the right and a 1px divider under it. The rows of the filter
+  scroll under it. The well keeps its height. Choosing "All" or clearing the search puts it
+  back in its normal place.
+- **Section header summary:** "Cyc_Wash, Perspective, 3840x2160"; "None selected" when nothing
+  is picked (Create stays disabled as today).
+- **Type filter:** the same chips (from the types present in the project) and the same
+  persisted value (`mediaSequencer.mappingTypeFilter`) as Advanced, so the filter is shared by
+  both modes.
+- Accessibility: the well is a `radiogroup` labelled "Mapping", rows are `role="radio"` with
+  `aria-checked`; the pinned row is the same radio. Arrow-key navigation is deferred with
+  Phase 9 C.
+
+**Implementation:**
+- `MappingsPanel.vue` gets a `pick` mode (prop), with the picked path as a `v-model`. In pick
+  mode it renders the radio rows, hides colour tags, grip, usage and the drag / arm handlers,
+  uses the fixed-height well and the pinned row. Assign mode (Advanced) stays as it is.
+- `SettingsPanel.vue`: the Simple branch of the Mappings section mounts `MappingsPanel` in pick
+  mode instead of the `searchable-select`; remove the dropdown state and handlers that only
+  served it (`mappingSearchQuery`, `isMappingMenuOpen`, `toggleMappingMenu`, `mappingRef` and
+  its outside-click branch) and the now unused dropdown CSS if nothing else uses it.
+  `selectedMapping` stays the source of the Simple `mappingPath` for Create; the summary
+  adds `type, res`.
+- After a Refresh, a picked mapping that no longer exists in the list is cleared (new: today
+  `selectedMapping` keeps the stale object), so Create cannot send a deleted mapping.
+- Check at 900x560: the open Mappings section with its fixed well still leaves the other
+  sections reachable by scrolling the settings panel; chips may wrap to a second row in a
+  narrow panel (they only change on load / Refresh, not while picking).
+
+**Files:** `settings/MappingsPanel.vue`, `settings/SettingsPanel.vue`.
+
+- **Acceptance:** checklist §9.8 and §9.1.
+
 ---
 
 ## 9. Acceptance checklists (manual)
@@ -1505,6 +1563,19 @@ pointer-down target is remembered), so those controls keep working.
       does not.
 - [ ] Rows, files and folders still drop as before while no group is dragged.
 - [ ] Reload the panel: the new order is kept.
+- [ ] Works at 900x560 and in a wide window.
+
+### 9.8. Simple mapping picker (Phase 11)
+- [ ] Simple shows search, type chips with counts and the mapping list; no dropdown, no colour
+      tags, no grip or usage badges. Advanced Mappings panel unchanged.
+- [ ] One click picks a mapping; the header summary shows "name, type, res"; Create uses it.
+- [ ] Changing the chip, typing in the search or getting no results never changes the list
+      height; the sections below do not move.
+- [ ] With the picked mapping outside the filter, it shows pinned at the top as a picked row
+      with "Not in filter", aligned with the other rows; the filtered rows scroll under it;
+      "All" puts it back in place.
+- [ ] The type filter is shared with Advanced and survives a reload.
+- [ ] Refresh after deleting the picked mapping in Designer clears the pick.
 - [ ] Works at 900x560 and in a wide window.
 
 ---
