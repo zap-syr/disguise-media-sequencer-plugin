@@ -32,7 +32,7 @@ This is a **Vue 3 + Vite plugin** that integrates as a window panel inside Disgu
   - `ChipRow.vue` + `SettingChip.vue` + `ChipPopover.vue` + `SettingEditor.vue`: the settings chips (fold into "+N" when narrow) and their editor popover;
   - `PlanDefaults.vue` (settings every group inherits, override counts), `AutoAssign.vue` (mappings by file name or resolution), `NumStepper.vue`.
 - **`src/components/settings/`** - `SettingsPanel.vue` (mode switch, collapsible sections via `SettingsSection.vue`: mappings, where to insert, layer settings in Simple, timeline markers; validation, track picker, create-track, Create with confirmation for unmapped / missing layers); `MappingsPanel.vue` (Advanced mapping list: filter, type chips, drag or click to arm).
-- **`src/components/common/`** - `Toast.vue` (with an optional Undo action), `WorkspaceSwitch.vue`, `InfoTip.vue`.
+- **`src/components/common/`** - `Toast.vue` (with an optional Undo action), `WorkspaceSwitch.vue`, `InfoTip.vue`, `MenuSelect.vue` (the styled dropdown used instead of native `<select>`).
 - **`src/composables/`**:
   - `useMediaLibrary` (load/refresh hierarchy, media details, mappings, tracks; reports non-blocking failures through `onError`);
   - `useLayerPlan` (plan state and every plan operation: groups, entries, inheritance, mappings, Undo restores);

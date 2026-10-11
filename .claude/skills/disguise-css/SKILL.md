@@ -251,6 +251,13 @@ reuse them for buttons or states.
 }
 ```
 
+**Never use a native `<select>`**: its open list is drawn by the browser and ignores the
+palette. For a short list of choices use `src/components/common/MenuSelect.vue` (this look,
+28px trigger, teleported list that flips above when there is no room, section headings
+`{ heading }`, a `create` action pinned under the scrolling list like "+ Create New Track",
+keyboard: arrows, Enter, Esc). With `v-model` it is a select; without it, an
+action menu that emits `select` and keeps its placeholder (e.g. "Add to group…").
+
 ### Segmented control (mode selector)
 
 ```css
