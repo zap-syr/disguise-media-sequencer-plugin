@@ -1080,7 +1080,7 @@ framework, so acceptance is manual in Designer against checklists.
 | 8c - One-row files toolbar, drop files to create groups, folder tree fixes (§2.3.0, owner request) | ✅ done (owner-reviewed). "+ New group" removed; "New group" is the first option of "Add to group…" (existing groups under an "Existing groups" optgroup; the select is enabled with any selection). Files toolbar is one row: `FilesPane` is a size container; at ≤500px the S/M/L toggle hides and the padding tightens, at ≤340px the counter becomes "N/M" and the view icons and select (min 92px) shrink. Checked: one row at 420px and at 270px (the files pane at the 900x560 minimum window); below ~300px it can no longer fit, so the §2.3.0 "down to 220px" is not reached (only windows under 900px get there). Files dragged onto the empty plan, the space under the last group (a 64px "Drop to create a new group" zone plus the list background) or a gap between groups create a group there (`drop-file-group`), toast "G2 created, 1 file", selection cleared; a drop onto a group still adds to it. Tree: the checkbox replaces the folder icon in a fixed 16px cell (names keep their x through hover / check / expand), the arrow is the group-header triangle. Groups-from-folders strip (owner bug report): a size container; under ~290px the content modes become icon radio buttons with tooltips and a caption naming the selected mode, Clear becomes an icon, "Create N groups" stays on one line ("Create N" at the 150px minimum), the insert select reads "At the end"; checked at 150 / 220 / 260 / 300px. Plan header at 900px wide (owner bug report): "+ Group" and the Files / Split / Plan switch become icons in a narrow pane like Auto-assign and Plan defaults, so the header actions stay on one row; the plugin's minimum window width (`disguise-plugin-window-min-size` in `index.html`) is now 900. Follow-up (owner report at 1245px): the plan header never wraps; by plan pane width the summary ellipsizes, the header buttons become icons at ≤760px, the workspace switch at ≤540px, paddings tighten at ≤360px; the files top bar's search shrinks (min 90px) instead of overflowing; the selection bar drops its labels at ≤620px. Files top bar (owner report): in a narrow files pane the title takes the first row (with the workspace switch in the Files layout) and search + refresh a second, full-width row: at ≤380px, or ≤480px when the switch is in the bar; in one row the search keeps 120px and the path ends with an ellipsis. The old Split-only overrides in `MediaSequencer.vue` are removed. Swept every 40px from 900 to 1900 in Files / Split / Plan (Advanced, with a checked layer) and Simple: no toolbar overflows or wraps. Checked in the browser with real `DragEvent`s (end zone, list background, gap, onto a group, empty plan with a reverse-order selection) |
 | 9 - Polish | ⏳ in progress: A, B, D, E, F, G done (owner-reviewed); C (keyboard) deferred; H (docs and release) in progress |
 | 10 - Reorder groups by drag and drop (owner request) | ✅ done (owner-reviewed, `cd5f96c`) |
-| 11 - Simple mapping picker with type filter (owner request) | ⏳ planned (design approved on the mockup canvas) |
+| 11 - Simple mapping picker with type filter (owner request) | ✅ done (owner-reviewed, `533274d`) |
 
 ### Phase 0 - API discovery (no UI changes)
 - Run queries Q-A…Q-D (§5.1). Record mapping type names, the source of mapping and clip
@@ -1435,6 +1435,11 @@ the same way. Mockup: artboard "Simple: mapping picker with type filter" on the 
   narrow panel (they only change on load / Refresh, not while picking).
 
 **Files:** `settings/MappingsPanel.vue`, `settings/SettingsPanel.vue`.
+
+Done (2026-10-11, owner-checked): as above. `MappingsPanel` has a `pick` prop and
+`v-model:picked`; `SettingsPanel` keeps the pick as a path (`selectedMappingPath`) and derives
+`selectedMapping` from the list. Not done: the list does not scroll to a pick below the
+fifth row when the panel opens.
 
 - **Acceptance:** checklist §9.8 and §9.1.
 
