@@ -289,12 +289,17 @@ export function useLayerPlan(isMissing = () => false) {
     if (group) assign(group.items, mappingPath);
   }
 
-  /** One mapping on every layer of every group (replaces existing ones); returns a restore() for the Undo toast. */
-  function assignAll(mappingPath) {
-    const ids = state.groups.flatMap(g => g.items);
+  /** One mapping on the given layers (replaces existing ones); returns a restore() for the Undo toast. */
+  function assignWithUndo(entryIds, mappingPath) {
+    const ids = entryIds.filter(id => state.entries[id]);
     const before = ids.map(id => [id, { mappingPath: state.entries[id].mappingPath, via: state.entries[id].via }]);
     assign(ids, mappingPath);
     return () => before.forEach(([id, prev]) => { if (state.entries[id]) Object.assign(state.entries[id], prev); });
+  }
+
+  /** One mapping on every layer of every group; returns a restore() for the Undo toast. */
+  function assignAll(mappingPath) {
+    return assignWithUndo(state.groups.flatMap(g => g.items), mappingPath);
   }
 
   /** scope: 'all' | group id | array of entry ids */
@@ -355,7 +360,7 @@ export function useLayerPlan(isMissing = () => false) {
     state, layerCount, missingCount, groupLabelsByMedia, unmappedCount, mappingUsage,
     clearUnknownMappings, addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
     removeGroup, moveGroup, updateGroup, setAllOpen, load,
-    assign, assignGroup, assignAll, clearMappings, applyAutoAssign,
+    assign, assignGroup, assignAll, assignWithUndo, clearMappings, applyAutoAssign,
     overrideStats, overrideCounts, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides,
     applyGroupValueToAll, applyLayerValueToGroup, resetPlanKeys, clearOverrides
   };

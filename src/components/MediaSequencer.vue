@@ -90,6 +90,7 @@
         @clear-entries="plan.clearMappings"
         @assign-group="plan.assignGroup"
         @assign-all="onAssignAll"
+        @assign-selected="onAssignSelected"
         @clear-group="plan.clearMappings"
         @clear-all-mappings="plan.clearMappings('all')"
         @disarm="armedMapping = null"
@@ -528,6 +529,14 @@ function onAssignAll(mappingPath) {
   const g = plan.state.groups.filter(gr => gr.items.length).length;
   const restore = plan.assignAll(mappingPath);
   showToast(`Mapping assigned to ${n} ${n === 1 ? 'layer' : 'layers'} in ${g} ${g === 1 ? 'group' : 'groups'}`, 'info', { label: 'Undo', fn: restore });
+}
+
+// Armed mapping onto the selected rows: the selection stays, so it can be re-assigned
+function onAssignSelected(mappingPath) {
+  const ids = planSelection.selectedIds.value;
+  if (!mappingPath || !ids.length) return;
+  const restore = plan.assignWithUndo(ids, mappingPath);
+  showToast(`Mapping assigned to ${ids.length} selected ${ids.length === 1 ? 'layer' : 'layers'}`, 'info', { label: 'Undo', fn: restore });
 }
 
 function onAddEmptyGroup() {

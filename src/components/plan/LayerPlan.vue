@@ -87,6 +87,18 @@
       <span class="armed-dot" :style="{ background: armedColor }"></span>
       <span class="bar-text">Assigning <strong>{{ armedMapping.name }}</strong><span class="bar-hint">: click layer slots</span></span>
       <span class="bar-sep"></span>
+      <!-- The click way to "drop on a selected row" (no drag and drop in the Designer window) -->
+      <button
+        type="button"
+        class="bar-btn"
+        :title="selectedIds.length ? `Assign to the ${selectedIds.length} selected ${selectedIds.length === 1 ? 'layer' : 'layers'}` : 'Select layers first (click, Ctrl+Click, Shift+Click)'"
+        aria-label="Assign to selected layers"
+        :disabled="!selectedIds.length"
+        @click="$emit('assign-selected', armed)"
+      >
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/></svg>
+        <span class="bar-btn-lbl">Assign to selected<template v-if="selectedIds.length"> ({{ selectedIds.length }})</template></span>
+      </button>
       <button
         type="button"
         class="bar-btn"
@@ -226,7 +238,7 @@ const props = defineProps({
   globals: { type: Object, default: () => ({ tagsOn: true, splitOn: true }) }
 });
 const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-entry', 'set-all-open',
-  'assign', 'clear-entries', 'assign-group', 'assign-all', 'clear-group', 'clear-all-mappings', 'disarm',
+  'assign', 'clear-entries', 'assign-group', 'assign-all', 'assign-selected', 'clear-group', 'clear-all-mappings', 'disarm',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
   'drop-folders', 'drop-folder-groups', 'drop-file-group', 'drop-group',
   'set-plan', 'reset-plan-keys', 'clear-overrides', 'reset-all-overrides', 'auto-assign',
