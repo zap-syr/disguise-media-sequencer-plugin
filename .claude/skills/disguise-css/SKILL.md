@@ -122,7 +122,8 @@ There is no green "success": success toasts are neutral (see Toasts).
 |-------|-------|
 | `rgba(0, 0, 0, 0.6)` | Badges over thumbnails (duration chip, group badge) |
 | `0 4px 12px rgba(0, 0, 0, 0.5)` | Dropdown lists, toast |
-| `0 10px 28px rgba(0, 0, 0, 0.5)` / `0.55` | Floating layers: chip popovers, header drop-down panels, the floating selection / armed bar |
+| `0 10px 28px rgba(0, 0, 0, 0.5)` / `0.55` | Drop shadow of floating layers |
+| `0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55)` + border `rgba(10, 132, 255, 0.55)` | **Glowing frame** of the plan's floating windows: the selection / armed bar, Plan defaults, Auto-assign, chip popovers, the "+N" list, Copy mappings. Not for settings-panel dropdowns (`MenuSelect`) or toasts |
 
 ### Mapping colours
 
@@ -502,8 +503,12 @@ tabular-nums). **Raised** above the group box: box `#2c2c2c`, border `#444444`, 
 
 ### Chip popover (`ChipPopover.vue`)
 
-Floating (`position: fixed`, z-index 1000), 268px, `#1e1e1e`, border `#3a3a3a`, radius 6px,
-`0 10px 28px rgba(0, 0, 0, 0.5)`, with a small notch pointing at the chip. Scope tag:
+Floating (`position: fixed`, z-index 1000), 268px, `#1e1e1e`, radius 6px, with a small notch
+pointing at the chip. Frame: the blue edge and glow of the floating bar (border
+`rgba(10, 132, 255, 0.55)`, shadow `0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132,
+255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55)`); the notch edge uses the same blue. Every group
+settings window has this frame: chip popovers, the "+N" list (`ChipRow.vue`), Copy mappings
+(`CopyMappings.vue`). Placement and closing come from `composables/useAnchoredPopover.js`. Scope tag:
 `rgba(10, 132, 255, 0.2)` background, `#0a84ff` 10px bold text. Option rows separated by
 `#262626`; the chosen row gets `rgba(10, 132, 255, 0.08)`. Esc closes and returns focus to
 the chip.
