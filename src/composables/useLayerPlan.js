@@ -1,5 +1,6 @@
 import { reactive, computed } from 'vue';
 import { PLAN_DEFAULTS, CHIPS, coerce, effectiveGroup, effectiveLayer, pruneOverrides, hasOverrides } from '../utils/planSchema';
+import { copyChanges } from '../utils/copyMappings';
 
 /**
  * Advanced-mode layer plan: ordered groups of entries (one entry = one future layer).
@@ -302,6 +303,23 @@ export function useLayerPlan(isMissing = () => false) {
     return assignWithUndo(state.groups.flatMap(g => g.items), mappingPath);
   }
 
+  /**
+   * Mappings of sourceIds copied by position into each target group (utils/copyMappings).
+   * Returns { layers, restore } for the Undo toast; layers counts the ones that changed.
+   */
+  function copyMappings(sourceIds, targetGids, { repeat = false } = {}) {
+    const pattern = sourceIds.map(id => state.entries[id]?.mappingPath || null);
+    const changes = state.groups
+      .filter(g => targetGids.includes(g.id))
+      .flatMap(g => copyChanges(pattern, g.items, state.entries, repeat));
+    const before = changes.map(c => [c.id, { mappingPath: state.entries[c.id].mappingPath, via: state.entries[c.id].via }]);
+    changes.forEach(c => assign([c.id], c.mappingPath));
+    return {
+      layers: changes.length,
+      restore: () => before.forEach(([id, prev]) => { if (state.entries[id]) Object.assign(state.entries[id], prev); })
+    };
+  }
+
   /** scope: 'all' | group id | array of entry ids */
   function clearMappings(scope) {
     let ids;
@@ -360,7 +378,7 @@ export function useLayerPlan(isMissing = () => false) {
     state, layerCount, missingCount, groupLabelsByMedia, unmappedCount, mappingUsage,
     clearUnknownMappings, addEmptyGroup, newGroup, insertGroups, addToGroup, removeEntry, removeEntries, moveEntries, insertFiles,
     removeGroup, moveGroup, updateGroup, setAllOpen, load,
-    assign, assignGroup, assignAll, assignWithUndo, clearMappings, applyAutoAssign,
+    assign, assignGroup, assignAll, assignWithUndo, copyMappings, clearMappings, applyAutoAssign,
     overrideStats, overrideCounts, groupOf, setPlan, setGroupOv, setLayerOv, resetGroup, resetAllOverrides,
     applyGroupValueToAll, applyLayerValueToGroup, resetPlanKeys, clearOverrides
   };
