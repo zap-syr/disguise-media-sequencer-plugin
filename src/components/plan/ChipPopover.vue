@@ -52,8 +52,9 @@
 </template>
 
 <script setup>
-import { computed, inject, reactive, ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { computed, inject, ref, watch, nextTick } from 'vue';
 import { CHIPS } from '../../utils/planSchema';
+import { useAnchoredPopover } from '../../composables/useAnchoredPopover';
 import SettingEditor from './SettingEditor.vue';
 
 /**
@@ -88,61 +89,19 @@ function openMarkers() {
 
 // --- Placement: below the anchor, flipped above when there is no room, kept on screen ---
 const popEl = ref(null);
-const pos = reactive({ top: null, bottom: null, left: 0, arrow: 16, above: false });
-const GAP = 6;
-const EDGE = 8;
-// Room kept for a nested number row, so picking an option never makes the popover flip
-const GROW = 40;
-let side = null;   // 'below' | 'above', chosen when the popover opens or moves to another anchor
-
-function place() {
-  const a = props.anchor;
-  const pop = popEl.value;
-  if (!a || !pop || !a.isConnected) return;
-  const c = a.getBoundingClientRect();
-  // The anchor scrolled out of the plan list: the popover would float detached, so close it
-  const list = a.closest('.plan')?.getBoundingClientRect();
-  if (list && (c.bottom < list.top || c.top > list.bottom)) { emit('close'); return; }
-  const vw = document.documentElement.clientWidth;
-  const vh = document.documentElement.clientHeight;
-  const w = pop.offsetWidth;
-  const h = pop.offsetHeight;
-  const left = Math.max(EDGE, Math.min(c.left, vw - w - EDGE));
-  if (!side) {
-    const roomBelow = vh - c.bottom - GAP - EDGE;
-    const roomAbove = c.top - GAP - EDGE;
-    side = h + GROW > roomBelow && roomAbove > roomBelow ? 'above' : 'below';
-  }
-  const arrow = Math.max(12, Math.min(c.left + Math.min(c.width / 2, 24) - left, w - 16));
-  // Above: pinned by its bottom edge, so a taller body grows upward and the popover stays put
-  if (side === 'above') Object.assign(pos, { top: null, bottom: Math.max(EDGE, vh - c.top + GAP), left, above: true, arrow });
-  else Object.assign(pos, { top: Math.max(EDGE, Math.min(c.bottom + GAP, vh - h - EDGE)), bottom: null, left, above: false, arrow });
-}
-
-function onOutside(event) {
-  if (popEl.value?.contains(event.target) || props.keepOpenOn?.contains(event.target)) return;
-  if (event.target.closest?.('.chip-overflow')) return;
-  emit('close');
-}
-/** Esc closes the popover before the plan's own Esc runs; a focused stepper takes the first Esc. */
-function onEsc(event) {
-  if (event.key !== 'Escape') return;
-  if (event.target.closest?.('.stp') && popEl.value?.contains(event.target)) return;
-  event.stopPropagation();
-  const back = props.anchor;
-  emit('close');
-  back?.focus?.();
-}
-
-const opts = [['pointerdown', onOutside, true], ['keydown', onEsc, true], ['resize', place, false], ['scroll', place, true]];
-onMounted(() => {
-  opts.forEach(([e, fn, cap]) => window.addEventListener(e, fn, cap));
-  nextTick(place);
+const { pos, place, resetSide } = useAnchoredPopover({
+  anchor: () => props.anchor,
+  keepOpenOn: () => props.keepOpenOn,
+  popEl,
+  onClose: () => emit('close'),
+  grow: 40,   // room for a nested number row, so picking an option never makes the popover flip
+  ignoreOutside: '.chip-overflow',
+  // A focused stepper takes the first Esc
+  keepEsc: event => !!(event.target.closest?.('.stp') && popEl.value?.contains(event.target))
 });
-onBeforeUnmount(() => opts.forEach(([e, fn, cap]) => window.removeEventListener(e, fn, cap)));
 
 // Another chip or anchor: choose the side again
-watch(() => [props.anchor, props.chipKey], () => { side = null; nextTick(place); });
+watch(() => [props.anchor, props.chipKey], resetSide);
 // Content (option with a nested number, notes) changes the size, not the side
 watch(() => [props.values, props.mixed, props.layerNote, props.globals], () => nextTick(place), { deep: true });
 </script>
