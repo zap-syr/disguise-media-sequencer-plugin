@@ -121,7 +121,7 @@
           }"
           draggable="true"
           :aria-selected="checked.has(row.id)"
-          title="Click to select, Ctrl/Cmd+click to add, Shift+click for a range, drag to move"
+          title="Click to select (again to deselect), Ctrl/Cmd+click to add, Shift+click for a range, drag to move"
           @click="$emit('row-click', row.id, $event)"
           @dragstart="onRowDragStart($event, row)"
           @dragend="onDragEnd"
@@ -309,9 +309,9 @@ function onSecondary() {
   if (popLayers.value) emit('apply-to-group', selInGroup.value, keys);
   else emit('apply-to-all', keys);
 }
-/** ◆ on a row: select that layer, which puts the group into selection scope. */
+/** ◆ on a row: select that layer, which puts the group into selection scope (never deselects). */
 function onOvMark(id) {
-  emit('row-click', id, { ctrlKey: false, metaKey: false, shiftKey: false });
+  emit('row-click', id, { ctrlKey: false, metaKey: false, shiftKey: false, keep: true });
 }
 
 const allChecked = computed(() => props.group.items.length > 0 && props.group.items.every(id => props.checked.has(id)));

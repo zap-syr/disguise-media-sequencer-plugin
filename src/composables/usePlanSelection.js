@@ -1,8 +1,9 @@
 import { reactive, computed, watch } from 'vue';
 
 /**
- * Selection of plan rows (entries). Click = only this row, Ctrl/Cmd = toggle,
- * Shift = range from the anchor across group boundaries (plan order), Ctrl+Shift = add range.
+ * Selection of plan rows (entries). Click = only this row (a click on the only selected row
+ * deselects it, unless event.keep), Ctrl/Cmd = toggle, Shift = range from the anchor across group boundaries
+ * (plan order), Ctrl+Shift = add range.
  */
 export function usePlanSelection(planState) {
   const checked = reactive(new Set());
@@ -36,6 +37,11 @@ export function usePlanSelection(planState) {
     if (additive) {
       if (checked.has(id)) checked.delete(id);
       else checked.add(id);
+    } else if (checked.size === 1 && checked.has(id) && !event.keep) {
+      // A second click on the only selected row undoes the first one
+      checked.clear();
+      anchor = null;
+      return;
     } else {
       checked.clear();
       checked.add(id);
