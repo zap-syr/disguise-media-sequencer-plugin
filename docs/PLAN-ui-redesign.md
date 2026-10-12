@@ -1443,6 +1443,168 @@ fifth row when the panel opens.
 
 - **Acceptance:** checklist §9.8 and §9.1.
 
+### Phase 12 - Text contrast, framed header panels, raised group chips (owner request, 2026-10-12)
+
+**Why.** On a large screen the 1.2.0 UI reads as one grey surface: file names, durations and
+resolutions are grey on grey (card
+name `#888888` on `#242424` is 4.4:1, the meta line `#666666` on `#242424` is 2.7:1, under the
+4.5:1 minimum). The Plan defaults panel has no edge against the group list under it, the
+Auto-assign panel still has its pre-redesign look, and the group setting chips (`#181818` on
+`#1e1e1e`) merge with the group box. Mockup: artboard "Phase 12" on the design canvas, with a
+Current / Proposed palette switch and the Plan defaults / Auto-assign panels.
+
+**A. Plan defaults: a frame like the floating bar.**
+- `.pd-drop` (shared by both header panels in `LayerPlan.vue`) gets the `.sel-bar` edge: border
+  `rgba(10, 132, 255, 0.55)` and shadow `0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10,
+  132, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55)`. The panel's own border in
+  `PlanDefaults.vue` is dropped so the two do not stack.
+- Header strip on the card background `#242424`, body on the panel background
+  `#1e1e1e`, footer on `#1a1a1a`, so the three parts read as one raised block.
+- The chips inside use the raised chip style from C.
+
+**B. Auto-assign: the same shell as Plan defaults.**
+- Same structure and classes as `PlanDefaults.vue`: header (title "Auto-assign", a blue
+  "Mappings" tag, one-line hint, × close with Esc), body, footer. Shares the frame from A.
+- Body in two columns (one column under ~560px pane width, container query):
+  - "Match by": an option list in the chip popover style (`#262626`-like dividers, chosen row
+    `rgba(10, 132, 255, 0.08)`), each row with the plan checkbox (16px, the one style used
+    everywhere) instead of the native checkbox, the rule name and its description;
+  - "Apply to": the same option list as radio rows ("Layers without mapping", "Selected
+    layers", "All layers") with the count right-aligned (tabular-nums) instead of the
+    wrapping segmented control.
+- Footer: the result of the last run on the left (blue tick + the `autoAssignSummary` text,
+  `role="status"`; before a run: "N of M layers have a mapping"), then "Clear all mappings"
+  (quiet button, red on hover) and "Run auto-assign" (primary). "Done" is removed: × and Esc
+  close the panel, the same as Plan defaults.
+- Logic, persisted prefs (`autoByName`, `autoByRes`, `autoScope`) and emits unchanged.
+
+**C. Group setting chips stand out from the group box.**
+- Chips become raised instead of sunken: background `#2c2c2c`, border `#444444`, hover border
+  `#6a6a6a`; key `#aeaeae`, value `#ffffff`. They sit on the group body `#1e1e1e` (unchanged),
+  under the header on `#242424` (unchanged), so header, chip strip and rows are three distinct
+  steps.
+- The states keep their meaning and colours: override (yellow border and value), selection
+  scope (blue border and fill), open (blue ring), off (muted, line-through), warning dot.
+- Same chips in Plan defaults and in the "+N" fold list. `SettingChip.vue` and `ChipRow.vue`.
+
+**D. Text and element contrast on the current backgrounds.**
+- Owner decision (2026-10-12): the backgrounds, borders and dividers stay exactly as they are
+  (`#1a1a1a`, `#1e1e1e`, `#242424`, `#181818`, `#151515`, `#222222` / `#2a2a2a` / `#2e2e2e`,
+  `#333333`, `#3a3a3a`). Only text, icons and the raised chip / hover surface change. The
+  text stays neutral grey (no tint) to match the neutral backgrounds. The accent `#0a84ff`,
+  the semantic colours (`#ef4444`, `#ffd60a`) and the mapping colours do not change.
+- Hex values stay hardcoded (project rule, no CSS variables). The change is a role-by-role
+  replacement, not a blind search and replace: the same old value plays different roles
+  (`#888888` is both meta text and secondary button text), so each use is mapped by its role.
+
+| Role | Current | Proposed | Contrast (on) |
+|------|---------|----------|---------------|
+| Raised chip | `#181818` (sunken) | `#2c2c2c`, border `#444444` | |
+| Hover on raised items (chips, option rows, × buttons) | `#1f1f1f` / `#2a2a2a` | `#2c2c2c` | |
+| Strong text (file, group, mapping names) | `#cccccc` / `#dddddd` | `#f2f2f2` | 14.9 on `#1e1e1e` |
+| Card file name | `#888888` | `#e6e6e6` | 12.4 on `#242424` (was 4.4) |
+| Body text | `#cccccc` | `#d4d4d4` | 11.2 on `#1e1e1e` |
+| Labels, chip keys, icons | `#aaaaaa` | `#aeaeae` | 6.3 on `#2c2c2c` |
+| Meta (duration, resolution, type, counts, folder icons) | `#666666` / `#888888` | `#9c9c9c` | 5.7 on `#242424` (was 2.7) |
+| Muted (placeholder, disabled, units) | `#777777` / `#666666` | `#888888` | 4.7 on `#1e1e1e` |
+
+- The plan row file name gets weight 500 for a clearer name / meta split; the card name stays
+  500. Selected card name stays `#ffffff`.
+- `style.css` is unchanged (it only holds backgrounds and scrollbars).
+- The `disguise-css` skill is updated in the same change (palette tables, recipes, the Layer
+  plan section), so later work uses the new values.
+
+**Order:** C and A first (small, visible), then B, then D across all components, then the
+skill update. Each group in its own commit after the owner's review.
+
+**Files:** `plan/LayerPlan.vue`, `plan/PlanDefaults.vue`, `plan/AutoAssign.vue`,
+`plan/SettingChip.vue`, `plan/ChipRow.vue`, `plan/PlanGroup.vue`; for D every component with
+colours (`files/`, `tree/`, `settings/`, `common/`, `plan/`);
+`.claude/skills/disguise-css/SKILL.md`.
+
+- **Acceptance:** checklist §9.9 and §9.1.
+
+### Phase 13 - Copy mappings from one group to other groups (owner request, 2026-10-12)
+
+**Why.** A group often needs the same set of mappings as another one (G1 has four layers on
+four different mappings, G2 should get the same set). Today each slot of G2 is assigned by
+hand. The copy must be simple and predictable when the groups have different lengths.
+
+**Entry point** (owner decision: the group header only): a "Copy mappings to..." icon button
+in the group header, next to Reset and Clear mappings. Hidden when the plan has one group;
+disabled with the tip "G1 has no mappings to copy" when the source has none.
+
+**Source:** the whole group, in plan order. If rows of this group are checked, only the
+checked rows, in plan order (the header shows "From 2 selected layers"). This is how a part of
+the set is copied, without extra controls.
+
+**Popover** (`ChipPopover` style, anchored to the button):
+- header: "Copy mappings", scope tag "G1, 4 layers" (or "G1, 2 selected"), ×, Esc closes;
+- "Pattern": the mapping colour dots of the source, in order (an empty square for a source
+  layer without mapping);
+- "Copy to": "All other groups" checkbox, then one row per other group: plan checkbox, G label,
+  name, layer count and a preview of the result as dots (what each layer gets; an empty square
+  for a layer that does not change);
+- "Longer group": segmented "Stop" (default, owner decision) / "Repeat", persisted
+  (`mediaSequencer.copyMappingsRepeat`);
+- footer: primary "Copy to N groups" (disabled with no target).
+- No "Start at layer" (owner decision): the copy always starts at the first layer of each
+  target. Placing the set further down a target group is not covered; it can be added later
+  if needed.
+
+**Rule: by position in the group.** Source layer 1 goes to target layer 1, 2 to 2, and so on.
+Source G1 = [A, B, C, D]:
+
+| Target | Stop (default) | Repeat |
+|--------|----------------|--------|
+| 4 layers | A B C D | A B C D |
+| 6 layers (longer) | A B C D, layers 5-6 unchanged | A B C D A B |
+| 3 layers (shorter) | A B C, D not used | the same |
+| source = checked rows 2-3 [B, C], 6 layers | B C, layers 3-6 unchanged | B C B C B C |
+
+- A source layer without mapping leaves the matching target layer unchanged: the copy never
+  clears a mapping (the Clear mappings button does that).
+- Existing target mappings are replaced; the toast "Mappings copied to G2: 4 layers" has Undo.
+- Rows with a missing clip count as normal positions on both sides, so positions match what
+  the plan shows.
+- Resolutions are not checked: it is a plain copy (matching by resolution is Auto-assign).
+- `via` of copied layers is cleared (the mapping was set by the user, not by Auto-assign).
+
+**Implementation:**
+- `utils/copyMappings.js`: pure `copyPlan(sourceMappings, targetIds, { repeat })` returning
+  `[{ id, mappingPath }]` for the layers that change; the popover preview and the action both
+  use it.
+- `useLayerPlan`: `copyMappings(sourceIds, targetGids, { repeat })` applies it and returns a
+  `restore()` for the Undo toast, like `assignWithUndo`.
+- New `plan/CopyMappings.vue` (the popover); `PlanGroup.vue` gets the header button and emits
+  the request; `LayerPlan.vue` / `MediaSequencer.vue` mount the popover and show the toast.
+
+**Files:** `utils/copyMappings.js`, `composables/useLayerPlan.js`, `plan/CopyMappings.vue`,
+`plan/PlanGroup.vue`, `plan/LayerPlan.vue`, `MediaSequencer.vue`.
+
+- **Acceptance:** checklist §9.10.
+
+### Phase 14 - Click on a selected plan row deselects it (owner request, 2026-10-12)
+
+**Why.** A plain click on a plan row selects it, but a second click on the same row does
+nothing: today a row can be deselected only with its checkbox, Ctrl+click, the group
+select-all or the bar's ×. Clicking the row again should undo the click.
+
+**Rule** (`usePlanSelection.click`, plain click without Ctrl / Shift):
+- the row is not selected: select only this row (as today);
+- the row is the only selected row: deselect it (new), and the anchor is cleared;
+- the row is selected together with others: keep only this row (as today, the usual list
+  behaviour); a second click then deselects it.
+- Ctrl+click, Shift+click, Ctrl+Shift+click, the checkbox and the select-all are unchanged.
+- A drag of a selected row still moves the selection and never deselects (a drag does not
+  produce a click).
+- Clicks on the mapping slot, its ×, the ◆ mark and the remove button stay `.stop` and never
+  change the selection.
+
+**Files:** `composables/usePlanSelection.js`.
+
+- **Acceptance:** checklist §9.11.
+
 ---
 
 ## 9. Acceptance checklists (manual)
@@ -1582,6 +1744,38 @@ fifth row when the panel opens.
 - [ ] The type filter is shared with Advanced and survives a reload.
 - [ ] Refresh after deleting the picked mapping in Designer clears the pick.
 - [ ] Works at 900x560 and in a wide window.
+
+### 9.9. Contrast and panels (Phase 12)
+- [ ] Plan defaults and Auto-assign open with the blue edge and glow of the floating bar and
+      are clearly apart from the groups under them; no double border.
+- [ ] Auto-assign has the Plan defaults layout: header with tag and ×, "Match by" and "Apply
+      to" option lists with counts, result line and buttons in the footer; Esc and × close;
+      one column in a narrow pane; prefs survive a reload; Run / Clear work as before.
+- [ ] Group chips are visibly lighter than the group box on a large screen; override, scope,
+      open, off and warning states still read the same.
+- [ ] File names on cards and rows are near white; duration, resolution and type are readable
+      (at least 4.5:1); no text left on the old greys (search the components for `#666666`,
+      `#888888` used as text).
+- [ ] Backgrounds, borders and dividers identical to 1.2.0; accent, red, yellow and mapping
+      colours unchanged; selection, drop and focus states look as before.
+- [ ] Checked at 900x560 and in a wide window, in Simple and Advanced, Files / Split / Plan.
+
+### 9.10. Copy mappings (Phase 13)
+- [ ] The header button is hidden with one group and disabled on a group without mappings.
+- [ ] G1 [A, B, C, D] to a 6-layer G2 with Stop: A B C D, layers 5-6 keep their mapping; with
+      Repeat: A B C D A B. To a 3-layer group: A B C.
+- [ ] With rows 2-3 of G1 checked, the source is [B, C] and the popover says so.
+- [ ] A source layer without mapping leaves its target layer unchanged.
+- [ ] The preview dots match the result; "All other groups" checks every target.
+- [ ] Toast with the layer count; Undo restores every target mapping.
+- [ ] Stop / Repeat survives a reload. Works at 900x560.
+
+### 9.11. Row click deselects (Phase 14)
+- [ ] Click a row: it is selected and the floating bar shows 1; click it again: nothing is
+      selected and the bar is gone.
+- [ ] Three rows selected, click one of them: only it stays selected; click it again: none.
+- [ ] Ctrl / Shift clicks, checkboxes, select-all, dragging selected rows, slot and remove
+      clicks behave as before.
 
 ---
 
