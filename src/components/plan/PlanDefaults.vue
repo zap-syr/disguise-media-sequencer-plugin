@@ -85,29 +85,29 @@ const statsText = computed(() => {
 * { box-sizing: border-box; }
 
 .pdbox {
+  /* The frame (border, glow) comes from LayerPlan .pd-drop */
   margin: 10px 14px 0;
-  border: 1px solid #3a3a3a;
   border-radius: 6px;
   background: #1e1e1e;
   overflow: hidden;
 }
-.pd-head { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 12px; border-bottom: 1px solid #2e2e2e; }
+.pd-head { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px 0 12px; background: #242424; border-bottom: 1px solid #2e2e2e; }
 .pd-title { font-size: 12px; font-weight: 700; color: #ffffff; white-space: nowrap; }
 .pd-tag {
   flex-shrink: 0; height: 18px; padding: 0 6px; border-radius: 4px;
   display: inline-flex; align-items: center;
   background: #0a84ff; color: #ffffff; font-size: 10px; font-weight: 700; white-space: nowrap;
 }
-.hint { flex: 1; min-width: 0; font-size: 11px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hint { flex: 1; min-width: 0; font-size: 11px; color: #9c9c9c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hint.warm { color: #ffd60a; }
 /* The footer summary wraps instead of being cut in a narrow pane */
 .pd-foot .hint { white-space: normal; line-height: 1.4; }
 .pd-x {
   width: 24px; height: 24px; flex-shrink: 0; border: none; border-radius: 4px;
-  background: transparent; color: #888888; cursor: pointer; padding: 0;
+  background: transparent; color: #9c9c9c; cursor: pointer; padding: 0;
   display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
 }
-.pd-x:hover { background: #2a2a2a; color: #ffffff; }
+.pd-x:hover { background: #2c2c2c; color: #ffffff; }
 .pd-x:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 
 .pd-body { display: flex; padding: 10px 12px; }
@@ -117,10 +117,9 @@ const statsText = computed(() => {
 }
 .quiet {
   flex-shrink: 0; height: 26px; padding: 0 10px; border-radius: 6px;
-  border: 1px solid transparent; background: transparent; color: #aaaaaa;
+  border: 1px solid transparent; background: transparent; color: #aeaeae;
   font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s ease;
 }
-.quiet:hover:not(:disabled) { border-color: #555555; background: #2a2a2a; color: #ffffff; }
-.quiet:disabled { opacity: 0.4; cursor: not-allowed; }
+.quiet:hover:not(:disabled) { border-color: #6a6a6a; background: #2c2c2c; color: #ffffff; }.quiet:disabled { opacity: 0.4; cursor: not-allowed; }
 .quiet:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 </style>

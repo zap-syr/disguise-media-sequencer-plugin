@@ -428,7 +428,7 @@ defineExpose({ jump, openDefaults });
   flex-shrink: 0;
 }
 .ph-title { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #0a84ff; white-space: nowrap; flex-shrink: 0; }
-.ph-sum { flex: 1 1 0; font-size: 12px; color: #888888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; font-variant-numeric: tabular-nums; }
+.ph-sum { flex: 1 1 0; font-size: 12px; color: #9c9c9c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; font-variant-numeric: tabular-nums; }
 .ph-spacer { flex: 1; }
 .plan-pane { container-type: inline-size; }
 @container (max-width: 760px) {
@@ -442,17 +442,19 @@ defineExpose({ jump, openDefaults });
 .ph-actions { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
 
 .pd-anchor { position: relative; height: 0; z-index: 20; }
+/* Blue edge and glow like the floating bar, so the panel stands apart from the groups under it */
 .pd-drop {
   position: absolute; top: 0; left: 0; right: 0;
   max-height: min(70vh, 560px); overflow-y: auto;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(10, 132, 255, 0.55);
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55);
 }
 
 .ghost {
   flex-shrink: 0;
   background: transparent;
   border: 1px solid #333333;
-  color: #aaaaaa;
+  color: #aeaeae;
   border-radius: 6px;
   padding: 6px 10px;
   font-size: 12px;
@@ -488,7 +490,7 @@ defineExpose({ jump, openDefaults });
   border-radius: 6px;
   box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55);
   font-size: 12px;
-  color: #cccccc;
+  color: #d4d4d4;
   white-space: nowrap;
 }
 .sel-bar strong { color: #ffffff; }
@@ -499,19 +501,19 @@ defineExpose({ jump, openDefaults });
   background: #0a84ff; color: #ffffff; font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums;
 }
 .bar-sep { width: 1px; height: 20px; background: #3a3a3a; flex-shrink: 0; }
-.bar-lbl { font-size: 11px; color: #888888; flex-shrink: 0; }
+.bar-lbl { font-size: 11px; color: #9c9c9c; flex-shrink: 0; }
 .bar-seg { display: inline-flex; height: 28px; padding: 2px; flex-shrink: 0; border: 1px solid #3a3a3a; border-radius: 6px; background: #181818; }
 .bar-seg button {
-  border: none; background: transparent; color: #888888;
+  border: none; background: transparent; color: #9c9c9c;
   padding: 0 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
 }
-.bar-seg button:hover { color: #cccccc; }
+.bar-seg button:hover { color: #f2f2f2; }
 .bar-seg button.on { background: #3a3a3a; color: #ffffff; }
 .bar-seg button:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 .bar-btn {
   display: inline-flex; align-items: center; gap: 6px;
   flex-shrink: 0; height: 28px; padding: 0 10px; border-radius: 6px;
-  border: 1px solid #3a3a3a; background: transparent; color: #cccccc;
+  border: 1px solid #3a3a3a; background: transparent; color: #d4d4d4;
   font-size: 12px; cursor: pointer; transition: all 0.2s ease;
 }
 .bar-btn:hover:not(:disabled) { border-color: #555555; background: #2a2a2a; color: #ffffff; }
@@ -520,7 +522,7 @@ defineExpose({ jump, openDefaults });
 .bar-btn:focus-visible, .bar-x:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 .bar-x {
   width: 28px; height: 28px; flex-shrink: 0; border: none; border-radius: 6px;
-  background: transparent; color: #888888; cursor: pointer; padding: 0;
+  background: transparent; color: #9c9c9c; cursor: pointer; padding: 0;
   display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
 }
 .bar-x:hover { background: #333333; color: #ffffff; }
@@ -557,7 +559,7 @@ defineExpose({ jump, openDefaults });
   border-radius: 6px;
   border: 1px solid #333333;
   background: transparent;
-  color: #cccccc;
+  color: #d4d4d4;
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -566,12 +568,12 @@ defineExpose({ jump, openDefaults });
 }
 .chip:hover { border-color: #555555; color: #ffffff; }
 .chip-label { color: #0a84ff; }
-.chip-count { color: #888888; font-weight: 500; font-variant-numeric: tabular-nums; }
+.chip-count { color: #9c9c9c; font-weight: 500; font-variant-numeric: tabular-nums; }
 
 /* Constant bottom room, so the last group can always be scrolled above the floating bar */
 .plan { flex: 1; overflow-y: auto; padding-bottom: 76px; }
 
-.empty { padding: 40px 18px; text-align: center; color: #555555; font-size: 13px; border: 1px dashed transparent; margin: 10px 14px; border-radius: 6px; }
+.empty { padding: 40px 18px; text-align: center; color: #888888; font-size: 13px; border: 1px dashed transparent; margin: 10px 14px; border-radius: 6px; }
 .empty.is-drop { border-color: #0a84ff; color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
 
 .gap-drop {
@@ -581,7 +583,7 @@ defineExpose({ jump, openDefaults });
   border-radius: 6px;
   text-align: center;
   font-size: 11px;
-  color: #777777;
+  color: #888888;
   transition: all 0.2s ease;
 }
 .gap-drop.over { border-color: #0a84ff; border-style: solid; color: #0a84ff; background: rgba(10, 132, 255, 0.15); }

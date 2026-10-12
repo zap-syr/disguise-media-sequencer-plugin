@@ -37,15 +37,15 @@ defineProps({
   position: relative;
   width: 100%; min-width: 0; height: 36px; padding: 3px 8px;
   display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 1px;
-  border: 1px solid #333333; border-radius: 6px; background: #181818;
+  border: 1px solid #444444; border-radius: 6px; background: #2c2c2c;
   text-align: left; cursor: pointer; font: inherit;
   transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
-.schip:hover { border-color: #555555; }
+.schip:hover { border-color: #6a6a6a; }
 .schip:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 .schip-k {
   max-width: calc(100% - 14px);
-  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #aaaaaa;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #aeaeae;
   line-height: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .schip-v {
@@ -62,6 +62,6 @@ defineProps({
 .schip.ov { border-color: rgba(255, 214, 10, 0.55); }
 .schip.ov .schip-v { color: #ffd60a; }
 .schip.mixed .schip-v { font-style: italic; color: #888888; }
-.schip.off .schip-v { color: #666666; text-decoration: line-through; }
+.schip.off .schip-v { color: #888888; text-decoration: line-through; }
 .schip.open { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
 </style>
