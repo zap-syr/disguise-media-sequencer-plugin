@@ -92,6 +92,7 @@
         @assign-all="onAssignAll"
         @assign-selected="onAssignSelected"
         @clear-group="plan.clearMappings"
+        @copy-mappings="onCopyMappings"
         @clear-all-mappings="plan.clearMappings('all')"
         @disarm="armedMapping = null"
         :checked="planSelection.checked"
@@ -529,6 +530,17 @@ function onAssignAll(mappingPath) {
   const g = plan.state.groups.filter(gr => gr.items.length).length;
   const restore = plan.assignAll(mappingPath);
   showToast(`Mapping assigned to ${n} ${n === 1 ? 'layer' : 'layers'} in ${g} ${g === 1 ? 'group' : 'groups'}`, 'info', { label: 'Undo', fn: restore });
+}
+
+/** Copy mappings (Phase 13): the source layers' mappings by position into the target groups. */
+function onCopyMappings(sourceGid, sourceIds, targetGids, repeat) {
+  const labels = targetGids.map(id => `G${plan.state.groups.findIndex(g => g.id === id) + 1}`).join(', ');
+  const { layers, restore } = plan.copyMappings(sourceIds, targetGids, { repeat });
+  if (!layers) {
+    showToast(`${labels} already ${targetGids.length === 1 ? 'has' : 'have'} these mappings`);
+    return;
+  }
+  showToast(`Mappings copied to ${labels}: ${layers} ${layers === 1 ? 'layer' : 'layers'}`, 'info', { label: 'Undo', fn: restore });
 }
 
 // Armed mapping onto the selected rows: the selection stays, so it can be re-assigned

@@ -164,6 +164,9 @@
         @clear-entries="ids => $emit('clear-entries', ids)"
         @assign-group="path => $emit('assign-group', g.id, path)"
         @clear-group="$emit('clear-group', g.id)"
+        :can-copy="planState.groups.length > 1"
+        :copy-open="copyFrom?.gid === g.id"
+        @copy-mappings="(anchor, ids, selected) => toggleCopy(g.id, anchor, ids, selected)"
         :checked="checked"
         :selected-ids="selectedIds"
         :any-selected="selectedIds.length > 0"
@@ -208,6 +211,19 @@
     >{{ draggingNew
       ? (draggingFolders ? 'Drop to create groups' : 'Drop to create a new group')
       : 'Drag files here to create a group, or select folders in the tree. Repeat to build Group 2, Group 3 and so on.' }}</div>
+
+    <!-- Teleported: placed after the list / empty-plan pair so it never breaks their v-if / v-else -->
+    <CopyMappings
+      v-if="copyFrom"
+      :anchor="copyFrom.anchor"
+      :source-gid="copyFrom.gid"
+      :source-ids="copyFrom.ids"
+      :selected="copyFrom.selected"
+      :groups="planState.groups"
+      :entries="planState.entries"
+      @copy="onCopy"
+      @close="copyFrom = null"
+    />
   </section>
 </template>
 
@@ -216,6 +232,7 @@ import { computed, ref, nextTick, watch, onBeforeUnmount } from 'vue';
 import PlanGroup from './PlanGroup.vue';
 import PlanDefaults from './PlanDefaults.vue';
 import AutoAssign from './AutoAssign.vue';
+import CopyMappings from './CopyMappings.vue';
 import { formatDuration } from '../../utils/format';
 import { mappingColor } from '../../utils/mappingColors';
 import { dragPayload, endDrag } from '../../composables/useDragPayload';
@@ -242,7 +259,22 @@ const emit = defineEmits(['add-group', 'update-group', 'remove-group', 'remove-e
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'remove-selected', 'deselect',
   'drop-folders', 'drop-folder-groups', 'drop-file-group', 'drop-group',
   'set-plan', 'reset-plan-keys', 'clear-overrides', 'reset-all-overrides', 'auto-assign',
-  'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group']);
+  'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group', 'copy-mappings']);
+
+// Copy mappings popover (Phase 13): { gid, anchor, ids, selected } of the source group, or null
+const copyFrom = ref(null);
+function toggleCopy(gid, anchor, ids, selected) {
+  copyFrom.value = copyFrom.value?.gid === gid ? null : { gid, anchor, ids: [...ids], selected };
+}
+function onCopy({ targetGids, repeat }) {
+  const { gid, ids } = copyFrom.value;
+  copyFrom.value = null;
+  emit('copy-mappings', gid, ids, targetGids, repeat);
+}
+// The source group is gone, or the plan has no other group left
+watch(() => props.planState.groups.map(g => g.id), list => {
+  if (copyFrom.value && (!list.includes(copyFrom.value.gid) || list.length < 2)) copyFrom.value = null;
+});
 
 // Header drop-down panels: 'defaults' | 'auto' | null (one at a time)
 const openPanel = ref(null);

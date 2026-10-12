@@ -38,6 +38,20 @@
       </div>
       <span class="g-meta" :class="{ 'is-drop': headOver }">{{ headOver ? `Assign to all ${group.items.length}` : meta }}</span>
       <div class="g-actions">
+        <button
+          v-if="canCopy"
+          type="button"
+          class="icon-btn"
+          :class="{ active: copyOpen }"
+          :title="copyTitle"
+          aria-label="Copy mappings to other groups"
+          aria-haspopup="dialog"
+          :aria-expanded="copyOpen"
+          :disabled="!copyHasMappings"
+          @click="onCopyClick"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+        </button>
         <button type="button" class="icon-btn" title="Group and its layers back to Plan defaults" aria-label="Reset group settings to Plan defaults" :disabled="!groupHasOverrides" @click="$emit('reset-group')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
         </button>
@@ -206,10 +220,12 @@ const props = defineProps({
   armed: { type: String, default: null },                 // armed mapping path (click-to-assign)
   checked: { type: Set, default: () => new Set() },       // selected entry ids (whole plan)
   selectedIds: { type: Array, default: () => [] },        // selected entry ids in plan order
-  anySelected: { type: Boolean, default: false }
+  anySelected: { type: Boolean, default: false },
+  canCopy: { type: Boolean, default: false },             // the plan has another group to copy mappings to
+  copyOpen: { type: Boolean, default: false }             // the Copy mappings popover of this group is open
 });
 const emit = defineEmits(['toggle', 'rename', 'remove', 'remove-entry',
-  'assign', 'clear-entries', 'assign-group', 'clear-group',
+  'assign', 'clear-entries', 'assign-group', 'clear-group', 'copy-mappings',
   'row-click', 'row-check', 'group-check', 'drop-rows', 'drop-files', 'drop-folders', 'drop-group',
   'set-group-ov', 'set-layer-ov', 'reset-group', 'apply-to-all', 'apply-to-group']);
 
@@ -412,6 +428,19 @@ const draggingMapping = computed(() => dragPayload.kind === 'mapping');
 const slotsReady = computed(() => draggingMapping.value || !!props.armed);
 const hasMappings = computed(() => props.group.items.some(id => props.entries[id]?.mappingPath));
 
+// Copy mappings (Phase 13): the checked rows of this group, otherwise the whole group
+const copySource = computed(() => (selInGroup.value.length ? selInGroup.value : props.group.items));
+const copyHasMappings = computed(() => copySource.value.some(id => props.entries[id]?.mappingPath));
+const copyTitle = computed(() => {
+  if (!copyHasMappings.value) return `${label.value} has no mappings to copy`;
+  return selInGroup.value.length
+    ? `Copy the mappings of the ${selInGroup.value.length} selected layers to other groups`
+    : 'Copy the mappings of this group to other groups, layer by layer';
+});
+function onCopyClick(event) {
+  emit('copy-mappings', event.currentTarget, copySource.value, selInGroup.value.length > 0);
+}
+
 function slotTitle(row) {
   if (row.mappingMissing) return `Mapping not found in the project: ${row.mappingPath}`;
   if (row.mappingPath) return `Mapping: ${row.mappingName}`;
@@ -584,6 +613,8 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   cursor: pointer; padding: 0; transition: all 0.2s ease;
 }
 .icon-btn:hover { background: #333333; color: #ffffff; }
+.icon-btn.active { background: rgba(10, 132, 255, 0.15); color: #0a84ff; }
+.icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 
 .g-set {
   display: flex; align-items: center; gap: 10px;
