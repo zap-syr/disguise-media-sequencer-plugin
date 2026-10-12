@@ -1588,9 +1588,22 @@ Source G1 = [A, B, C, D]:
 **Files:** `utils/copyMappings.js`, `composables/useLayerPlan.js`, `plan/CopyMappings.vue`,
 `plan/PlanGroup.vue`, `plan/LayerPlan.vue`, `MediaSequencer.vue`.
 
+Done (2026-10-12, owner-checked). The popover placement
+moved from `ChipPopover` into `composables/useAnchoredPopover.js`, shared by both popovers.
+With a single other group it is checked from the start; target rows show "N to update" /
+"up to date". Checked in Chrome with a test plan (restored afterwards): Repeat into a 6-layer
+group, Stop with 2 checked rows into a 3-layer group, Undo, Esc (closes the popover only, the
+selection stays), disabled button on a group without mappings, and a 900x560 frame. Fixes
+after the owner's check: the popover sat between the group list and the empty-plan text and
+broke their `v-if` / `v-else` (the empty text showed under every plan); the preview dots of a
+long target group ran into its text, so they moved to their own line under it (18 dots, then
+"+N").
+
 - **Acceptance:** checklist §9.10.
 
-### Phase 14 - Click on a selected plan row deselects it (owner request, 2026-10-12)
+### Phase 14 - Row click deselects, glowing frame on group popovers (owner requests, 2026-10-12)
+
+**A. Click on a selected plan row deselects it.**
 
 **Why.** A plain click on a plan row selects it, but a second click on the same row does
 nothing: today a row can be deselected only with its checkbox, Ctrl+click, the group
@@ -1608,6 +1621,26 @@ select-all or the bar's ×. Clicking the row again should undo the click.
   change the selection.
 
 **Files:** `composables/usePlanSelection.js`.
+
+**B. Glowing frame on every drop-down of the group settings.**
+
+**Why.** The chip popovers and the other small windows of a group still have the plain grey
+frame (`#3a3a3a`) and sink into the plan behind them on a large screen. Plan defaults,
+Auto-assign and the floating bar already have the blue edge and glow (Phase 12 A).
+
+**Design:** the same frame as `.pd-drop` / `.sel-bar`: border `rgba(10, 132, 255, 0.55)` and
+shadow `0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px
+rgba(0, 0, 0, 0.55)`. The notch pointing at the chip / button gets the same blue edge, so it
+reads as part of the frame. Applies to:
+- the setting chip popover (`ChipPopover.vue`), in groups and in Plan defaults;
+- the "+N" list of folded chips (`ChipRow.vue` `.chip-overflow`);
+- the Copy mappings popover (`CopyMappings.vue`).
+
+The settings panel dropdowns (`MenuSelect`) and toasts keep their look: they are not group
+settings windows. The skill's chip popover section is updated.
+
+**Files:** `plan/ChipPopover.vue`, `plan/ChipRow.vue`, `plan/CopyMappings.vue`,
+`.claude/skills/disguise-css/SKILL.md`.
 
 - **Acceptance:** checklist §9.11.
 
@@ -1776,7 +1809,10 @@ select-all or the bar's ×. Clicking the row again should undo the click.
 - [ ] Toast with the layer count; Undo restores every target mapping.
 - [ ] Stop / Repeat survives a reload. Works at 900x560.
 
-### 9.11. Row click deselects (Phase 14)
+### 9.11. Row click deselects, popover frames (Phase 14)
+- [ ] Every chip popover (group, selection, Plan defaults), the "+N" list and Copy mappings
+      have the blue edge and glow, the notch included; they stand apart from the plan on a
+      large screen and at 900x560.
 - [ ] Click a row: it is selected and the floating bar shows 1; click it again: nothing is
       selected and the bar is gone.
 - [ ] Three rows selected, click one of them: only it stays selected; click it again: none.
