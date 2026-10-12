@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.1] - 2026-10-12
+
+### Added
+- **Copy mappings between groups** - a new button in the group header copies the group's mappings, layer by layer, to the other groups you choose. If rows of the group are checked, only those are copied. A preview shows what each layer will get before anything changes; when a target group is longer, its remaining layers either keep their mappings (Stop) or the pattern repeats (Repeat). A source layer without a mapping changes nothing. Undo in the toast.
+- A second click on a selected plan row deselects it (when it is the only selected row).
+
+### Changed
+- **Readability** - file names, labels, durations, resolutions and other metadata are brighter on the same dark backgrounds, so they no longer blend into them.
+- **Group setting chips** stand out from the group box, so they are easy to tell apart on a large screen.
+- **Floating windows** - Plan defaults, Auto-assign, the setting popovers, the "+N" list of hidden settings and Copy mappings get the blue glowing frame of the selection bar.
+- **Auto-assign** redesigned to match Plan defaults: header with a close button, "Match by" and "Apply to" option lists with layer counts, the result of the last run next to the buttons. In a narrow or short window the descriptions move to tooltips and the Run button stays in view.
+
 ## [1.2.0] - 2026-10-11
 
 ### Added
