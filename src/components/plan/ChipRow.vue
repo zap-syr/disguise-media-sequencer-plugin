@@ -175,8 +175,9 @@ defineExpose({ rowEl, anchorOf });
 .chip-overflow {
   position: fixed; z-index: 1000;
   min-width: 200px; max-width: calc(100vw - 16px); padding: 4px 0;
-  background: #1e1e1e; border: 1px solid #3a3a3a; border-radius: 6px;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  /* Same blue edge and glow as the chip popover */
+  background: #1e1e1e; border: 1px solid rgba(10, 132, 255, 0.55); border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55);
   font-family: inherit;
 }
 .ovf-row {

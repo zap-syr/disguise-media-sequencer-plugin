@@ -113,15 +113,16 @@ watch(() => [props.values, props.mixed, props.layerNote, props.globals], () => n
   position: fixed; z-index: 1000;
   width: 268px; max-width: calc(100vw - 16px);
   display: flex; flex-direction: column; max-height: calc(100vh - 16px);
-  border: 1px solid #3a3a3a; border-radius: 6px; background: #1e1e1e;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  /* Blue edge and glow of the floating bar and the header panels, so it stands apart from the plan */
+  border: 1px solid rgba(10, 132, 255, 0.55); border-radius: 6px; background: #1e1e1e;
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px rgba(0, 0, 0, 0.55);
   font-family: inherit; color: #d4d4d4;
 }
-/* Small notch pointing at the chip */
+/* Small notch pointing at the chip, with the same blue edge */
 .chip-pop::before {
   content: ''; position: absolute; left: var(--arrow-x); top: -5px;
   width: 8px; height: 8px; background: #1e1e1e;
-  border-left: 1px solid #3a3a3a; border-top: 1px solid #3a3a3a;
+  border-left: 1px solid rgba(10, 132, 255, 0.55); border-top: 1px solid rgba(10, 132, 255, 0.55);
   transform: translateX(-50%) rotate(45deg);
 }
 .chip-pop.above::before { top: auto; bottom: -5px; background: #1a1a1a; transform: translateX(-50%) rotate(225deg); }
