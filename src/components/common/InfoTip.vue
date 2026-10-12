@@ -10,6 +10,6 @@ defineProps({ text: { type: String, required: true } });
 </script>
 
 <style scoped>
-.info { display: inline-flex; vertical-align: -2px; color: #666666; cursor: help; border-radius: 50%; outline: none; transition: color 0.2s ease; }
-.info:hover, .info:focus-visible { color: #cccccc; }
+.info { display: inline-flex; vertical-align: -2px; color: #9c9c9c; cursor: help; border-radius: 50%; outline: none; transition: color 0.2s ease; }
+.info:hover, .info:focus-visible { color: #f2f2f2; }
 </style>

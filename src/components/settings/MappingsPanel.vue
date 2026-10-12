@@ -141,22 +141,22 @@ function clearFilter() {
 <style scoped>
 * { box-sizing: border-box; }
 
-.hint { font-size: 11px; color: #888888; margin-bottom: 8px; }
+.hint { font-size: 11px; color: #9c9c9c; margin-bottom: 8px; }
 
 .search-bar { display: flex; align-items: center; background: #181818; border: 1px solid #3a3a3a; border-radius: 6px; padding: 6px 10px; transition: border-color 0.2s ease; }
 .search-bar:focus-within { border-color: #0a84ff; }
-.search-icon { color: #666666; margin-right: 8px; flex-shrink: 0; }
+.search-icon { color: #9c9c9c; margin-right: 8px; flex-shrink: 0; }
 .search-bar input { background: transparent; border: none; color: #eeeeee; outline: none; width: 100%; font-size: 12px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .chip {
   height: 24px; padding: 0 8px; border-radius: 6px;
-  border: 1px solid #3a3a3a; background: transparent; color: #aaaaaa;
+  border: 1px solid #3a3a3a; background: transparent; color: #aeaeae;
   font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
 }
 .chip:hover { border-color: #555555; color: #ffffff; }
 .chip.on { background: rgba(10, 132, 255, 0.2); border-color: #0a84ff; color: #ffffff; }
-.chip .cnt { color: #777777; font-weight: 500; }
+.chip .cnt { color: #9c9c9c; font-weight: 500; }
 
 /* Framed scroll well: the list's edges are visible, so cards cut at the top or bottom read as "scroll for more" */
 .maps {
@@ -176,14 +176,14 @@ function clearFilter() {
 .map:active { cursor: grabbing; }
 .map:focus-visible { outline: none; border-color: #0a84ff; }
 .map.armed { border-color: #0a84ff; background: rgba(10, 132, 255, 0.15); }
-.grip { color: #555555; flex-shrink: 0; }
+.grip { color: #888888; flex-shrink: 0; }
 .mtag { width: 5px; align-self: stretch; border-radius: 3px; flex-shrink: 0; }
 .mtext { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; line-height: 1.3; }
-.mname { font-size: 12px; font-weight: 600; color: #dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mtype { font-size: 11px; color: #888888; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.uses { font-size: 11px; color: #cccccc; background: #333333; border-radius: 6px; padding: 1px 6px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
-.uses.zero { color: #666666; background: transparent; }
-.empty { font-size: 11px; color: #777777; padding: 8px 2px; }
+.mname { font-size: 12px; font-weight: 600; color: #f2f2f2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mtype { font-size: 11px; color: #9c9c9c; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.uses { font-size: 11px; color: #d4d4d4; background: #333333; border-radius: 6px; padding: 1px 6px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.uses.zero { color: #888888; background: transparent; }
+.empty { font-size: 11px; color: #888888; padding: 8px 2px; }
 
 /* Pick mode (Simple): constant height whatever the filter, about 5 rows */
 .maps.pick { height: 218px; max-height: none; padding: 4px; gap: 2px; }

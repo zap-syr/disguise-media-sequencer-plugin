@@ -623,7 +623,7 @@ async function handleCreateLayers(requestOptions) {
   flex-direction: column;
   height: 100vh;
   background-color: transparent;
-  color: #cccccc;
+  color: #d4d4d4;
   font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: hidden;
 }
@@ -656,5 +656,5 @@ async function handleCreateLayers(requestOptions) {
   .plan-actions { min-width: 92px; }
 }
 
-.loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #888; }
+.loading, .error { flex: 1; display: flex; align-items: center; justify-content: center; color: #9c9c9c; }
 </style>

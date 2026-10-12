@@ -542,7 +542,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 
 .chev {
   width: 22px; height: 22px;
-  border: none; background: transparent; color: #aaaaaa;
+  border: none; background: transparent; color: #aeaeae;
   display: flex; align-items: center; justify-content: center;
   border-radius: 4px; cursor: pointer; padding: 0;
 }
@@ -560,7 +560,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .g-name {
   min-width: 0; height: 28px;
   background: transparent; border: 1px solid transparent; border-radius: 6px;
-  color: #dddddd; font: inherit; font-size: 13px; font-weight: 600;
+  color: #f2f2f2; font: inherit; font-size: 13px; font-weight: 600;
   padding: 0 6px; outline: none; transition: border-color 0.2s ease;
 }
 .g-name:hover { border-color: #3a3a3a; }
@@ -571,15 +571,15 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .mk-split { position: absolute; top: 0; bottom: 0; width: 2px; background: #dddddd; transform: translateX(-1px); }
 .mk-tag { position: absolute; top: 3px; width: 7px; height: 7px; background: #0a84ff; transform: translateX(-50%) rotate(45deg); }
 
-.g-meta { font-size: 11px; color: #888888; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.g-meta { font-size: 11px; color: #9c9c9c; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .g-meta.is-drop { color: #0a84ff; font-weight: 600; }
 .g-head.map-over { box-shadow: inset 0 0 0 1px #0a84ff; background: rgba(10, 132, 255, 0.15); }
 .g-actions { display: flex; gap: 2px; }
-.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; background: transparent; color: #888888; }
+.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; background: transparent; color: #9c9c9c; }
 
 .icon-btn {
   width: 24px; height: 24px; border: none; border-radius: 4px;
-  background: transparent; color: #888888;
+  background: transparent; color: #9c9c9c;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; padding: 0; transition: all 0.2s ease;
 }
@@ -619,7 +619,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .row.drop-after { box-shadow: inset 0 -2px 0 #0a84ff; }
 
 .ord-cell { width: 26px; height: 22px; display: flex; align-items: center; justify-content: center; }
-.ord { font-size: 11px; color: #888888; text-align: center; font-variant-numeric: tabular-nums; }
+.ord { font-size: 11px; color: #9c9c9c; text-align: center; font-variant-numeric: tabular-nums; }
 .cb {
   display: none;
   width: 16px; height: 16px; padding: 0;
@@ -636,8 +636,8 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .thumb { width: 40px; height: 26px; border-radius: 4px; background: #151515; overflow: hidden; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pname { min-width: 0; }
-.pname-txt { font-size: 12px; color: #cccccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pname-sub { font-size: 11px; color: #666666; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pname-txt { font-size: 12px; font-weight: 500; color: #f2f2f2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pname-sub { font-size: 11px; color: #9c9c9c; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pname.missing .pname-txt, .pname.missing .pname-sub { color: #ef4444; }
 .miss-icon { vertical-align: -2px; margin-right: 5px; }
 .slot {
@@ -652,8 +652,8 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 .slot.missing { border-color: #ef4444; }
 .slot:focus-visible { border-color: #0a84ff; box-shadow: 0 0 0 1px #0a84ff; }
 .dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
-.sname { flex: 1; min-width: 0; color: #dddddd; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sname.empty-slot { color: #666666; font-style: italic; }
+.sname { flex: 1; min-width: 0; color: #f2f2f2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sname.empty-slot { color: #888888; font-style: italic; }
 .via {
   flex-shrink: 0; padding: 1px 5px; border-radius: 4px;
   background: rgba(10, 132, 255, 0.15); color: #0a84ff;
@@ -661,7 +661,7 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
 }
 .slot-x {
   width: 20px; height: 20px; flex-shrink: 0; border: none; border-radius: 4px;
-  background: transparent; color: #888888; cursor: pointer; padding: 0;
+  background: transparent; color: #9c9c9c; cursor: pointer; padding: 0;
   display: flex; align-items: center; justify-content: center;
 }
 .slot-x:hover { background: #3a3a3a; color: #ffffff; }
@@ -680,5 +680,5 @@ const rows = computed(() => props.layout.rows.map((r, i) => {
   .g-meta { display: none; }
 }
 
-.g-empty { padding: 14px; text-align: center; color: #666666; font-size: 12px; border-top: 1px solid #2a2a2a; }
+.g-empty { padding: 14px; text-align: center; color: #888888; font-size: 12px; border-top: 1px solid #2a2a2a; }
 </style>

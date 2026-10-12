@@ -182,7 +182,7 @@ function stopResize() {
 .panel-toggle-btn {
   background: transparent;
   border: none;
-  color: #888;
+  color: #9c9c9c;
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -202,7 +202,7 @@ function stopResize() {
   left: 52px;
   font-size: 11px;
   font-weight: 700;
-  color: #666666;
+  color: #9c9c9c;
   letter-spacing: 0.5px;
   transition: opacity 0.2s ease;
   white-space: nowrap;
@@ -247,7 +247,7 @@ function stopResize() {
   border: none;
   border-radius: 4px;
   background: transparent;
-  color: #aaaaaa;
+  color: #aeaeae;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -268,8 +268,8 @@ function stopResize() {
   align-items: center;
   justify-content: center;
 }
-.folder-icon { color: #666666; }
-.tree-item.is-selected .folder-icon { color: #aaaaaa; }
+.folder-icon { color: #9c9c9c; }
+.tree-item.is-selected .folder-icon { color: #d4d4d4; }
 
 .folder-name {
   font-size: 13px;
@@ -280,10 +280,10 @@ function stopResize() {
   margin-left: auto;
   padding-left: 12px;
   font-size: 11px;
-  color: #666666;
+  color: #9c9c9c;
   font-variant-numeric: tabular-nums;
 }
-.tree-item.is-selected .folder-count { color: #aaaaaa; }
+.tree-item.is-selected .folder-count { color: #d4d4d4; }
 
 .tree-item:focus-visible { outline: none; box-shadow: inset 0 0 0 1px #0a84ff; }
 .tree-item.is-checked { background: rgba(10, 132, 255, 0.15); color: #ffffff; }

@@ -628,7 +628,7 @@ defineExpose({ revealSection });
   width: 320px;
   min-width: 260px;
   background: #1e1e1e;
-  color: #dddddd;
+  color: #d4d4d4;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #36373a;
@@ -647,14 +647,14 @@ defineExpose({ revealSection });
 
 .settings-header-title {
   font-weight: 700;
-  color: #888;
+  color: #aeaeae;
   font-size: 14px;
   letter-spacing: 0.5px;
 }
 
 .mode-hint {
   font-size: 11px;
-  color: #777777;
+  color: #9c9c9c;
   line-height: 1.4;
   padding: 0 16px 12px 16px;
 }
@@ -671,14 +671,14 @@ defineExpose({ revealSection });
   border-radius: 6px;
   background: #1a1a1a;
   font-size: 12px;
-  color: #dddddd;
+  color: #d4d4d4;
   line-height: 1.4;
 }
 .confirm-actions { display: flex; gap: 8px; }
 
 .footer-summary {
   font-size: 11px;
-  color: #888888;
+  color: #aeaeae;
   margin-bottom: 10px;
   line-height: 1.4;
   font-variant-numeric: tabular-nums;
@@ -708,14 +708,14 @@ defineExpose({ revealSection });
 .kv-end { justify-self: end; }
 .kv-lbl {
   font-size: 12px;
-  color: #cccccc;
+  color: #d4d4d4;
   font-weight: 600;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 5px;
 }
-.kv-lbl.sub { font-weight: 500; color: #888888; padding-left: 10px; }
+.kv-lbl.sub { font-weight: 500; color: #9c9c9c; padding-left: 10px; }
 
 .disabled { opacity: 0.3; pointer-events: none; }
 .kv-lbl.disabled, .kv-end.disabled { opacity: 0.4; }
@@ -723,14 +723,14 @@ defineExpose({ revealSection });
 label {
   display: block;
   font-size: 12px;
-  color: #cccccc;
+  color: #d4d4d4;
   margin-bottom: 6px;
   font-weight: 600;
 }
 
-.adv-note { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 11px; color: #888888; }
+.adv-note { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font-size: 11px; color: #9c9c9c; }
 .link-btn {
-  border: 1px solid #3a3a3a; background: transparent; color: #cccccc;
+  border: 1px solid #3a3a3a; background: transparent; color: #d4d4d4;
   border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -742,8 +742,8 @@ label {
 .mk-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 22px; }
 .mk-divider { height: 1px; margin: 4px 0; background: #2e2e2e; }
 .mk-preview { margin-top: 4px; padding-top: 10px; border-top: 1px solid #2e2e2e; display: flex; flex-direction: column; gap: 6px; }
-.mk-will { font-size: 12px; color: #dddddd; }
-.mk-hint { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; font-size: 11px; color: #888888; }
+.mk-will { font-size: 12px; color: #f2f2f2; }
+.mk-hint { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; font-size: 11px; color: #9c9c9c; }
 .mk-hint .link-btn { padding: 3px 8px; }
 
 /* Horizontal Switcher (Segmented Control) */
@@ -760,7 +760,7 @@ label {
   flex: 1;
   background: transparent;
   border: none;
-  color: #888;
+  color: #9c9c9c;
   padding: 8px 10px;
   font-size: 11px;
   font-weight: 600;
@@ -771,7 +771,7 @@ label {
   white-space: nowrap;
 }
 
-.segment:hover:not(:disabled) { color: #ccc; }
+.segment:hover:not(:disabled) { color: #f2f2f2; }
 .segment.active {
   background: #3a3a3a;
   color: #fff;
@@ -817,7 +817,7 @@ label {
   top: 50%;
   transform: translateY(-50%);
   font-size: 8px;
-  color: #888;
+  color: #9c9c9c;
   pointer-events: none;
 }
 
@@ -887,11 +887,11 @@ ul.dropdown-list {
 .dropdown-empty {
   padding: 8px 12px;
   font-size: 12px;
-  color: #777;
+  color: #888888;
   text-align: center;
 }
 
-.label-text-secondary { font-size: 11px; color: #777777; font-weight: 500; }
+.label-text-secondary { font-size: 11px; color: #9c9c9c; font-weight: 500; }
 
 .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; margin: 0; cursor: pointer; }
 .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
@@ -979,7 +979,7 @@ input:checked + .slider:before { transform: translateX(16px); background-color: 
 
 .create-track-cancel-btn {
   background: #2a2a2a;
-  color: #aaa;
+  color: #aeaeae;
 }
 .create-track-cancel-btn:hover { background: #333; color: #fff; }
 

@@ -260,19 +260,19 @@ const listMeta = computed(() => {
   font-weight: 500; 
   white-space: nowrap; 
   overflow: hidden; 
-  text-overflow: ellipsis; 
-  color: #888888; 
+  text-overflow: ellipsis;
+  color: #e6e6e6;
 }
 .media-card.is-card-selected .file-name { color: #ffffff; }
 
 .file-subfolder {
-  color: #666666;
+  color: #9c9c9c;
   font-weight: 400;
 }
 
 .file-type {
   font-size: 10px;
-  color: #666666;
+  color: #9c9c9c;
 }
 .file-type.is-live { color: #0a84ff; font-weight: 600; }
 .media-card:not(.is-list) .file-type {
@@ -284,7 +284,7 @@ const listMeta = computed(() => {
 .media-card.is-compact .card-footer { padding: 8px 7px; }
 .media-card.is-compact .file-meta { gap: 3px; }
 .file-res {
-  color: #666666;
+  color: #9c9c9c;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
 }
@@ -307,14 +307,14 @@ const listMeta = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #aaaaaa;
+  color: #aeaeae;
 }
 .flag { display: block; }
 
 .list-meta {
   flex-shrink: 0;
   font-size: 11px;
-  color: #666666;
+  color: #9c9c9c;
   font-variant-numeric: tabular-nums;
 }
 
@@ -381,7 +381,7 @@ const listMeta = computed(() => {
   padding: 1px 6px;
   border-radius: 4px;
   background: #333333;
-  color: #cccccc;
+  color: #d4d4d4;
   font-size: 10px;
   font-weight: 600;
 }

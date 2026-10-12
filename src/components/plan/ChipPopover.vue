@@ -156,7 +156,7 @@ watch(() => [props.values, props.mixed, props.layerNote, props.globals], () => n
   display: flex; flex-direction: column; max-height: calc(100vh - 16px);
   border: 1px solid #3a3a3a; border-radius: 6px; background: #1e1e1e;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
-  font-family: inherit; color: #cccccc;
+  font-family: inherit; color: #d4d4d4;
 }
 /* Small notch pointing at the chip */
 .chip-pop::before {
@@ -177,14 +177,14 @@ watch(() => [props.values, props.mixed, props.layerNote, props.globals], () => n
 .cp-fill { flex: 1; }
 .cp-x {
   width: 24px; height: 24px; flex-shrink: 0; border: none; border-radius: 4px;
-  background: transparent; color: #888888; cursor: pointer; padding: 0;
+  background: transparent; color: #9c9c9c; cursor: pointer; padding: 0;
   display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;
 }
-.cp-x:hover { background: #2a2a2a; color: #ffffff; }
+.cp-x:hover { background: #2c2c2c; color: #ffffff; }
 .cp-x:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 
 .cp-switch { display: flex; align-items: center; gap: 6px; margin: 0; cursor: pointer; }
-.cp-state { font-size: 11px; color: #aaaaaa; font-weight: 600; }
+.cp-state { font-size: 11px; color: #aeaeae; font-weight: 600; }
 .switch { position: relative; display: inline-block; width: 28px; height: 16px; flex-shrink: 0; }
 .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
 .slider { position: absolute; inset: 0; background: #3a3a3a; border-radius: 8px; transition: 0.2s; cursor: pointer; }
@@ -195,14 +195,14 @@ watch(() => [props.values, props.mixed, props.layerNote, props.globals], () => n
 
 .cp-off {
   height: 20px; padding: 0 8px; border-radius: 10px; flex-shrink: 0;
-  border: 1px solid #3a3a3a; background: #242424; color: #aaaaaa;
+  border: 1px solid #3a3a3a; background: #242424; color: #aeaeae;
   font-size: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;
 }
-.cp-off:hover { border-color: #555555; background: #2a2a2a; color: #ffffff; }
+.cp-off:hover { border-color: #6a6a6a; background: #2c2c2c; color: #ffffff; }
 
 /* Only the body scrolls (a very short window), so the notch outside the box is never clipped */
 .cp-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto; }
-.cp-note { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; color: #888888; }
+.cp-note { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; color: #9c9c9c; }
 
 .cp-foot {
   flex-shrink: 0; border-radius: 0 0 6px 6px;
@@ -214,10 +214,10 @@ watch(() => [props.values, props.mixed, props.layerNote, props.globals], () => n
   font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;
 }
-.quiet { border: 1px solid transparent; background: transparent; color: #aaaaaa; }
-.quiet:hover:not(:disabled) { border-color: #555555; background: #2a2a2a; color: #ffffff; }
-.secondary { border: 1px solid #3a3a3a; background: #242424; color: #dddddd; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.secondary:hover:not(:disabled) { border-color: #555555; background: #2a2a2a; color: #ffffff; }
+.quiet { border: 1px solid transparent; background: transparent; color: #aeaeae; }
+.quiet:hover:not(:disabled) { border-color: #6a6a6a; background: #2c2c2c; color: #ffffff; }
+.secondary { border: 1px solid #3a3a3a; background: #242424; color: #f2f2f2; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.secondary:hover:not(:disabled) { border-color: #6a6a6a; background: #2c2c2c; color: #ffffff; }
 .quiet:disabled, .secondary:disabled { opacity: 0.4; cursor: not-allowed; }
 .quiet:focus-visible, .secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 </style>

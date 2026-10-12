@@ -100,7 +100,7 @@ function onKeydown(event) {
 .stp.disabled { opacity: 0.4; }
 .stp-btn {
   width: 24px; height: 100%; flex-shrink: 0;
-  border: none; background: transparent; color: #aaaaaa;
+  border: none; background: transparent; color: #aeaeae;
   font-size: 13px; line-height: 1; cursor: pointer; padding: 0;
   transition: color 0.2s ease, background 0.2s ease;
 }
@@ -114,7 +114,7 @@ function onKeydown(event) {
   color: #eeeeee; font: inherit; font-size: 12px; text-align: right;
   font-variant-numeric: tabular-nums; padding: 0 2px 0 0;
 }
-.stp-in::placeholder { color: #777777; font-style: italic; }
+.stp-in::placeholder { color: #888888; font-style: italic; }
 .stp-in:disabled { cursor: not-allowed; }
-.stp-unit { font-size: 11px; color: #777777; padding-right: 4px; }
+.stp-unit { font-size: 11px; color: #888888; padding-right: 4px; }
 </style>

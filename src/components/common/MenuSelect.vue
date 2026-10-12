@@ -204,7 +204,7 @@ onBeforeUnmount(() => listeners.forEach(([e, fn, cap]) => window.removeEventList
 .ms-trigger:focus-visible { box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3); }
 .ms-trigger:disabled { opacity: 0.4; cursor: not-allowed; }
 .ms-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ms-arrow { flex-shrink: 0; font-size: 8px; color: #888888; transition: transform 0.2s ease; }
+.ms-arrow { flex-shrink: 0; font-size: 8px; color: #9c9c9c; transition: transform 0.2s ease; }
 .open .ms-arrow { transform: rotate(180deg); }
 
 .ms-list {
@@ -225,7 +225,7 @@ onBeforeUnmount(() => listeners.forEach(([e, fn, cap]) => window.removeEventList
 .ms-scroll::-webkit-scrollbar-thumb { background: #333333; border-radius: 3px; }
 .ms-scroll::-webkit-scrollbar-thumb:hover { background: #555555; }
 
-.ms-empty { padding: 8px 12px; font-size: 12px; color: #777777; text-align: center; }
+.ms-empty { padding: 8px 12px; font-size: 12px; color: #888888; text-align: center; }
 
 /* Same as the Track menu's "+ Create New Track" */
 .ms-create {
@@ -244,7 +244,7 @@ onBeforeUnmount(() => listeners.forEach(([e, fn, cap]) => window.removeEventList
   padding: 8px 12px 4px; margin-top: 4px;
   border-top: 1px solid #2e2e2e;
   font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-  color: #777777; cursor: default; user-select: none;
+  color: #9c9c9c; cursor: default; user-select: none;
 }
 .ms-heading:first-child { margin-top: 0; border-top: none; }
 

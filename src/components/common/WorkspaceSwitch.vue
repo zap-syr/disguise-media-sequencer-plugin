@@ -33,7 +33,7 @@ const workspace = defineModel({ type: String, default: 'split' });
   gap: 6px;
   background: transparent;
   border: none;
-  color: #888;
+  color: #9c9c9c;
   padding: 5px 10px;
   font-size: 11px;
   font-weight: 600;
@@ -42,7 +42,7 @@ const workspace = defineModel({ type: String, default: 'split' });
   transition: all 0.2s ease;
   outline: none;
 }
-.segment:hover { color: #ccc; }
+.segment:hover { color: #f2f2f2; }
 .segment:focus-visible { box-shadow: 0 0 0 2px #0a84ff; }
 .segment.active {
   background: #3a3a3a;

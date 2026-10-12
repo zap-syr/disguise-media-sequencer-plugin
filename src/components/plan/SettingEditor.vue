@@ -117,21 +117,21 @@ function emitPatch(key, value) {
   width: 100%; height: 36px; padding: 0 10px;
   display: flex; align-items: center; gap: 10px;
   border: none; background: transparent; cursor: pointer; text-align: left;
-  font: inherit; font-size: 12px; color: #cccccc;
+  font: inherit; font-size: 12px; color: #d4d4d4;
   transition: background 0.15s ease, color 0.15s ease;
 }
-.opt:hover { background: #222222; color: #ffffff; }
+.opt:hover { background: #2c2c2c; color: #ffffff; }
 .opt-wrap:has(.opt.on) .opt:hover { background: transparent; }
 .opt:focus-visible { outline: none; box-shadow: inset 0 0 0 1px #0a84ff; }
 .opt.on { color: #ffffff; font-weight: 600; }
 .radio {
   width: 14px; height: 14px; flex-shrink: 0; border-radius: 50%;
-  border: 1.5px solid #666666; background: transparent; transition: all 0.15s ease;
+  border: 1.5px solid #888888; background: transparent; transition: all 0.15s ease;
 }
-.opt:hover .radio { border-color: #aaaaaa; }
+.opt:hover .radio { border-color: #cccccc; }
 .opt.on .radio { border-color: #0a84ff; background: #0a84ff; box-shadow: inset 0 0 0 3px #181818; }
 .opt-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.opt-hint { font-size: 11px; font-weight: 400; color: #777777; }
+.opt-hint { font-size: 11px; font-weight: 400; color: #9c9c9c; }
 
 /* Number inside the selected option: indented to the option text, set off by a thin divider */
 .nested {
@@ -139,7 +139,7 @@ function emitPatch(key, value) {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   border-top: 1px solid #262626;
 }
-.nested-lbl { font-size: 12px; color: #cccccc; }
+.nested-lbl { font-size: 12px; color: #d4d4d4; }
 
 .sub { display: flex; flex-direction: column; gap: 6px; }
 .sub-title { font-size: 12px; font-weight: 600; color: #ffffff; }

@@ -185,12 +185,12 @@ defineExpose({ rowEl, anchorOf });
   border: none; background: transparent; cursor: pointer; text-align: left; font: inherit;
   transition: background 0.15s ease;
 }
-.ovf-row:hover, .ovf-row:focus-visible { background: #2a2a2a; outline: none; }
-.ovf-k { width: 52px; flex-shrink: 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #aaaaaa; }
+.ovf-row:hover, .ovf-row:focus-visible { background: #2c2c2c; outline: none; }
+.ovf-k { width: 52px; flex-shrink: 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #aeaeae; }
 .ovf-v { flex: 1; min-width: 0; font-size: 12px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ovf-v.ov { color: #ffd60a; }
-.ovf-v.off { color: #666666; text-decoration: line-through; }
+.ovf-v.off { color: #888888; text-decoration: line-through; }
 .ov-mark { color: #ffd60a; font-size: 9px; font-weight: 700; }
 .warn-dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }
-.chev { color: #666666; flex-shrink: 0; }
+.chev { color: #9c9c9c; flex-shrink: 0; }
 </style>

@@ -81,13 +81,13 @@ defineExpose({ reveal });
 .pill {
   flex-shrink: 0; height: 18px; padding: 0 7px; border-radius: 9px;
   display: inline-flex; align-items: center;
-  border: 1px solid #3a3a3a; color: #888888; font-size: 10px; font-weight: 700; white-space: nowrap;
+  border: 1px solid #3a3a3a; color: #9c9c9c; font-size: 10px; font-weight: 700; white-space: nowrap;
 }
 .pill.on { border-color: transparent; background: rgba(10, 132, 255, 0.2); color: #0a84ff; }
-.chev { color: #888888; flex-shrink: 0; transition: transform 0.18s ease; }
+.chev { color: #aeaeae; flex-shrink: 0; transition: transform 0.18s ease; }
 .chev.open { transform: rotate(90deg); }
 .sec-head:hover .chev { color: #ffffff; }
-.sec-sum { font-size: 11px; color: #888888; line-height: 1.4; padding-left: 22px; overflow-wrap: anywhere; }
+.sec-sum { font-size: 11px; color: #9c9c9c; line-height: 1.4; padding-left: 22px; overflow-wrap: anywhere; }
 
 .sec-body { padding: 12px; border-top: 1px solid #2e2e2e; }
 </style>

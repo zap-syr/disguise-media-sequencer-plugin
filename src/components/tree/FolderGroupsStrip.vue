@@ -107,23 +107,23 @@ const notes = computed(() => {
   background: #1e1e1e;
   container-type: inline-size;
 }
-.strip-sum { font-size: 12px; color: #cccccc; }
+.strip-sum { font-size: 12px; color: #d4d4d4; }
 .strip-sum strong { color: #ffffff; }
-.strip-note { font-size: 11px; color: #888888; }
+.strip-note { font-size: 11px; color: #9c9c9c; }
 
 .seg { display: flex; background: #181818; border: 1px solid #3a3a3a; border-radius: 6px; padding: 2px; }
 .seg button {
-  flex: 1; min-width: 0; border: none; background: transparent; color: #888888;
+  flex: 1; min-width: 0; border: none; background: transparent; color: #9c9c9c;
   padding: 5px 4px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 4px;
   white-space: nowrap; transition: all 0.2s ease;
 }
-.seg button:hover { color: #cccccc; }
+.seg button:hover { color: #f2f2f2; }
 .seg button.on { background: #3a3a3a; color: #ffffff; }
 .seg button:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
 .seg-icon { display: none; flex-shrink: 0; }
 .seg-label { overflow: hidden; text-overflow: ellipsis; }
-.seg-caption { display: none; font-size: 11px; color: #888888; margin-top: -2px; }
+.seg-caption { display: none; font-size: 11px; color: #9c9c9c; margin-top: -2px; }
 
 .strip-actions { display: flex; gap: 8px; }
 .btn-primary, .btn-secondary {
@@ -136,7 +136,7 @@ const notes = computed(() => {
 .btn-primary:disabled { background: #3a3a3a; color: #777777; cursor: not-allowed; }
 .btn-secondary {
   flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 6px;
-  background: #2a2a2a; color: #aaaaaa; font-weight: 600;
+  background: #2a2a2a; color: #aeaeae; font-weight: 600;
 }
 .btn-secondary:hover { background: #333333; color: #ffffff; }
 .btn-primary:focus-visible, .btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 2px #0a84ff; }
