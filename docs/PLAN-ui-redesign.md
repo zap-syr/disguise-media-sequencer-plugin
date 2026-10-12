@@ -1517,6 +1517,12 @@ Current / Proposed palette switch and the Plan defaults / Auto-assign panels.
 **Order:** C and A first (small, visible), then B, then D across all components, then the
 skill update. Each group in its own commit after the owner's review.
 
+Done (2026-10-12, owner-checked): A, B, C, D and the skill update. Checked in Chrome at
+887x456, 1236x516 and 1436x616. Auto-assign extras found there: both option lists share one
+height; in a short window only the body scrolls (header and Run button stay in view); under
+560px the hint and the rule descriptions move to tooltips, under 420px the status goes above
+the buttons.
+
 **Files:** `plan/LayerPlan.vue`, `plan/PlanDefaults.vue`, `plan/AutoAssign.vue`,
 `plan/SettingChip.vue`, `plan/ChipRow.vue`, `plan/PlanGroup.vue`; for D every component with
 colours (`files/`, `tree/`, `settings/`, `common/`, `plan/`);
