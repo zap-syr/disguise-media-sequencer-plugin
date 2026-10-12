@@ -1622,6 +1622,11 @@ select-all or the bar's ×. Clicking the row again should undo the click.
 
 **Files:** `composables/usePlanSelection.js`.
 
+Done (2026-10-12, owner-checked). Correction to the rule
+above: a click on an empty mapping slot (no armed mapping) already acted as a row click, so it
+deselects the same way; the ◆ mark only selects (`keep: true`), so it never deselects the
+layer whose override it shows. The row tooltip mentions the second click.
+
 **B. Glowing frame on every drop-down of the group settings.**
 
 **Why.** The chip popovers and the other small windows of a group still have the plain grey
@@ -1641,6 +1646,9 @@ settings windows. The skill's chip popover section is updated.
 
 **Files:** `plan/ChipPopover.vue`, `plan/ChipRow.vue`, `plan/CopyMappings.vue`,
 `.claude/skills/disguise-css/SKILL.md`.
+
+Done (2026-10-12, owner-checked). Checked in Chrome: a group
+chip popover in a wide window, the "+N" list and Copy mappings in a 900x560 frame.
 
 - **Acceptance:** checklist §9.11.
 
