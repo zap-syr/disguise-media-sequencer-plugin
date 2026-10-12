@@ -89,18 +89,23 @@ One primary accent color with opacity variants for overlays:
 
 ### Text / icon grayscale
 
-| Hex | Where |
-|-----|-------|
-| `#ffffff` | Active/selected text, primary text on interactive surfaces |
-| `#dddddd` | Settings sidebar body text, secondary headings |
-| `#cccccc` | Primary body text throughout the app |
-| `#aaaaaa` | Icon colors, secondary labels, selected folder icons |
-| `#888888` | Breadcrumbs, status text, placeholder text, secondary button text |
-| `#777777` | Disabled text, unit labels |
-| `#666666` | Folder icons (default), secondary text, search icon |
-| `#555555` | Subtle icons, empty-state text, unassigned mapping dot |
-| `#444444` | Breadcrumb divider, video placeholder icon |
-| `#333333` | Darkest icon / card preview area fallback |
+Phase 12 (1.3) raised the text contrast on the unchanged backgrounds: every text role reads at
+4.5:1 or better. Pick the colour by **role**, never by copying an old value.
+
+| Hex | Role | Where |
+|-----|------|-------|
+| `#ffffff` | Selected / active | Selected card name, active segment, chip values, titles in panels |
+| `#f2f2f2` | Strong text | File names in plan rows, group names, mapping names, current breadcrumb, hover text of segments and links |
+| `#e6e6e6` | Card file name | File name on media cards (12.4:1 on `#242424`) |
+| `#d4d4d4` | Body text | App body text, settings labels, bar buttons, gnav chips, link buttons |
+| `#aeaeae` | Labels and icons | Chip keys, expand arrows, ghost / quiet button text, flags, section chevrons |
+| `#9c9c9c` | Meta | Duration, resolution, type, counts, summaries, hints, breadcrumbs, folder icons and counts, inactive segments, icon buttons, search icon (5.7:1 on `#242424`) |
+| `#888888` | Muted | Placeholders, units, empty states, empty mapping slot, off / mixed chip values, drag grip (4.7:1 on `#1e1e1e`) |
+| `#777777` | Disabled | Text on disabled primary buttons; checkbox border |
+| `#666666` | Decoration | Breadcrumb divider |
+| `#555555` / `#444444` | Placeholder art | Video / image placeholder icons on card previews; unassigned mapping dot `#555555` |
+
+Never use `#666666` or darker for readable text.
 ### Semantic
 
 | Hex | Purpose |
@@ -191,7 +196,7 @@ reuse them for buttons or states.
 ```css
 .btn-secondary {
   background: #2a2a2a;
-  color: #aaaaaa;
+  color: #aeaeae;
   border: none;
   border-radius: 6px;
   padding: 8px 16px;
@@ -231,7 +236,7 @@ reuse them for buttons or states.
 .dropdown-item {
   padding: 8px 12px;
   font-size: 12px;
-  color: #cccccc;
+  color: #eeeeee;
   cursor: pointer;
   transition: background 0.15s ease;
 }
@@ -271,7 +276,7 @@ action menu that emits `select` and keeps its placeholder (e.g. "Add to group…
 .segmented-item {
   flex: 1;
   background: transparent;
-  color: #888888;
+  color: #9c9c9c;
   border: none;
   border-radius: 4px;
   padding: 5px 10px;
@@ -280,7 +285,7 @@ action menu that emits `select` and keeps its placeholder (e.g. "Add to group…
   transition: all 0.2s ease;
 }
 .segmented-item:hover {
-  color: #cccccc;
+  color: #f2f2f2;
 }
 .segmented-item.active {
   background: #3a3a3a;
@@ -347,8 +352,14 @@ action menu that emits `select` and keeps its placeholder (e.g. "Add to group…
 
 /* Footer label */
 .media-card-name {
-  color: #888888;
-  font-size: 11px;
+  color: #e6e6e6;
+  font-size: 12px;
+  font-weight: 500;
+}
+/* Type, resolution */
+.media-card-meta {
+  color: #9c9c9c;
+  font-size: 10px;
 }
 .media-card.selected .media-card-name {
   color: #ffffff;
@@ -359,7 +370,7 @@ action menu that emits `select` and keeps its placeholder (e.g. "Add to group…
 
 ```css
 .tree-item {
-  color: #cccccc;
+  color: #d4d4d4;
   cursor: pointer;
   transition: background 0.15s ease;
   border-left: 3px solid transparent;
@@ -372,15 +383,17 @@ action menu that emits `select` and keeps its placeholder (e.g. "Add to group…
   background: rgba(10, 132, 255, 0.10);
 }
 
-.tree-item-icon {
-  color: #666666;
+.tree-item-icon,
+.tree-item-count {
+  color: #9c9c9c;
 }
-.tree-item.selected .tree-item-icon {
-  color: #aaaaaa;
+.tree-item.selected .tree-item-icon,
+.tree-item.selected .tree-item-count {
+  color: #d4d4d4;
 }
 
 .tree-item-chevron {
-  color: #555555;
+  color: #aeaeae;
 }
 ```
 
@@ -407,14 +420,14 @@ action menu that emits `select` and keeps its placeholder (e.g. "Add to group…
 
 /* Field label */
 .settings-label {
-  color: #cccccc;
+  color: #d4d4d4;
   font-size: 12px;
   font-weight: 600;
 }
 
 /* Unit / secondary label */
 .settings-label-secondary {
-  color: #777777;
+  color: #9c9c9c;
   font-size: 11px;
 }
 ```
@@ -460,7 +473,7 @@ inventing variants. File references point at the reference implementation.
 
 ```css
 .ghost {
-  background: transparent; border: 1px solid #333333; color: #aaaaaa;
+  background: transparent; border: 1px solid #333333; color: #aeaeae;
   border-radius: 6px; padding: 6px 10px; font-size: 12px; white-space: nowrap;
   transition: all 0.2s ease;
 }
@@ -470,7 +483,7 @@ inventing variants. File references point at the reference implementation.
 
 .icon-btn {          /* 24px, no border, inside group headers and rows */
   width: 24px; height: 24px; border: none; border-radius: 4px;
-  background: transparent; color: #888888;
+  background: transparent; color: #9c9c9c;
 }
 .icon-btn:hover { background: #333333; color: #ffffff; }
 ```
@@ -479,12 +492,12 @@ Header buttons are icon + label (`.icon-text`); the label hides in a narrow pane
 
 ### Setting chip (`SettingChip.vue`)
 
-Two lines: key (`10px / 700 / uppercase / #aaaaaa`) over value (`12px / 500 / #ffffff`,
-tabular-nums). Box `#181818`, border `#333333`, hover `#555555`, open `#0a84ff` +
-`0 0 0 1px #0a84ff`. States:
+Two lines: key (`10px / 700 / uppercase / #aeaeae`) over value (`12px / 500 / #ffffff`,
+tabular-nums). **Raised** above the group box: box `#2c2c2c`, border `#444444`, hover
+`#6a6a6a`, open `#0a84ff` + `0 0 0 1px #0a84ff`. States:
 - **override**: border `rgba(255, 214, 10, 0.55)`, value `#ffd60a`, ◆ (+ count) in the corner;
 - **selection scope**: border `rgba(10, 132, 255, 0.45)`, background `rgba(10, 132, 255, 0.10)`;
-- **mixed**: italic `#888888` value; **off** (switched off globally): `#666666`, line-through;
+- **mixed**: italic `#888888` value; **off** (switched off globally): `#888888`, line-through;
 - **warning**: a 6px red dot `#ef4444` in the corner.
 
 ### Chip popover (`ChipPopover.vue`)
@@ -494,6 +507,17 @@ Floating (`position: fixed`, z-index 1000), 268px, `#1e1e1e`, border `#3a3a3a`, 
 `rgba(10, 132, 255, 0.2)` background, `#0a84ff` 10px bold text. Option rows separated by
 `#262626`; the chosen row gets `rgba(10, 132, 255, 0.08)`. Esc closes and returns focus to
 the chip.
+
+### Header drop-down panels (`PlanDefaults.vue`, `AutoAssign.vue`, frame from `LayerPlan.vue` `.pd-drop`)
+
+One shell for both: the frame of the floating bar (border `rgba(10, 132, 255, 0.55)`, shadow
+`0 0 0 1px rgba(10, 132, 255, 0.12), 0 0 14px rgba(10, 132, 255, 0.22), 0 10px 28px rgba(0, 0,
+0, 0.55)`; the panel itself has no border). Header 40px on `#242424` (white 12px bold title, a
+solid `#0a84ff` tag, a `#9c9c9c` one-line hint, × closing with Esc), body on `#1e1e1e` with 12px
+padding, footer on `#1a1a1a` (status text on the left, quiet / primary buttons on the right).
+Choices inside are option lists in the chip popover style (`#181818` box, `#262626` dividers,
+chosen row `rgba(10, 132, 255, 0.08)`, hover `#2c2c2c`) with the plan checkbox or the popover
+radio; no native checkboxes or wrapping segmented controls.
 
 ### Floating bar (`LayerPlan.vue` `.sel-bar`)
 
@@ -509,7 +533,8 @@ labels (icons stay).
 - Group box `#1e1e1e`, border `#333333`; header `#242424`; group label "G1" is a solid
   `#0a84ff` tag with white 11px bold text. Flash / drop highlight: border `#0a84ff` +
   `0 0 0 1px #0a84ff`.
-- Expand arrow: filled 10px triangle `#aaaaaa`, white on hover, rotates 90° in 0.18s (the
+- Rows: file name `#f2f2f2` 12px 500, meta line (start, length, resolution) `#9c9c9c` 11px.
+- Expand arrow: filled 10px triangle `#aeaeae`, white on hover, rotates 90° in 0.18s (the
   folder tree uses the same control).
 - Rows 44px, divider `#222222`, hover `#242424`, checked `rgba(10, 132, 255, 0.10)`
   (selection is colour only, sizes never change).
@@ -536,7 +561,7 @@ labels (icons stay).
 | Badge | Style |
 |-------|-------|
 | Duration / still / LIVE (thumbnail bottom right) | `rgba(0, 0, 0, 0.6)`, `#dddddd` 10px 600, radius 4px; LIVE in `#0a84ff` |
-| Plan groups "G1, G3" (thumbnail top right) | same as the duration chip; list view: pill `#333333` / `#cccccc` |
+| Plan groups "G1, G3" (thumbnail top right) | same as the duration chip; list view: pill `#333333` / `#d4d4d4` |
 | MISSING (thumbnail top left) | solid `#ef4444`, white 10px 700; the card is dimmed (`opacity: 0.4` on thumbnail and text) with `cursor: not-allowed` |
 | Selection order | white circle with `#0a84ff` number |
 | Auto-assign `via` | `rgba(10, 132, 255, 0.15)`, `#0a84ff` 10px 700 uppercase |
@@ -572,8 +597,8 @@ Some elements (like a toolbar button that's never `<button disabled>`) use opaci
 | You're building… | Background | Border | Text |
 |------------------|-----------|--------|------|
 | Right settings sidebar | `#1e1e1e` | `1px solid #36373a` (left) | `#dddddd` |
-| Left tree sidebar | transparent | `1px solid #2a2a2a` (right) | `#cccccc` |
+| Left tree sidebar | transparent | `1px solid #2a2a2a` (right) | `#d4d4d4` |
 | Any input/control | `#181818` | `1px solid #3a3a3a` | `#eeeeee` |
-| Card / group box | `#242424` | `1px solid #333333` | `#cccccc` |
-| Floating dropdown | `#1e1e1e` | `1px solid #3a3a3a` | `#cccccc` |
-| Top toolbar / footer | `#1a1a1a` | `1px solid #2a2a2a` (top/bottom) | `#888888` |
+| Card / group box | `#242424` | `1px solid #333333` | `#d4d4d4` |
+| Floating dropdown | `#1e1e1e` | `1px solid #3a3a3a` | `#eeeeee` |
+| Top toolbar / footer | `#1a1a1a` | `1px solid #2a2a2a` (top/bottom) | `#9c9c9c` |
