@@ -23,6 +23,7 @@
 #   continuous across the plan (i-th placed tag), like 1.1.x.
 # Creation order: 'same' groups are reversed, because addNewLayer always puts the new layer on
 # top of the stack, so the first row ends up on top.
+import __builtin__
 import json
 
 ARGS = json.loads(__ARGS__)
@@ -65,7 +66,7 @@ def bump_last(value, i):
         parts = value.split(".")
         parts[-1] = str(int(parts[-1]) + i)
         return ".".join(parts)
-    except Exception:
+    except __builtin__.Exception:  # `Exception` is d3.Exception here and catches nothing
         return value
 
 
@@ -83,7 +84,10 @@ def run():
     else:
         track = guisystem.track
         if not track:
-            return {"status": "error", "message": "No track is selected in Designer"}
+            # Name the machine: the script may run on an editor, with its own open track
+            local = d3NetManager.localMachine
+            where = " on {}".format(local.name) if local else ""
+            return {"status": "error", "message": "No track is selected in Designer" + where}
         start = guisystem.player.tCurrent
 
     refresh_rate_val = state.globalRefreshRate.asDouble

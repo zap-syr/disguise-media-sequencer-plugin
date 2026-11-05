@@ -36,7 +36,9 @@
       <!-- 2. Center: files and/or layer plan -->
       <FilesPane
         v-if="showFiles"
+        ref="filesPaneRef"
         :class="{ 'files-side': showPlan }"
+        :style="showPlan ? { flexBasis: `${splitFilesWidth}px` } : null"
         v-model:search-query="searchQuery"
         v-model:view-mode="effectiveViewMode"
         v-model:grid-size="gridSize"
@@ -51,7 +53,7 @@
         :drag-enabled="showPlan"
         :selection="selection"
         @select-folder="selectFolder"
-        @refresh="library.refresh"
+        @refresh="refreshAll"
       >
         <!-- Next to the plan the switch lives in the plan header; the side pane is narrow -->
         <template v-if="isAdvanced && !showPlan" #nav-extra>
@@ -73,6 +75,17 @@
           </div>
         </template>
       </FilesPane>
+
+      <!-- Split: drag to resize the files pane, double click for the widest size -->
+      <div
+        v-if="showFiles && showPlan"
+        class="split-handle"
+        :class="{ active: filesResize.isResizing.value }"
+        title="Drag to resize, double click to reset"
+        @pointerdown="filesResize.startResize"
+        @click.stop
+        @dblclick="filesResize.resetToMax"
+      ></div>
 
       <LayerPlan
         v-if="showPlan"
@@ -137,7 +150,7 @@
       <SettingsPanel
         ref="settingsRef"
         v-model:creation-mode="creationMode"
-        :director-endpoint="props.directorEndpoint"
+        :machines="machines"
         :mappings="library.mappings.value"
         :tracks="library.tracks.value"
         :options="layerOptions"
@@ -179,6 +192,8 @@ import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath, folderOrder,
 import { useFolderSelection } from '../composables/useFolderSelection';
 import FolderGroupsStrip from './tree/FolderGroupsStrip.vue';
 import { useMediaLibrary } from '../composables/useMediaLibrary';
+import { useSessionMachines } from '../composables/useSessionMachines';
+import { usePaneResize, clampWidth } from '../composables/usePaneResize';
 import { useFileSelection } from '../composables/useFileSelection';
 import { usePersistedRef } from '../composables/usePersistedRef';
 import { useToast } from '../composables/useToast';
@@ -201,6 +216,14 @@ const props = defineProps({
 
 const { toast, show: showToast, dismiss: dismissToast } = useToast();
 const library = useMediaLibrary(props.directorEndpoint, message => showToast(message, 'error'));
+// "Run on": the director or an editor creates the layers; reads stay on the director
+const machines = useSessionMachines(props.directorEndpoint, message => showToast(message, 'error'));
+
+/** Files pane Refresh: the media library and the session machines (editors join and leave). */
+function refreshAll() {
+  library.refresh();
+  machines.refresh();
+}
 
 const layerOptions = useLayerOptions();
 const isCreating = ref(false);
@@ -217,6 +240,20 @@ const creationMode = usePersistedRef('mediaSequencer.creationMode', 'simple', s 
 const workspace = usePersistedRef('mediaSequencer.workspace', 'split', s => ['files', 'split', 'plan'].includes(s) ? s : undefined);
 // Split defaults to the compact list; the Files layout keeps the user's own grid/list choice (docs §0.1)
 const splitViewMode = usePersistedRef('mediaSequencer.splitViewMode', 'list', s => ['grid', 'list'].includes(s) ? s : undefined);
+// Split: files pane width, dragged with the handle next to the plan. The old fixed width is the
+// widest; a narrow window can still squeeze the pane below it (CSS min-width) so the plan fits.
+const SPLIT_FILES_MIN = 260;
+const SPLIT_FILES_MAX = 420;
+const splitFilesWidth = usePersistedRef('mediaSequencer.splitFilesWidth', SPLIT_FILES_MAX, s => {
+  const n = Number(s);
+  return Number.isFinite(n) ? clampWidth(n, SPLIT_FILES_MIN, SPLIT_FILES_MAX) : undefined;
+});
+const filesPaneRef = ref(null);
+const filesResize = usePaneResize(splitFilesWidth, {
+  min: SPLIT_FILES_MIN,
+  max: SPLIT_FILES_MAX,
+  getWidth: () => filesPaneRef.value?.$el?.getBoundingClientRect().width ?? splitFilesWidth.value
+});
 
 const isAdvanced = computed(() => creationMode.value === 'advanced');
 const effectiveWorkspace = computed(() => (isAdvanced.value ? workspace.value : 'files'));
@@ -587,6 +624,7 @@ watch([selectedFolderId, searchQuery, includeSubfolders], () => {
 
 onMounted(() => {
   library.load();
+  machines.refresh();
   if (planWasReset) showToast('Saved plan was reset');
 });
 
@@ -595,25 +633,32 @@ async function handleCreateLayers(requestOptions) {
 
   try {
     isCreating.value = true;
+    // Never fall back to the director silently: "At Playhead" would use another playhead
+    if (!(await machines.check())) {
+      showToast(`${machines.targetName.value} does not answer, no layers were created. Pick another machine in Where.`, 'error');
+      return;
+    }
+    const host = machines.targetHost.value;
+    const onMachine = machines.target.value ? ` on ${machines.targetName.value}` : '';
     const advanced = isAdvanced.value;
     const payload = advanced
       ? buildAdvancedPlan(requestOptions, plan.state, isMissingClip)
       : buildSimplePlan(requestOptions, selectedClipPaths());
     const expected = payload.groups.reduce((n, g) => n + g.layers.length, 0);
 
-    const result = await createLayerPlan(props.directorEndpoint, payload, (created, total) => {
+    const result = await createLayerPlan(host, payload, (created, total) => {
       createProgress.value = { created, total };
     });
 
     // Simple consumes the selection; Advanced keeps the plan so it can be tweaked and re-created
     if (!advanced) selection.clear();
     if (result.errors.length) {
-      showToast(`Created ${result.created} of ${expected} layers, ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
+      showToast(`Created ${result.created} of ${expected} layers${onMachine}, ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
       console.warn('Layer creation issues:', result.errors);
     } else {
       showToast(advanced
-        ? `Created ${result.created} layers in ${payload.groups.length} ${payload.groups.length === 1 ? 'group' : 'groups'}.`
-        : `Successfully created ${result.created} layers.`);
+        ? `Created ${result.created} layers in ${payload.groups.length} ${payload.groups.length === 1 ? 'group' : 'groups'}${onMachine}.`
+        : `Successfully created ${result.created} layers${onMachine}.`);
     }
   } catch (err) {
     showToast(`Failed to create layers: ${err.message}`, 'error');
@@ -652,11 +697,31 @@ async function handleCreateLayers(requestOptions) {
 
 /* Files pane next to the layer plan (Split layout) */
 .files-side {
-  /* Gives up width first in a narrow window, so the plan keeps its minimum */
+  /* The basis is the dragged width (inline style); it still gives up width first in a narrow
+     window, so the plan keeps its minimum */
   flex: 0 1 420px;
   width: auto;
   min-width: 220px;
   border-right: 1px solid #2a2a2a;
+}
+
+/* Zero-width flex item on the pane border; the 6px hit area straddles it (FolderTree handle look) */
+.split-handle {
+  position: relative;
+  flex: 0 0 0;
+  z-index: 10;
+}
+.split-handle::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: -3px;
+  width: 6px;
+  cursor: col-resize;
+  transition: background-color 0.2s ease;
+}
+.split-handle:hover::before,
+.split-handle.active::before {
+  background-color: rgba(10, 132, 255, 0.2);
 }
 /* The top bar and toolbar adapt to the pane width themselves (FilesPane container queries) */
 .files-side :deep(.media-grid) { padding: 12px; }

@@ -20,10 +20,18 @@ This is a **Vue 3 + Vite plugin** that integrates as a window panel inside Disgu
 
 **Key integration point:** Designer exposes a Python Execute REST endpoint (`/api/session/python/execute`). The frontend dynamically constructs Python scripts and POSTs them to this endpoint - there is no static backend. The `director` hostname is injected via URL query param (`?director=localhost:80`) and passed from `App.vue` down to `MediaSequencer.vue`.
 
+**Run on (director or editor):** in a d3net session with editors (Designer workstations, role 5
+`MobileEditor`), "Run on" in the Where section picks the machine that runs the **writes**
+(`createLayerPlan`, `createTrack`). Every machine runs its own Python, so "At Playhead" uses
+that machine's open track and playhead; edits reach the whole session at once. **Reads**
+(media, details, mappings, tracks, thumbnails) always go to the director. The plugin page is
+always served by the director, so the default is the director. Details and live-session
+results: `docs/PLAN-execution-target.md`.
+
 ### Component / Service Breakdown
 
 - **`App.vue`** - Reads `?director=` from the URL and passes it as a prop. Entry point only.
-- **`src/components/MediaSequencer.vue`** - Shell: loads data, owns the creation mode and workspace layout (Files / Split / Plan), navigation, file and plan selection, the armed mapping and the missing-clip check (`isMissingClip`); wires the panels, runs layer creation, shows toasts.
+- **`src/components/MediaSequencer.vue`** - Shell: loads data, owns the creation mode and workspace layout (Files / Split / Plan; in Split the files pane is resized with the handle next to the plan, 260 to 420 px, remembered, double click resets), navigation, file and plan selection, the armed mapping and the missing-clip check (`isMissingClip`); wires the panels, runs layer creation, shows toasts.
 - **`src/components/tree/`** - `FolderTree.vue` (collapsible/resizable tree with file counts; in Advanced, folder checkboxes for groups from folders) and `FolderGroupsStrip.vue` (content mode, insert position, Create groups).
 - **`src/components/files/FilesPane.vue`** + **`MediaCard.vue`** - Breadcrumb, search, refresh, one-row selection toolbar ("Add to group…" in Advanced), grid/list of cards with marquee selection and dragging into the plan. Cards show thumbnails (`http://{director}/api/v1/thumbnail/{uid}`), duration, type (VIDEO/IMAGE/LIVE), alpha/audio icons, plan group badges, and a MISSING badge (not selectable) for clips whose media was deleted.
 - **`src/components/plan/`** - the Advanced Layer Plan:
@@ -31,14 +39,15 @@ This is a **Vue 3 + Vite plugin** that integrates as a window panel inside Disgu
   - `PlanGroup.vue`: group header with mini timeline and markers, settings chips, layer rows with mapping slots, row / file / folder / mapping drag and drop, and the header as the grab handle for reordering groups;
   - `ChipRow.vue` + `SettingChip.vue` + `ChipPopover.vue` + `SettingEditor.vue`: the settings chips (fold into "+N" when narrow) and their editor popover;
   - `PlanDefaults.vue` (settings every group inherits, override counts), `AutoAssign.vue` (mappings by file name or resolution), `NumStepper.vue`.
-- **`src/components/settings/`** - `SettingsPanel.vue` (mode switch, collapsible sections via `SettingsSection.vue`: mappings, where to insert, layer settings in Simple, timeline markers; validation, track picker, create-track, Create with confirmation for unmapped / missing layers); `MappingsPanel.vue` (Advanced mapping list: filter, type chips, drag or click to arm).
+- **`src/components/settings/`** - `SettingsPanel.vue` (plugin version next to the title, from `package.json` via the `__APP_VERSION__` define in `vite.config.js`; mode switch, collapsible sections via `SettingsSection.vue`: mappings, where to insert (with "Run on" when the session has editors), layer settings in Simple, timeline markers; validation, track picker, create-track, Create with confirmation for unmapped / missing layers); `MappingsPanel.vue` (Advanced mapping list: filter, type chips, drag or click to arm).
 - **`src/components/common/`** - `Toast.vue` (with an optional Undo action), `WorkspaceSwitch.vue`, `InfoTip.vue`, `MenuSelect.vue` (the styled dropdown used instead of native `<select>`).
 - **`src/composables/`**:
   - `useMediaLibrary` (load/refresh hierarchy, media details, mappings, tracks; reports non-blocking failures through `onError`);
+  - `useSessionMachines` ("Run on": session machines from the director, the chosen editor remembered by hostname per director, reachability and Locked / Independent per editor; read on load, Refresh and menu open, never polled);
   - `useLayerPlan` (plan state and every plan operation: groups, entries, inheritance, mappings, Undo restores);
   - `usePlanStorage` (the plan in localStorage per director, schema-versioned);
   - `usePlanSelection` (plan row selection), `useFileSelection` (click/Ctrl/Shift/marquee, locked missing files), `useFolderSelection`;
-  - `useLayerOptions` (settings-panel options), `useDragPayload` (one reactive drag payload: files / rows / folders / mapping), `usePersistedRef` (localStorage prefs), `useToast`.
+  - `useLayerOptions` (settings-panel options), `useDragPayload` (one reactive drag payload: files / rows / folders / mapping), `usePersistedRef` (localStorage prefs), `usePaneResize` (drag handle on a pane's right edge with pointer capture: folder tree, Split files pane), `useToast`.
 - **`src/utils/`**:
   - `planSchema` (Plan defaults, chip definitions, inheritance and override normalisation, saved-plan serialisation);
   - `planLayout` (UI time layout in seconds and marker positions, same rules as `plan_prepare.py`);
@@ -46,6 +55,7 @@ This is a **Vue 3 + Vite plugin** that integrates as a window panel inside Disgu
   - `autoAssign`, `mappingColors` (12-colour mapping set), `mediaTree` (tree helpers, groups from folders), `tagInputs` (cue/MIDI masks), `timecode`, `format`.
 - **`src/services/disguiseService.js`** - All Designer API calls via `executePython`. Non-trivial Python lives in **`src/services/python/*.py`**, imported with `?raw`; scripts read input through `json.loads(__ARGS__)` (filled by `runScript`). The same files run as probes: `node tools/designer-probes/run.mjs src/services/python/<name>` (args templates need `__ARGS__` substituted):
   - `media_details.py` (per-clip kind, duration, resolution, alpha, audio, missing), `mapping_list.py`;
+  - `session_machines.py` (every machine of the session, run on the director); `checkMachine()` and `isLockedToDirector()` ask the machine itself;
   - `plan_prepare.py`, `plan_layers.py`, `plan_markers.py` (the three createLayerPlan steps).
 - **`src/api_scripts.py`** - Old reference/template file for the Python API (pre-redesign). Not imported at runtime.
 
@@ -66,13 +76,16 @@ panel); groups only choose where markers go ("Each file" / "Group start").
    - `buildAdvancedPlan()`: one payload group per plan group with its effective timing and
      marker placement, each layer with its own mapping (none = cleared); rows with a missing
      clip are skipped, empty groups dropped.
-3. `disguiseService.createLayerPlan()` runs three steps against Designer:
+3. `disguiseService.createLayerPlan()` runs three steps against Designer, all on the "Run on"
+   machine (`useSessionMachines().targetHost`, checked right before; an unreachable editor
+   blocks Create instead of falling back to the director):
    - `plan_prepare.py` (read-only): resolves the track, computes every layer's start/length in
      track beats, tag texts/positions and split positions, and the required track length;
    - `plan_layers.py` in chunks of ≤100 (`LAYER_CHUNK_SIZE`): extends the track first, then creates
      layers and sets video/mapping/mode/end/brightness;
    - `plan_markers.py`: section splits, then tags, in chunks of ≤300 (`MARKER_CHUNK_SIZE`).
-4. Progress is reported per chunk; partial creation is reported in the error (Designer never rolls back).
+4. Progress is reported per chunk; partial creation is reported in the error (Designer rolls back
+   only the failed call, the chunks before it stay).
    Advanced keeps the plan after Create, so it can be tweaked and created again.
 
 ### Media Hierarchy
@@ -114,10 +127,13 @@ Resources arrive as flat paths like `objects/videoclip/folder/subfolder/clip.apx
 - **No TypeScript**: The project uses plain JS. `api_scripts.py.d.ts` provides type hints for the Python loader integration only.
 - **Designer Python runtime limits** (verified on a live session; details in the `disguise-api` skill):
   - Python 2.7;
-  - ~1 s execution timeout, and **nothing rolls back** on timeout, so create layers in chunks
-    of ≤100 per call;
+  - ~1 s execution timeout. A call that raises or times out is **rolled back**, but earlier calls
+    stay, and the timeout does not stop an unbounded loop: create layers in chunks of ≤100 per
+    call and bound every loop;
   - never poll the execute endpoint;
-  - touching `Action` objects or a failing `open()` raises errors that `try/except` cannot catch.
+  - **`except Exception` catches nothing**: `Exception` is `d3.Exception` in Designer scripts.
+    Use `import __builtin__` + `except __builtin__.Exception:` or a concrete class
+    (`ValueError`, `IndexError`, ...). Still never touch `Action` objects.
 - **Timeline gotchas** (verified):
   - the track is **not** extended automatically; layers past `lengthInBeats` end up truncated
     or zero-length. `plan_layers.py` extends the track before creating;

@@ -72,13 +72,14 @@
       <slot name="footer"></slot>
     </div>
 
-    <div class="resize-handle" v-show="!isSidebarCollapsed" @mousedown.prevent="startResize"></div>
+    <div class="resize-handle" v-show="!isSidebarCollapsed" @pointerdown="startResize" @click.stop></div>
   </aside>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { startDrag, endDrag } from '../../composables/useDragPayload';
+import { usePaneResize } from '../../composables/usePaneResize';
 
 const props = defineProps({
   folders: { type: Array, required: true },
@@ -120,33 +121,10 @@ function hiddenChecked(node) {
 // Controlled by the shell so layouts can collapse it (Split / Plan workspaces)
 const isSidebarCollapsed = defineModel('collapsed', { type: Boolean, default: false });
 const sidebarWidth = ref(260);
-const isResizing = ref(false);
+const { isResizing, startResize } = usePaneResize(sidebarWidth, { min: 150, max: 300 });
 
 function toggleSidebar() {
   isSidebarCollapsed.value = !isSidebarCollapsed.value;
-}
-
-function startResize() {
-  isResizing.value = true;
-  window.addEventListener('mousemove', doResize);
-  window.addEventListener('mouseup', stopResize);
-  document.body.style.cursor = 'col-resize';
-}
-
-function doResize(event) {
-  if (isResizing.value) {
-    let newWidth = event.clientX;
-    if (newWidth < 150) newWidth = 150;
-    if (newWidth > 300) newWidth = 300;
-    sidebarWidth.value = newWidth;
-  }
-}
-
-function stopResize() {
-  isResizing.value = false;
-  window.removeEventListener('mousemove', doResize);
-  window.removeEventListener('mouseup', stopResize);
-  document.body.style.cursor = '';
 }
 </script>
 
