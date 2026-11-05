@@ -1,7 +1,7 @@
 # Plan: choose the machine that runs layer creation (Director or Editor)
 
-Status: decisions made (§8), phase 1 (probes, §9) and phase 2 (service, composable) done,
-next step is phase 3 (UI).
+Status: phases 1 to 4 done and checked on a live session (§9); phase 5 docs done except the
+version bump (CHANGELOG entry is under [Unreleased]).
 Source: `disguise-api` skill 1.3.0, `references/d3net.md` -> "Talking to an editor machine",
 `references/rest-api.md` -> "Sessions", `references/execution-api.md` -> "Undo".
 
@@ -264,3 +264,27 @@ host `unreachable` (after the 2 s timeout). `isLockedToDirector(editor)` = False
 `useSessionMachines`: defaults to the director; `select('d3-designer')` switches `targetHost`
 to the editor and is stored; a new instance restores it; a stored editor that is not in the
 session falls back to the director, clears the choice and sends the notice.
+
+### Phases 3 and 4 check (browser, dev server, live session)
+
+- The "Run on" row shows "Director (vx4p-46269)" by default; the menu lists
+  "d3-designer, Independent". Picking it changes the Where summary to
+  "At playhead, d3-designer".
+- With Run on = d3-designer: "+ Create New Track" `zz_probe_ui` (created on the editor),
+  Specific Time 00:00:00:00, one still, mapping `surface 1 (direct)`, Create. Toast
+  "Successfully created 1 layers on d3-designer."; read on the director: one layer 0-5 with
+  the right clip and mapping. The scratch track was removed afterwards.
+- Editor unreachable (its requests rejected in the page): the menu tag turns "unreachable",
+  the Where header gets the red dot, a red hint "d3-designer (192.168.0.5) does not answer...",
+  Create is disabled with the same text as its tooltip.
+- At 900x560 (the plugin in an iframe of that size) the row fits; the menu is the teleported
+  `MenuSelect` list.
+- **No jumps on re-check** (owner's feedback: a "Checking..." line flashed under the menu on
+  every open). A re-check keeps the last known status and tag; there is no "Checking" text;
+  only a confirmed failure shows the red hint and disables Create; a check slower than 400 ms
+  shows a small spinner in place of the menu arrow (`MenuSelect` `busy`). Checked: 3 opens
+  against the live editor changed nothing in the DOM; with a 1.5 s delayed editor the spinner
+  appeared after 400 ms and went away, the row height stayed 28 px; a dead editor still shows
+  the hint, and it clears when the editor answers again.
+- Not tested live: an editor in Locked mode (the tag reads `state.lockedToDirector`, verified
+  False on this editor), a session without editors (the row is hidden by `v-if`).
