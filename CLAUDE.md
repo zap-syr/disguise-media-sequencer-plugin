@@ -72,7 +72,8 @@ panel); groups only choose where markers go ("Each file" / "Group start").
    - `plan_layers.py` in chunks of ≤100 (`LAYER_CHUNK_SIZE`): extends the track first, then creates
      layers and sets video/mapping/mode/end/brightness;
    - `plan_markers.py`: section splits, then tags, in chunks of ≤300 (`MARKER_CHUNK_SIZE`).
-4. Progress is reported per chunk; partial creation is reported in the error (Designer never rolls back).
+4. Progress is reported per chunk; partial creation is reported in the error (Designer rolls back
+   only the failed call, the chunks before it stay).
    Advanced keeps the plan after Create, so it can be tweaked and created again.
 
 ### Media Hierarchy
@@ -114,10 +115,13 @@ Resources arrive as flat paths like `objects/videoclip/folder/subfolder/clip.apx
 - **No TypeScript**: The project uses plain JS. `api_scripts.py.d.ts` provides type hints for the Python loader integration only.
 - **Designer Python runtime limits** (verified on a live session; details in the `disguise-api` skill):
   - Python 2.7;
-  - ~1 s execution timeout, and **nothing rolls back** on timeout, so create layers in chunks
-    of ≤100 per call;
+  - ~1 s execution timeout. A call that raises or times out is **rolled back**, but earlier calls
+    stay, and the timeout does not stop an unbounded loop: create layers in chunks of ≤100 per
+    call and bound every loop;
   - never poll the execute endpoint;
-  - touching `Action` objects or a failing `open()` raises errors that `try/except` cannot catch.
+  - **`except Exception` catches nothing**: `Exception` is `d3.Exception` in Designer scripts.
+    Use `import __builtin__` + `except __builtin__.Exception:` or a concrete class
+    (`ValueError`, `IndexError`, ...). Still never touch `Action` objects.
 - **Timeline gotchas** (verified):
   - the track is **not** extended automatically; layers past `lengthInBeats` end up truncated
     or zero-length. `plan_layers.py` extends the track before creating;
