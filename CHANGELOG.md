@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.2] - 2026-11-05
+
+### Added
+- **Run on** - in a session with editors, the Where section gets a "Run on" menu: create layers and tracks on the Director or on one of the editors. On an editor, "At Playhead" uses that editor's open track and playhead; the layers appear in the whole session at once. Each editor shows whether it is Independent or Locked to the director. The choice is remembered; an editor that left the session falls back to the Director with a message. If the chosen editor does not answer, Create is blocked with the reason instead of creating on another machine. Without editors nothing changes.
+- **Plugin version** - shown next to SETTINGS in the settings panel (also in the title tooltip).
+- **Resizable files pane in Split** - drag the border between All files and the Layer Plan to make the files pane narrower (down to 260 px) and give the plan more room; the old width is the widest. The width is remembered; double click the border to reset it.
+
+### Fixed
+- Media details no longer fail as a whole when one clip has no source file path.
+
 ## [1.2.1] - 2026-10-12
 
 ### Added
