@@ -91,10 +91,21 @@ Controls where the layers are placed on the timeline.
 
 | Setting | Description |
 |---|---|
+| **Run on** | Only in a session with editors: the machine that creates the layers and tracks, the **Director** or one of the editors (see below) |
 | **At Playhead** | Layers start at the current playhead position |
 | **Specific Time** | Layers start at a chosen track and time |
 | **Track** | Pick an existing track or create a new one from the dropdown (**+ Create New Track**) |
 | **Time** | Start time in `HH:MM:SS:FF` format |
+
+#### Run on: Director or editor
+
+When Designer workstations (editors) have joined the session, the **Where** section shows a **Run on** menu. It chooses the machine that creates the layers and new tracks. The default is the **Director**; without editors the menu is hidden and everything works on the director as before.
+
+- **On an editor**, **At Playhead** uses the track open on that editor and its own playhead, not the director's. The new layers appear in the whole session at once.
+- Media, mappings and tracks are always read from the director, whichever machine is chosen.
+- Each editor in the menu is marked **Independent** (its own timeline and playhead) or **Locked** (it follows the director's playhead, so At Playhead gives the same position as on the director).
+- The choice is remembered. If the chosen editor has left the session, the plugin goes back to the Director and says so.
+- If the chosen editor doesn't answer, a red message appears under the menu and **Create** is disabled; nothing is created on another machine instead. The editor's Designer API must be reachable on port 80: on a Windows PC another web server (for example IIS) can hold that port.
 
 ### Layers
 
@@ -187,7 +198,7 @@ Settings are inherited in three levels: **Plan defaults → group → layer**. *
 
 With layers selected, the selection bar chooses whether the group chips edit the **Selected** layers or the whole **Group**.
 
-The settings panel keeps the parts that apply to the whole plan: **Where** (the start of the plan on the timeline) and **Timeline markers** (which markers are on: Split section, Timecode, Cue and MIDI tags). Timecode, cue and MIDI numbering continues across the whole plan. Each group header has a mini timeline that shows where its layers and markers will go.
+The settings panel keeps the parts that apply to the whole plan: **Where** (the start of the plan on the timeline, and in a session with editors the machine that creates it, see [Run on](#run-on-director-or-editor)) and **Timeline markers** (which markers are on: Split section, Timecode, Cue and MIDI tags). Timecode, cue and MIDI numbering continues across the whole plan. Each group header has a mini timeline that shows where its layers and markers will go.
 
 ### Missing clips
 
