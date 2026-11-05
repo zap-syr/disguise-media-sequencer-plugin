@@ -9,6 +9,12 @@ import mappingListScript from './python/mapping_list.py?raw';
 import planPrepareScript from './python/plan_prepare.py?raw';
 import planLayersScript from './python/plan_layers.py?raw';
 import planMarkersScript from './python/plan_markers.py?raw';
+import sessionMachinesScript from './python/session_machines.py?raw';
+
+/** d3net MachineRole of a Designer workstation joined to the session (MobileEditor). */
+export const EDITOR_ROLE = 5;
+/** How long checkMachine() waits for an answer before calling the machine unreachable. */
+const MACHINE_CHECK_TIMEOUT_MS = 2000;
 
 /** Layers per execute call. Designer's ~1 s timeout and per-call undo cost make bigger calls unsafe (docs §12). */
 export const LAYER_CHUNK_SIZE = 100;
@@ -27,20 +33,21 @@ function pythonJsonLiteral(args) {
 }
 
 /** Runs a .py template that reads its input via `json.loads(__ARGS__)` (comments may mention the token too). */
-async function runScript(directorIp, template, args) {
+async function runScript(host, template, args) {
   const marker = 'json.loads(__ARGS__)';
   if (!template.includes(marker)) throw new Error('Script template has no json.loads(__ARGS__)');
-  return executePython(directorIp, template.replace(marker, () => `json.loads(${pythonJsonLiteral(args)})`));
+  return executePython(host, template.replace(marker, () => `json.loads(${pythonJsonLiteral(args)})`));
 }
 
 /**
  * Generic function to execute a Python script via the d3 API.
- * @param {string} directorIp - The IP address and port.
+ * The script runs on the machine it is sent to: the director, or an editor of the session.
+ * @param {string} host - The machine's address and port.
  * @param {string} script - The Python script string to execute.
  * @returns {Promise<any>} The parsed returnValue from the response.
  */
-async function executePython(directorIp, script) {
-  const endpoint = `http://${directorIp}/api/session/python/execute`;
+async function executePython(host, script) {
+  const endpoint = `http://${host}/api/session/python/execute`;
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -224,15 +231,18 @@ function buildFileHierarchy(files) {
 
 /**
  * Creates the layers of a plan in Designer: prepare (read-only timing), layer chunks, markers.
- * Nothing rolls back in Designer, so on failure the error says how many layers were created.
+ * Designer rolls back only the failed call; earlier chunks stay, so on failure the error says
+ * how many layers were created.
  *
- * @param {string} directorIp
+ * Every step runs on `host`: "At Playhead" uses that machine's open track and playhead.
+ *
+ * @param {string} host - The director or an editor of the session.
  * @param {Object} plan - see src/services/python/plan_prepare.py for the shape
  * @param {(created: number, total: number) => void} [onProgress]
  * @returns {Promise<{status: 'success', created: number, total: number, errors: Array}>}
  */
-export async function createLayerPlan(directorIp, plan, onProgress) {
-  const prep = await runScript(directorIp, planPrepareScript, plan);
+export async function createLayerPlan(host, plan, onProgress) {
+  const prep = await runScript(host, planPrepareScript, plan);
   if (!prep || prep.status !== 'success') {
     throw new Error(prep?.message || 'Failed to prepare the layer plan.');
   }
@@ -246,7 +256,7 @@ export async function createLayerPlan(directorIp, plan, onProgress) {
     const chunk = prep.layers.slice(i, i + LAYER_CHUNK_SIZE);
     let res;
     try {
-      res = await runScript(directorIp, planLayersScript, {
+      res = await runScript(host, planLayersScript, {
         trackPath: prep.trackPath,
         ensureLength: i === 0 ? prep.requiredLength : null,
         layers: chunk
@@ -268,7 +278,7 @@ export async function createLayerPlan(directorIp, plan, onProgress) {
     const chunk = markers.slice(i, i + MARKER_CHUNK_SIZE);
     let res;
     try {
-      res = await runScript(directorIp, planMarkersScript, {
+      res = await runScript(host, planMarkersScript, {
         trackPath: prep.trackPath,
         splits: chunk.filter(m => 'split' in m).map(m => m.split),
         tags: chunk.filter(m => m.tag).map(m => m.tag)
@@ -286,21 +296,73 @@ export async function createLayerPlan(directorIp, plan, onProgress) {
 
 /**
  * Creates a new Track resource in Disguise.
- * @param {string} directorIp - The IP address and port.
+ * @param {string} host - The director or an editor of the session (the track syncs to all).
  * @param {string} trackName - The desired track name (must be unique).
  * @returns {Promise<{uid: string, path: string, name: string}>}
  */
-export async function createTrack(directorIp, trackName) {
+export async function createTrack(host, trackName) {
   const script = `
 def run():
     track = resourceManager.loadOrCreate("objects/track/${trackName}.apx", Track)
     return track
 return run()
 `;
-  const result = await executePython(directorIp, script);
+  const result = await executePython(host, script);
   if (!result || !result.path) throw new Error('Failed to create track');
   const pathParts = result.path.split('/');
   let name = pathParts[pathParts.length - 1];
   if (name.toLowerCase().endsWith('.apx')) name = name.slice(0, -4);
   return { uid: result.uid, path: result.path, name };
+}
+
+/**
+ * Every machine of the d3net session, asked from the director (editors are not listed by
+ * /api/session/status/session). A machine reports its own IP as 127.0.0.1, so the director
+ * keeps the host already in use and the others get their IP (hostname as a fallback).
+ * @param {string} directorHost - The director's address and port (`?director=`).
+ * @returns {Promise<Array<{name, hostname, role, isDirector, isEditor, host}>>}
+ */
+export async function getSessionMachines(directorHost) {
+  const rows = await executePython(directorHost, sessionMachinesScript);
+  if (!Array.isArray(rows)) return [];
+  return rows.map(m => ({
+    name: m.name,
+    hostname: m.hostname,
+    role: m.role,
+    isDirector: m.isDirector,
+    isEditor: m.role === EDITOR_ROLE,
+    host: m.isDirector ? directorHost : (m.ip && m.ip !== '127.0.0.1' ? m.ip : m.hostname)
+  }));
+}
+
+/**
+ * Whether a machine answers with a Designer session API (GET /api/session/status/project).
+ * 'not-designer': something else answers on the port (e.g. IIS holding port 80 on a Windows PC)
+ * or Designer runs no project; 'unreachable': no answer within the timeout.
+ * @param {string} host
+ * @returns {Promise<'ok' | 'not-designer' | 'unreachable'>}
+ */
+export async function checkMachine(host) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), MACHINE_CHECK_TIMEOUT_MS);
+  try {
+    const response = await fetch(`http://${host}/api/session/status/project`, { signal: controller.signal });
+    if (!response.ok) return 'not-designer';
+    const body = await response.json().catch(() => null);
+    return body?.result?.projectPath ? 'ok' : 'not-designer';
+  } catch (e) {
+    return 'unreachable';
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Whether an editor follows the director's timeline (Locked) or has its own (Independent).
+ * Ask the editor itself.
+ * @param {string} host
+ * @returns {Promise<boolean>}
+ */
+export async function isLockedToDirector(host) {
+  return !!(await executePython(host, 'return state.lockedToDirector'));
 }
