@@ -1,7 +1,7 @@
 <template>
   <div class="settings-sidebar" @click.stop>
     <div class="settings-header">
-      <span class="settings-header-title">SETTINGS</span>
+      <span class="settings-header-title" :title="`Media Sequencer ${APP_VERSION}`">SETTINGS<span class="app-version">v{{ APP_VERSION }}</span></span>
       <div class="segmented-control compact" role="group" aria-label="Creation mode">
         <button type="button" class="segment" :class="{ active: creationMode === 'simple' }" @click="creationMode = 'simple'">Simple</button>
         <button type="button" class="segment" :class="{ active: creationMode === 'advanced' }" @click="creationMode = 'advanced'">Advanced</button>
@@ -331,6 +331,9 @@ import MappingsPanel from './MappingsPanel.vue';
 import NumStepper from '../plan/NumStepper.vue';
 import InfoTip from '../common/InfoTip.vue';
 import MenuSelect from '../common/MenuSelect.vue';
+
+/** package.json version, set at build time (vite.config.js `define`). */
+const APP_VERSION = __APP_VERSION__;
 
 const props = defineProps({
   // useSessionMachines(): the "Run on" choice; createTrack runs on its targetHost
@@ -709,6 +712,23 @@ defineExpose({ revealSection });
   color: #aeaeae;
   font-size: 14px;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+/* Quiet, on the title's baseline; the title hover names the plugin and version */
+.app-version {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #888888;
+  font-variant-numeric: tabular-nums;
+}
+/* Narrowest panel: the version goes first (still in the title tooltip), the title stays whole.
+   The width is the header's content box (panel width minus 32px padding); title, version, gap
+   and the mode switch need 246px. */
+.settings-header { container-type: inline-size; }
+@container (max-width: 245px) {
+  .app-version { display: none; }
 }
 
 .mode-hint {
