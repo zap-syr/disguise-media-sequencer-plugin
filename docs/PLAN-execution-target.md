@@ -1,6 +1,7 @@
 # Plan: choose the machine that runs layer creation (Director or Editor)
 
-Status: decisions made (§8), phase 1 (probes) done (§9), next step is phase 2.
+Status: decisions made (§8), phase 1 (probes, §9) and phase 2 (service, composable) done,
+next step is phase 3 (UI).
 Source: `disguise-api` skill 1.3.0, `references/d3net.md` -> "Talking to an editor machine",
 `references/rest-api.md` -> "Sessions", `references/execution-api.md` -> "Undo".
 
@@ -250,7 +251,16 @@ Session: director `vx4p-46269` at 192.168.0.20 (role 1, DedicatedDirector), edit
     the whole media details call instead of skipping its source path;
   - `src/services/python/plan_prepare.py:68` (`bump_last`): safe today, because the cue input
     mask only allows digits.
-  Fix: `import __builtin__` and `except __builtin__.Exception:` (or the concrete
-  `IndexError` / `ValueError`). Proposed as a separate `fix:` commit.
-- `CLAUDE.md`, the `createLayerPlan` JSDoc and `tools/designer-probes/README.md` still say
-  "nothing rolls back" (see §6).
+  **Fixed** with `import __builtin__` + `except __builtin__.Exception:`; verified: a cue
+  value `1.A` now passes `plan_prepare.py` on both machines (it failed with HTTP 500 before).
+- **Fixed:** `CLAUDE.md`, the `createLayerPlan` JSDoc and `tools/designer-probes/README.md`
+  said "nothing rolls back" (see §6).
+
+### Phase 2 check (browser, dev server, `?director=192.168.0.20`)
+
+`getSessionMachines` gives the editor host `192.168.0.5` and keeps `192.168.0.20` for the
+director. `checkMachine`: director and editor `ok`, the dev server `not-designer`, a missing
+host `unreachable` (after the 2 s timeout). `isLockedToDirector(editor)` = False.
+`useSessionMachines`: defaults to the director; `select('d3-designer')` switches `targetHost`
+to the editor and is stored; a new instance restores it; a stored editor that is not in the
+session falls back to the director, clears the choice and sends the notice.
