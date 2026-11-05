@@ -5,6 +5,7 @@
 # Alpha: videos use VideoAsset.hasAlpha; stills read their own file header, because
 # VideoAsset.hasAlpha is a default setting that is wrong for stills (see 09_alpha_resolved.py).
 # missing: the clip is in error (its media was deleted or cannot be loaded), see 10_missing_media.py.
+import __builtin__
 import os.path
 import struct
 
@@ -60,7 +61,7 @@ def run():
         src = None
         try:
             src = str(f.fragments[0].proxies[0].path)
-        except Exception:
+        except __builtin__.Exception:  # `Exception` is d3.Exception here and catches nothing
             pass
         if live:
             alpha = None
