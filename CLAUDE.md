@@ -31,7 +31,7 @@ results: `docs/PLAN-execution-target.md`.
 ### Component / Service Breakdown
 
 - **`App.vue`** - Reads `?director=` from the URL and passes it as a prop. Entry point only.
-- **`src/components/MediaSequencer.vue`** - Shell: loads data, owns the creation mode and workspace layout (Files / Split / Plan), navigation, file and plan selection, the armed mapping and the missing-clip check (`isMissingClip`); wires the panels, runs layer creation, shows toasts.
+- **`src/components/MediaSequencer.vue`** - Shell: loads data, owns the creation mode and workspace layout (Files / Split / Plan; in Split the files pane is resized with the handle next to the plan, 260 to 420 px, remembered, double click resets), navigation, file and plan selection, the armed mapping and the missing-clip check (`isMissingClip`); wires the panels, runs layer creation, shows toasts.
 - **`src/components/tree/`** - `FolderTree.vue` (collapsible/resizable tree with file counts; in Advanced, folder checkboxes for groups from folders) and `FolderGroupsStrip.vue` (content mode, insert position, Create groups).
 - **`src/components/files/FilesPane.vue`** + **`MediaCard.vue`** - Breadcrumb, search, refresh, one-row selection toolbar ("Add to group…" in Advanced), grid/list of cards with marquee selection and dragging into the plan. Cards show thumbnails (`http://{director}/api/v1/thumbnail/{uid}`), duration, type (VIDEO/IMAGE/LIVE), alpha/audio icons, plan group badges, and a MISSING badge (not selectable) for clips whose media was deleted.
 - **`src/components/plan/`** - the Advanced Layer Plan:
@@ -47,7 +47,7 @@ results: `docs/PLAN-execution-target.md`.
   - `useLayerPlan` (plan state and every plan operation: groups, entries, inheritance, mappings, Undo restores);
   - `usePlanStorage` (the plan in localStorage per director, schema-versioned);
   - `usePlanSelection` (plan row selection), `useFileSelection` (click/Ctrl/Shift/marquee, locked missing files), `useFolderSelection`;
-  - `useLayerOptions` (settings-panel options), `useDragPayload` (one reactive drag payload: files / rows / folders / mapping), `usePersistedRef` (localStorage prefs), `useToast`.
+  - `useLayerOptions` (settings-panel options), `useDragPayload` (one reactive drag payload: files / rows / folders / mapping), `usePersistedRef` (localStorage prefs), `usePaneResize` (drag handle on a pane's right edge with pointer capture: folder tree, Split files pane), `useToast`.
 - **`src/utils/`**:
   - `planSchema` (Plan defaults, chip definitions, inheritance and override normalisation, saved-plan serialisation);
   - `planLayout` (UI time layout in seconds and marker positions, same rules as `plan_prepare.py`);
