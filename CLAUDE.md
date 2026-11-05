@@ -90,11 +90,12 @@ Resources arrive as flat paths like `objects/videoclip/folder/subfolder/clip.apx
   modes, groups, per-layer mappings, settings inheritance, groups from folders, alpha/audio
   badges. §11 lists the owner's decisions; §12 lists API findings verified on a live Designer.
   Plan documents are always written in English.
-- **`.claude/skills/disguise-api/`** - Designer Python API reference for this project. Load it
-  before touching `disguiseService.js` or writing Python. `references/d3.pyi` holds the official
-  type stubs; grep it, never read it whole.
-- **`.claude/skills/disguise-css/`** - the colour palette and component styles. Load it before
-  writing CSS.
+- Skills come from the `disguise` plugin of the owner's `my-skills` marketplace
+  (github.com/zap-syr/my-skills), not from this repo:
+  - **`disguise-api`** - Designer Python and REST API reference. Load it before touching
+    `disguiseService.js` or writing Python. `references/d3.pyi` holds the official type stubs;
+    grep it, never read it whole.
+  - **`disguise-css`** - the colour palette and component styles. Load it before writing CSS.
 - **`tools/designer-probes/`** - runs Python probes and write tests against a live Designer
   (`node tools/designer-probes/run.mjs`). Use it to verify an API assumption before relying on
   it. See its README.
