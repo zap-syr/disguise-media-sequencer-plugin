@@ -13,7 +13,9 @@
       @keydown="onTriggerKey"
     >
       <span class="ms-text">{{ triggerText }}</span>
-      <span class="ms-arrow" aria-hidden="true">▼</span>
+      <!-- A slow background check spins in the arrow's place: same size, nothing moves -->
+      <span v-if="showBusy" class="ms-busy" aria-hidden="true"></span>
+      <span v-else class="ms-arrow" aria-hidden="true">▼</span>
     </button>
 
     <!-- Floats over the layout (teleported, fixed position), so a narrow pane never clips it -->
@@ -60,7 +62,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
 
 /**
  * The project dropdown (the settings panel look) for a short list of choices:
@@ -77,9 +79,12 @@ const props = defineProps({
   placeholder: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   title: { type: String, default: '' },
-  ariaLabel: { type: String, default: '' }
+  ariaLabel: { type: String, default: '' },
+  // Work behind the value is running (e.g. a machine check); shown only when it is slow
+  busy: { type: Boolean, default: false }
 });
-const emit = defineEmits(['update:modelValue', 'select']);
+// open: the list was just shown (e.g. to refresh a list that changes outside the plugin)
+const emit = defineEmits(['update:modelValue', 'select', 'open']);
 
 const triggerEl = ref(null);
 const listEl = ref(null);
@@ -87,6 +92,16 @@ const open = ref(false);
 const active = ref(-1);
 
 const choices = computed(() => props.items.filter(i => !i.heading));
+
+// `busy` shows a spinner only after BUSY_DELAY_MS, so a fast check never flickers
+const BUSY_DELAY_MS = 400;
+const showBusy = ref(false);
+let busyTimer = null;
+watch(() => props.busy, busy => {
+  clearTimeout(busyTimer);
+  if (busy) busyTimer = setTimeout(() => { showBusy.value = true; }, BUSY_DELAY_MS);
+  else showBusy.value = false;
+}, { immediate: true });
 const triggerText = computed(() => {
   if (props.modelValue === undefined) return props.placeholder;
   return choices.value.find(i => i.value === props.modelValue)?.label ?? props.placeholder;
@@ -137,6 +152,7 @@ function show() {
   active.value = at >= 0 ? at : 0;
   listeners.forEach(([e, fn, cap]) => window.addEventListener(e, fn, cap));
   nextTick(() => { place(); scrollActive(); });
+  emit('open');
 }
 function close(refocus = true) {
   if (!open.value) return;
@@ -185,7 +201,10 @@ function onListKey(event) {
   } else if (event.key === 'Tab') close(false);
 }
 
-onBeforeUnmount(() => listeners.forEach(([e, fn, cap]) => window.removeEventListener(e, fn, cap)));
+onBeforeUnmount(() => {
+  clearTimeout(busyTimer);
+  listeners.forEach(([e, fn, cap]) => window.removeEventListener(e, fn, cap));
+});
 </script>
 
 <style scoped>
@@ -206,6 +225,13 @@ onBeforeUnmount(() => listeners.forEach(([e, fn, cap]) => window.removeEventList
 .ms-text { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ms-arrow { flex-shrink: 0; font-size: 8px; color: #9c9c9c; transition: transform 0.2s ease; }
 .open .ms-arrow { transform: rotate(180deg); }
+/* Same footprint as the arrow; the Refresh button's spin timing */
+.ms-busy {
+  flex-shrink: 0; width: 9px; height: 9px; box-sizing: border-box;
+  border: 1.5px solid #9c9c9c; border-top-color: transparent; border-radius: 50%;
+  animation: ms-spin 0.8s linear infinite;
+}
+@keyframes ms-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 .ms-list {
   position: fixed; z-index: 1000;

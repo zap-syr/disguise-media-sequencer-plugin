@@ -29,6 +29,19 @@
         <template #icon>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 8l-3 4 3 4M19 8l3 4-3 4"/></svg>
         </template>
+        <!-- Run on: only in a session with editors (docs/PLAN-execution-target.md) -->
+        <div v-if="hasEditors" class="kv run-on">
+          <span class="kv-lbl">Run on <InfoTip text="The machine that creates the layers and tracks. At Playhead uses its open track and playhead. Media and tracks are always read from the director." /></span>
+          <MenuSelect
+            :items="runOnItems"
+            :model-value="runOnValue"
+            :busy="machines.targetChecking.value"
+            aria-label="Run on"
+            @update:model-value="machines.select"
+            @open="machines.refresh"
+          />
+          <div v-if="runOnProblem" class="run-on-hint kv-full" role="status">{{ runOnProblem }}</div>
+        </div>
         <div class="segmented-control">
           <button
             type="button"
@@ -297,6 +310,7 @@
       </div>
       <button v-if="!confirmCreateAsk"
         class="create-btn"
+        :title="runOnError ? runOnProblem : ''"
         :disabled="!isCreateLayersEnabled || isCreating"
         @click="handleCreate"
       >
@@ -316,9 +330,11 @@ import SettingsSection from './SettingsSection.vue';
 import MappingsPanel from './MappingsPanel.vue';
 import NumStepper from '../plan/NumStepper.vue';
 import InfoTip from '../common/InfoTip.vue';
+import MenuSelect from '../common/MenuSelect.vue';
 
 const props = defineProps({
-  directorEndpoint: { type: String, required: true },
+  // useSessionMachines(): the "Run on" choice; createTrack runs on its targetHost
+  machines: { type: Object, required: true },
   mappings: { type: Array, required: true },
   tracks: { type: Array, required: true },
   // reactive object from useLayerOptions(); fields are edited in place
@@ -399,11 +415,51 @@ const validMidi = computed(() => isMidiNoteValid.value && (options.addMidiNote ?
 const validTimecode = computed(() => isTimecodeStartValid.value && isTimecodeIncrementValid.value);
 const validLocation = computed(() => options.insertMode === 'At Playhead' || (!!selectedTrack.value && isStartTimeValid.value));
 
+// --- Run on (director or an editor of the session) ---
+
+const machines = props.machines;
+const hasEditors = computed(() => machines.editors.value.length > 0);
+const runOnValue = computed(() => machines.target.value?.hostname || '');
+
+/** "Independent" / "Locked" (whose playhead At Playhead follows) or "unreachable". */
+function editorTag(editor) {
+  const info = machines.info.value[editor.hostname];
+  if (info?.status === 'unreachable' || info?.status === 'not-designer') return 'unreachable';
+  if (info?.locked === true) return 'Locked';
+  if (info?.locked === false) return 'Independent';
+  return '';
+}
+const runOnItems = computed(() => {
+  const director = machines.director.value;
+  return [
+    { value: '', label: director ? `Director (${director.name})` : 'Director' },
+    ...machines.editors.value.map(e => {
+      const tag = editorTag(e);
+      return { value: e.hostname, label: tag ? `${e.name}, ${tag}` : e.name };
+    })
+  ];
+});
+
+// Only a confirmed failure shows a hint and blocks Create; a check in progress does neither
+// (Create re-checks the machine itself right before it runs).
+const runOnError = computed(() => ['unreachable', 'not-designer'].includes(machines.targetStatus.value));
+const runOnProblem = computed(() => {
+  const t = machines.target.value;
+  if (!t) return '';
+  switch (machines.targetStatus.value) {
+    case 'unreachable': return `${t.name} (${t.host}) does not answer. Is Designer running there?`;
+    case 'not-designer': return `No Designer API at ${t.host}: another server holds port 80 (IIS?) or no project is open.`;
+    default: return '';
+  }
+});
+const validRunOn = computed(() => !runOnError.value);
+
 const isCreateLayersEnabled = computed(() => {
   const hasSelection = props.layerCount > 0;
   // Advanced assigns mappings per layer in the plan
   const hasMapping = isAdvanced.value || !!selectedMapping.value;
-  return hasSelection && hasMapping && validCue.value && validMidi.value && validTimecode.value && validLocation.value;
+  return hasSelection && hasMapping && validCue.value && validMidi.value && validTimecode.value &&
+    validLocation.value && validRunOn.value;
 });
 
 const createLabel = computed(() => {
@@ -428,10 +484,12 @@ const mappingsSummary = computed(() => {
 });
 
 const whereSummary = computed(() => {
-  if (!isSpecific.value) return 'At playhead';
-  return `${selectedTrack.value ? selectedTrack.value.name : 'no track'}, ${options.startTime || 'no time'}`;
+  const at = isSpecific.value
+    ? `${selectedTrack.value ? selectedTrack.value.name : 'no track'}, ${options.startTime || 'no time'}`
+    : 'At playhead';
+  return machines.target.value ? `${at}, ${machines.targetName.value}` : at;
 });
-const whereError = computed(() => !validLocation.value);
+const whereError = computed(() => !validLocation.value || runOnError.value);
 
 const layersSummary = computed(() => {
   if (isAdvanced.value) return 'Per group';
@@ -537,7 +595,8 @@ async function confirmCreateTrack() {
   if (newTrackNameError.value || isCreatingTrackLoading.value) return;
   isCreatingTrackLoading.value = true;
   try {
-    const newTrack = await createTrack(props.directorEndpoint, newTrackName.value.trim());
+    // Same machine as the layers; the new track syncs to the whole session
+    const newTrack = await createTrack(machines.targetHost.value, newTrackName.value.trim());
     emit('track-created', newTrack);
     selectTrack(newTrack);
   } catch (err) {
@@ -704,6 +763,9 @@ defineExpose({ revealSection });
   row-gap: 8px;
 }
 .kv-gap { margin-top: 10px; }
+/* Run on sits above the insert mode switch */
+.run-on { margin-bottom: 10px; row-gap: 6px; }
+.run-on-hint { font-size: 11px; color: #ef4444; line-height: 1.4; }
 .kv-full { grid-column: 1 / -1; }
 .kv-end { justify-self: end; }
 .kv-lbl {

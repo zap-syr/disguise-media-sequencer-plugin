@@ -26,18 +26,24 @@ export function useSessionMachines(directorEndpoint, onNotice = () => {}) {
   const targetHost = computed(() => target.value ? target.value.host : directorEndpoint);
   const targetName = computed(() => target.value?.name || director.value?.name || 'Director');
 
-  // { [hostname]: { status: 'checking' | 'ok' | 'not-designer' | 'unreachable', locked: bool | null } }
+  // { [hostname]: { status: 'unknown' | 'ok' | 'not-designer' | 'unreachable', locked: bool | null,
+  //                 checking: bool } }
+  // A re-check keeps the last known status and tag until the answer arrives, so a fast check
+  // that changes nothing changes nothing on screen.
   const info = ref({});
   /** Reachability of the target; the director is the plugin's own host, so it counts as ok. */
-  const targetStatus = computed(() => target.value ? (info.value[target.value.hostname]?.status || 'checking') : 'ok');
+  const targetStatus = computed(() => target.value ? (info.value[target.value.hostname]?.status || 'unknown') : 'ok');
+  /** A check of the target is running (the UI shows it only when it is slow). */
+  const targetChecking = computed(() => !!(target.value && info.value[target.value.hostname]?.checking));
 
-  function setInfo(hostname, value) {
-    info.value = { ...info.value, [hostname]: value };
+  function setInfo(hostname, patch) {
+    const prev = info.value[hostname] || { status: 'unknown', locked: null, checking: false };
+    info.value = { ...info.value, [hostname]: { ...prev, ...patch } };
   }
 
   /** Reachability and Locked / Independent of one editor, asked from the editor itself. */
   async function probe(machine) {
-    setInfo(machine.hostname, { status: 'checking', locked: info.value[machine.hostname]?.locked ?? null });
+    setInfo(machine.hostname, { checking: true });
     const status = await checkMachine(machine.host);
     let locked = null;
     if (status === 'ok') {
@@ -47,7 +53,7 @@ export function useSessionMachines(directorEndpoint, onNotice = () => {}) {
         // the tag stays unknown, the machine itself answered
       }
     }
-    setInfo(machine.hostname, { status, locked });
+    setInfo(machine.hostname, { status, locked, checking: false });
     return status;
   }
 
@@ -90,7 +96,7 @@ export function useSessionMachines(directorEndpoint, onNotice = () => {}) {
 
   return {
     machines, editors, director, isLoading, info,
-    target, targetHost, targetName, targetStatus,
+    target, targetHost, targetName, targetStatus, targetChecking,
     refresh, select, check
   };
 }

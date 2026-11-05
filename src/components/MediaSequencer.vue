@@ -51,7 +51,7 @@
         :drag-enabled="showPlan"
         :selection="selection"
         @select-folder="selectFolder"
-        @refresh="library.refresh"
+        @refresh="refreshAll"
       >
         <!-- Next to the plan the switch lives in the plan header; the side pane is narrow -->
         <template v-if="isAdvanced && !showPlan" #nav-extra>
@@ -137,7 +137,7 @@
       <SettingsPanel
         ref="settingsRef"
         v-model:creation-mode="creationMode"
-        :director-endpoint="props.directorEndpoint"
+        :machines="machines"
         :mappings="library.mappings.value"
         :tracks="library.tracks.value"
         :options="layerOptions"
@@ -179,6 +179,7 @@ import { flattenFiles, folderFiles, visibleFolders, breadcrumbPath, folderOrder,
 import { useFolderSelection } from '../composables/useFolderSelection';
 import FolderGroupsStrip from './tree/FolderGroupsStrip.vue';
 import { useMediaLibrary } from '../composables/useMediaLibrary';
+import { useSessionMachines } from '../composables/useSessionMachines';
 import { useFileSelection } from '../composables/useFileSelection';
 import { usePersistedRef } from '../composables/usePersistedRef';
 import { useToast } from '../composables/useToast';
@@ -201,6 +202,14 @@ const props = defineProps({
 
 const { toast, show: showToast, dismiss: dismissToast } = useToast();
 const library = useMediaLibrary(props.directorEndpoint, message => showToast(message, 'error'));
+// "Run on": the director or an editor creates the layers; reads stay on the director
+const machines = useSessionMachines(props.directorEndpoint, message => showToast(message, 'error'));
+
+/** Files pane Refresh: the media library and the session machines (editors join and leave). */
+function refreshAll() {
+  library.refresh();
+  machines.refresh();
+}
 
 const layerOptions = useLayerOptions();
 const isCreating = ref(false);
@@ -587,6 +596,7 @@ watch([selectedFolderId, searchQuery, includeSubfolders], () => {
 
 onMounted(() => {
   library.load();
+  machines.refresh();
   if (planWasReset) showToast('Saved plan was reset');
 });
 
@@ -595,25 +605,32 @@ async function handleCreateLayers(requestOptions) {
 
   try {
     isCreating.value = true;
+    // Never fall back to the director silently: "At Playhead" would use another playhead
+    if (!(await machines.check())) {
+      showToast(`${machines.targetName.value} does not answer, no layers were created. Pick another machine in Where.`, 'error');
+      return;
+    }
+    const host = machines.targetHost.value;
+    const onMachine = machines.target.value ? ` on ${machines.targetName.value}` : '';
     const advanced = isAdvanced.value;
     const payload = advanced
       ? buildAdvancedPlan(requestOptions, plan.state, isMissingClip)
       : buildSimplePlan(requestOptions, selectedClipPaths());
     const expected = payload.groups.reduce((n, g) => n + g.layers.length, 0);
 
-    const result = await createLayerPlan(props.directorEndpoint, payload, (created, total) => {
+    const result = await createLayerPlan(host, payload, (created, total) => {
       createProgress.value = { created, total };
     });
 
     // Simple consumes the selection; Advanced keeps the plan so it can be tweaked and re-created
     if (!advanced) selection.clear();
     if (result.errors.length) {
-      showToast(`Created ${result.created} of ${expected} layers, ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
+      showToast(`Created ${result.created} of ${expected} layers${onMachine}, ${result.errors.length} skipped: ${result.errors[0].message}`, 'error');
       console.warn('Layer creation issues:', result.errors);
     } else {
       showToast(advanced
-        ? `Created ${result.created} layers in ${payload.groups.length} ${payload.groups.length === 1 ? 'group' : 'groups'}.`
-        : `Successfully created ${result.created} layers.`);
+        ? `Created ${result.created} layers in ${payload.groups.length} ${payload.groups.length === 1 ? 'group' : 'groups'}${onMachine}.`
+        : `Successfully created ${result.created} layers${onMachine}.`);
     }
   } catch (err) {
     showToast(`Failed to create layers: ${err.message}`, 'error');
