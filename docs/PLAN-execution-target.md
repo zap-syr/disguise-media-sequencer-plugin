@@ -1,6 +1,6 @@
 # Plan: choose the machine that runs layer creation (Director or Editor)
 
-Status: draft, waiting for the owner's decisions (§8).
+Status: decisions made (§8), phase 1 (probes) done (§9), next step is phase 2.
 Source: `disguise-api` skill 1.3.0, `references/d3net.md` -> "Talking to an editor machine",
 `references/rest-api.md` -> "Sessions", `references/execution-api.md` -> "Undo".
 
@@ -69,9 +69,7 @@ Run against the live session with an editor before writing UI code:
   rows, `hostname`, `IP_address`, role values.
 - **P2** CORS: the plugin page calls the director today; check that a `fetch` from the plugin
   origin to the **editor** host (execute + `status/project`) is not blocked by CORS.
-- **P3** Where the plugin page is served from when the panel is opened inside the editor's
-  Designer (`window.location.host`): the director or the editor. Needed for the auto-preselect
-  idea (§8, Q4).
+- **P3** dropped: the plugin page is always served by the director (§8, Q4).
 - **P4** `return {"locked": state.lockedToDirector, "editor": d3NetManager.mobileEditorMode}`
   on the editor, to show the Locked / Independent badge.
 - **P5** End-to-end: run the existing `plan_prepare.py` + `plan_layers.py` on the editor with a
@@ -121,6 +119,8 @@ useSessionMachines(directorEndpoint, onError) -> {
   opens. **No polling** (skill rule: the execute endpoint must never be polled).
 - Persists the choice by **hostname** (IPs change) with `usePersistedRef`, key
   `mediaSequencer.runOn.<director>`, next to the plan key.
+- Default target: the saved hostname if it is still in the session, else the director
+  (§8, Q4).
 - If the saved editor is not in the session any more: fall back to the director and show a
   toast ("Editor d3-edit-2 is not in the session, running on the director").
 - `check()` runs on selection and right before Create.
@@ -177,26 +177,80 @@ useSessionMachines(directorEndpoint, onError) -> {
 
 ## 7. Phases
 
-1. Probes P1 to P5, results in §9.
+1. Probes P1, P2, P4, P5, results in §9.
 2. Service + `session_machines.py` + `useSessionMachines`.
 3. "Run on" control, status, Create guard, messages with the machine name.
 4. Wiring in `MediaSequencer.vue`, check on a live session (director + editor, Independent and
    Locked), narrow window check.
 5. Docs (§6), CHANGELOG, version bump.
 
-## 8. Decisions for the owner
+## 8. Owner's decisions (2026-11-05)
 
-- **Q1. Placement:** the first row of the "Where" section (recommended), or a separate small
-  button in the panel header / next to Create?
-- **Q2. Reads:** keep the media / mapping / track reads on the director (recommended), or send
-  everything to the target?
-- **Q3. Visibility:** hide the control when there are no editors (recommended), or always show
-  it with only "Director"?
-- **Q4. Auto-preselect:** if P3 shows the plugin page is served by the editor, preselect that
-  editor on first open? Otherwise the default is always the director.
-- **Q5. Remember the choice** between sessions (recommended, by hostname), or reset to the
-  director each time the panel opens?
+- **Q1. Placement:** the first row of the "Where" section.
+- **Q2. Reads:** media, mapping and track reads stay on the director; only writes go to the
+  target (§3).
+- **Q3. Visibility:** the control is hidden when the session has no editors.
+- **Q4. Default target:** the director. In a session the plugin page is always served by the
+  director (owner's knowledge), so the plugin cannot tell which machine it is opened on; no
+  auto-preselect of an editor.
+- **Q5. Remember the choice:** yes, by hostname, key `mediaSequencer.runOn.<director>` (§4.3).
 
-## 9. Probe results
+## 9. Probe results (2026-11-05, r34.2.2, project `start`)
 
-(to be filled in phase 1)
+Session: director `vx4p-46269` at 192.168.0.20 (role 1, DedicatedDirector), editor
+`d3-designer` at 192.168.0.5 (role 5, MobileEditor, Independent). Both opened `track 1`.
+
+- **P1, machine list** (`tools/designer-probes/probes/11_session_machines.py`): OK.
+  - On the director: `vx4p-46269` `ip 127.0.0.1`, `isDirector`, `isLocal`; `d3-designer`
+    `ip 192.168.0.5`, role 5.
+  - On the editor the IPs are swapped (director `192.168.0.20`, editor `127.0.0.1`), as the
+    skill says. The host rule of §4.2 (director = the host already called, others = `ip`,
+    `hostname` if the ip is `127.0.0.1`) gives 192.168.0.5 for the editor. Hostname resolution
+    from the browser was not tested; the plugin uses the IP.
+  - ~40 ms round trip, ~5 ms Python.
+- **P2, reachability and CORS:** OK on both machines.
+  - `GET /api/session/status/project`: 200, `Server: nginx/1.22.0`, same project path and version.
+  - Both send `access-control-allow-origin: *` and allow `Content-Type`; the `OPTIONS` preflight
+    for execute answers 200 with the same headers. A page served by the director can call the
+    editor directly.
+  - The editor PC had no IIS conflict on port 80.
+- **P3:** dropped (§8, Q4).
+- **P4, machine mode** (`probes/12_machine_mode.py`):
+
+  | | Director | Editor |
+  |---|---|---|
+  | `localMachine` / role | `vx4p-46269` / 1 | `d3-designer` / 5 |
+  | `mobileEditorMode` | False | True |
+  | `state.lockedToDirector` | False (meaningless on the director) | False (Independent) |
+  | `guisystem.track` | `track 1` | `track 1` |
+  | `guisystem.player.tCurrent` | 58 | **15** |
+
+  "At Playhead" on the editor really uses the editor's playhead. Read the Locked / Independent
+  tag from the editor itself.
+- **P5, end to end** (scratchpad script, scratch track `zz_probe_test` only): the plugin's real
+  `plan_prepare.py` -> `plan_layers.py` -> `plan_markers.py`, all three on the **editor**,
+  Specific Time 00:00:10:00, 2 stills, one mapping, brightness fade, splits and cue tags on.
+  - Every step `success`: 2 layers, 3 splits, 2 cue tags, 74 ms for the whole pipeline.
+  - A dump read right after on both machines was **identical**: names, extents (10-15,
+    15-20), stack index, video, mapping, 2 brightness keys, tags `1` / `2`, 4 sections.
+  - `t99_cleanup` on the editor emptied the track on the director too.
+  - Side finding, not editor-specific: after `resourceManager.remove(track.path)` the file is
+    gone from disk on both machines, but the track **stays in memory** (`load` still returns
+    it, `allResources(Track)` still lists it) on the editor that removed it and on the director.
+    The plugin never removes tracks, so this only matters for the probe cleanup.
+
+**Conclusion:** no blocker. Phase 1 is done; the design of §3 and §4 stands as written.
+
+### Found while probing (outside this feature)
+
+- `except Exception:` does not catch anything in Designer scripts (`Exception` is
+  `d3.Exception`; verified: `int('A')` under `except Exception` fails with HTTP 500). Two
+  places use it:
+  - `src/services/python/media_details.py:63`: a clip with no fragments or proxies would fail
+    the whole media details call instead of skipping its source path;
+  - `src/services/python/plan_prepare.py:68` (`bump_last`): safe today, because the cue input
+    mask only allows digits.
+  Fix: `import __builtin__` and `except __builtin__.Exception:` (or the concrete
+  `IndexError` / `ValueError`). Proposed as a separate `fix:` commit.
+- `CLAUDE.md`, the `createLayerPlan` JSDoc and `tools/designer-probes/README.md` still say
+  "nothing rolls back" (see §6).
