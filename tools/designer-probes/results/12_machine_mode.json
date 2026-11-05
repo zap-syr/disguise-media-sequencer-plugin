@@ -1,0 +1,20 @@
+{
+  "probe": "12_machine_mode",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 37,
+  "d3Log": "Python script took 5.0724ms\n",
+  "pythonLog": "",
+  "result": {
+    "track": "objects/track/track 1.apx",
+    "mobileEditorMode": true,
+    "localRole": 5,
+    "lockedToDirector": false,
+    "playheadBeats": 15,
+    "local": "d3-designer"
+  }
+}

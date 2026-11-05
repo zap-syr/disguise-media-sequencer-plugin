@@ -1,0 +1,30 @@
+{
+  "probe": "11_session_machines",
+  "httpStatus": 200,
+  "status": {
+    "code": 0,
+    "message": "",
+    "details": []
+  },
+  "roundTripMs": 37,
+  "d3Log": "Python script took 5.6932ms\n",
+  "pythonLog": "",
+  "result": [
+    {
+      "name": "vx4p-46269",
+      "isLocal": true,
+      "ip": "127.0.0.1",
+      "isDirector": true,
+      "hostname": "vx4p-46269",
+      "role": 1
+    },
+    {
+      "name": "d3-designer",
+      "isLocal": false,
+      "ip": "192.168.0.5",
+      "isDirector": false,
+      "hostname": "d3-designer",
+      "role": 5
+    }
+  ]
+}
