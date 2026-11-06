@@ -30,7 +30,8 @@ results: `docs/PLAN-execution-target.md`.
 
 ### Component / Service Breakdown
 
-- **`App.vue`** - Reads `?director=` from the URL and passes it as a prop. Entry point only.
+- **`App.vue`** - Reads `?director=` from the URL (without it: the host that served the page; `localhost:80` under the Vite dev server) and passes it as a prop. Entry point only.
+- **`main.js`** - Mounts the app and imports the bundled Inter font (`@fontsource/inter`, latin + cyrillic, 400-700): no external font request, show networks are often offline.
 - **`src/components/MediaSequencer.vue`** - Shell: loads data, owns the creation mode and workspace layout (Files / Split / Plan; in Split the files pane is resized with the handle next to the plan, 260 to 420 px, remembered, double click resets), navigation, file and plan selection, the armed mapping and the missing-clip check (`isMissingClip`); wires the panels, runs layer creation, shows toasts.
 - **`src/components/tree/`** - `FolderTree.vue` (collapsible/resizable tree with file counts; in Advanced, folder checkboxes for groups from folders) and `FolderGroupsStrip.vue` (content mode, insert position, Create groups).
 - **`src/components/files/FilesPane.vue`** + **`MediaCard.vue`** - Breadcrumb, search, refresh, one-row selection toolbar ("Add to group…" in Advanced), grid/list of cards with marquee selection and dragging into the plan. Cards show thumbnails (`http://{director}/api/v1/thumbnail/{uid}`), duration, type (VIDEO/IMAGE/LIVE), alpha/audio icons, plan group badges, and a MISSING badge (not selectable) for clips whose media was deleted.
@@ -54,10 +55,11 @@ results: `docs/PLAN-execution-target.md`.
   - `planBuilder` (UI state → createLayerPlan payload, Simple and Advanced);
   - `autoAssign`, `mappingColors` (12-colour mapping set), `mediaTree` (tree helpers, groups from folders), `tagInputs` (cue/MIDI masks), `timecode`, `format`.
 - **`src/services/disguiseService.js`** - All Designer API calls via `executePython`. Non-trivial Python lives in **`src/services/python/*.py`**, imported with `?raw`; scripts read input through `json.loads(__ARGS__)` (filled by `runScript`). The same files run as probes: `node tools/designer-probes/run.mjs src/services/python/<name>` (args templates need `__ARGS__` substituted):
-  - `media_details.py` (per-clip kind, duration, resolution, alpha, audio, missing), `mapping_list.py`;
+  - `media_details.py` (per-clip kind, duration, resolution, alpha, audio, missing; opens no files, stills that need a header read get `alphaPending`), `still_alpha.py` (alpha of those stills from their file headers, in chunks with a time budget; `getStillAlpha()`, run by `useMediaLibrary` after the details), `mapping_list.py`;
   - `session_machines.py` (every machine of the session, run on the director); `checkMachine()` and `isLockedToDirector()` ask the machine itself;
+  - `track_create.py` (`createTrack()`; the name is checked by `trackNameError()` in the service and the UI, and again in Python).
+  - User data never goes into a script source: always JSON through `runScript()`. `pythonJsonLiteral()` escapes non-ASCII and spaces (Designer turns every 4 spaces of a script into a tab).
   - `plan_prepare.py`, `plan_layers.py`, `plan_markers.py` (the three createLayerPlan steps).
-- **`src/api_scripts.py`** - Old reference/template file for the Python API (pre-redesign). Not imported at runtime.
 
 ### Settings inheritance (Advanced)
 
@@ -124,7 +126,8 @@ Resources arrive as flat paths like `objects/videoclip/folder/subfolder/clip.apx
 - **Time format**: Timeline times use `HH:MM:SS:FF` (frames, not milliseconds). Conversion to beats happens in `disguiseService.js` via `track.timeToBeat()`.
 - **Base path**: `vite.config.js` sets `base: './'` so asset paths are relative - required for the plugin to load resources when served from Designer's local file server.
 - **Python script generation**: Since scripts are strings built via template literals, be careful with escaping and with variable naming collisions inside the generated Python. The script runs in Designer's Python interpreter, not Node.
-- **No TypeScript**: The project uses plain JS. `api_scripts.py.d.ts` provides type hints for the Python loader integration only.
+- **No TypeScript**: The project uses plain JS. The `.py` scripts are imported with `?raw` (no Python loader).
+- **ASCII only in `.py` files**, comments included (Designer runs them as Python 2.7).
 - **Designer Python runtime limits** (verified on a live session; details in the `disguise-api` skill):
   - Python 2.7;
   - ~1 s execution timeout. A call that raises or times out is **rolled back**, but earlier calls
