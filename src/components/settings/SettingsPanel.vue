@@ -82,10 +82,12 @@
                   v-for="t in filteredTracks"
                   :key="t.uid"
                   class="dropdown-item"
-                  :class="{ selected: selectedTrack?.uid === t.uid }"
-                  @click="selectTrack(t)"
+                  :class="{ selected: selectedTrack?.uid === t.uid, 'is-missing': t.missing }"
+                  :title="t.missing ? 'The track file is missing in Designer and cannot be used' : null"
+                  @click="!t.missing && selectTrack(t)"
                 >
-                  {{ t.name }}
+                  <span class="track-name">{{ t.name }}</span>
+                  <span v-if="t.missing" class="missing-pill">MISSING</span>
                 </li>
                 <li v-if="filteredTracks.length === 0" class="dropdown-empty">
                   No results found
@@ -663,6 +665,15 @@ watch(() => props.mappings, list => {
   if (selectedMappingPath.value && !list.some(m => m.path === selectedMappingPath.value)) selectedMappingPath.value = null;
 });
 
+// Refresh: a picked track that became missing in Designer is cleared, so Create can't use it
+watch(() => props.tracks, list => {
+  const current = selectedTrack.value && list.find(t => t.uid === selectedTrack.value.uid);
+  if (current?.missing) {
+    selectedTrack.value = null;
+    trackSearchQuery.value = '';
+  }
+});
+
 watch(isCreatingTrack, async (val) => {
   if (val) {
     await nextTick();
@@ -960,6 +971,31 @@ ul.dropdown-list {
 }
 
 .dropdown-item:hover { background: #3a3a3a; }
+.dropdown-item.is-missing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
+}
+.dropdown-item.is-missing:hover { background: transparent; }
+.dropdown-item.is-missing .track-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.4;
+}
+.missing-pill {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
 .dropdown-item.selected {
   background: rgba(59, 130, 246, 0.2);
   color: #0a84ff;

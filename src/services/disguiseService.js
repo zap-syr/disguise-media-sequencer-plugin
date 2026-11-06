@@ -145,14 +145,16 @@ export async function getMappingList(directorIp) {
  * @returns {Promise<Array>} Filtered list of tracks.
  */
 export async function getTrackList(directorIp) {
-  const script = "return resourceManager.allResources(Track)";
-  const items = await executePython(directorIp, script);
-  
-  if (!Array.isArray(items)) return [];
+  // missing: the track's file is not found (Designer lists it as missing), same flag as clips
+  const script = 'return [{"track": t, "missing": bool(t.isInError)} for t in resourceManager.allResources(Track)]';
+  const rows = await executePython(directorIp, script);
 
-  return items
-    .filter(item => item.path)
-    .map(item => {
+  if (!Array.isArray(rows)) return [];
+
+  return rows
+    // Only user tracks: Designer keeps its own tracks under internal/ (e.g. internal/track/look/<uid>.apx)
+    .filter(row => row.track?.path && row.track.path.toLowerCase().startsWith('objects/'))
+    .map(({ track: item, missing }) => {
       const pathParts = item.path.split('/');
       let name = pathParts[pathParts.length - 1];
       if (name.toLowerCase().endsWith('.apx')) {
@@ -161,7 +163,8 @@ export async function getTrackList(directorIp) {
       return {
         uid: item.uid,
         path: item.path,
-        name: name
+        name: name,
+        missing: !!missing
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
