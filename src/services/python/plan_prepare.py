@@ -12,7 +12,7 @@
 #                           "fit", "movieDur", "stillDur"}]}]
 # }
 #
-# Timing rules (docs/PLAN-ui-redesign.md §2.7, §4.3, §11):
+# Timing rules (docs/PLAN-ui-redesign.md sections 2.7, 4.3, 11):
 #   seq : start = cursor; cursor = max(gStart, start + length - overlap)
 #   same: every layer starts at gStart
 #   group end = end of its LONGEST layer; the next group starts there.

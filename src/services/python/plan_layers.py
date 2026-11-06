@@ -1,6 +1,6 @@
 # createLayerPlan step 2: create one chunk (<= 100) of layers whose beats were computed by
 # plan_prepare.py. The first chunk also extends the track: Designer does NOT grow a track, and
-# layers past lengthInBeats end up truncated or zero-length (verified, docs §12).
+# layers past lengthInBeats end up truncated or zero-length (verified, docs section 12).
 # __ARGS__ = {"trackPath": str, "ensureLength": beats|None,
 #             "layers": [{"clipPath", "mappingPath"|None, "mode", "end", "bright",
 #                         "start", "length", "fadeLength"}]}
