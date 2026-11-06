@@ -10,6 +10,8 @@ import planPrepareScript from './python/plan_prepare.py?raw';
 import planLayersScript from './python/plan_layers.py?raw';
 import planMarkersScript from './python/plan_markers.py?raw';
 import sessionMachinesScript from './python/session_machines.py?raw';
+import trackCreateScript from './python/track_create.py?raw';
+import stillAlphaScript from './python/still_alpha.py?raw';
 
 /** d3net MachineRole of a Designer workstation joined to the session (MobileEditor). */
 export const EDITOR_ROLE = 5;
@@ -20,15 +22,18 @@ const MACHINE_CHECK_TIMEOUT_MS = 2000;
 export const LAYER_CHUNK_SIZE = 100;
 /** Tags + splits per execute call: a 500-layer plan with TC, cue and MIDI tags places ~2000 markers. */
 export const MARKER_CHUNK_SIZE = 300;
+/** Still images per header-reading call (still_alpha.py also stops early on slow storage). */
+const STILL_ALPHA_CHUNK_SIZE = 50;
 
 /**
  * Turns `args` into a Python unicode string literal holding JSON, for `json.loads(__ARGS__)`.
  * JSON string escapes are valid in a Python u"" literal; non-ASCII is escaped so the
- * Python 2.7 source stays ASCII.
+ * Python 2.7 source stays ASCII. Spaces are escaped too: Designer turns every 4 spaces of an
+ * executed script into a tab, which would change a path with 4 spaces in a row.
  */
 function pythonJsonLiteral(args) {
   const literal = JSON.stringify(JSON.stringify(args))
-    .replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+    .replace(/[ \u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
   return 'u' + literal;
 }
 
@@ -105,11 +110,35 @@ export async function getMediaList(directorIp) {
  * Fetches per-clip metadata (kind, duration, resolution, alpha, audio...) keyed by VideoClip path.
  * @param {string} directorIp - The IP address and port.
  * @returns {Promise<Object<string, {kind: 'video'|'still'|'live', codec: string, nFrames: number,
- *   fps: number, duration: number|null, res: string, hasAlpha: boolean|null, hasAudio: boolean}>>}
+ *   fps: number, duration: number|null, res: string, hasAlpha: boolean|null, alphaPending: boolean,
+ *   hasAudio: boolean}>>} alphaPending: a still whose alpha comes later from getStillAlpha().
  */
 export async function getMediaDetails(directorIp) {
   const details = await executePython(directorIp, mediaDetailsScript);
   return details && typeof details === 'object' && !Array.isArray(details) ? details : {};
+}
+
+/**
+ * Alpha of the stills getMediaDetails() marked `alphaPending`, read from their file headers
+ * by still_alpha.py, STILL_ALPHA_CHUNK_SIZE per call. A call stops early on slow storage and
+ * reports how many it handled (at least one); the rest goes into the next call.
+ * @param {string} directorIp - The IP address and port.
+ * @param {Object} details - getMediaDetails() result.
+ * @returns {Promise<Object<string, boolean|null>>} hasAlpha keyed by clip path.
+ */
+export async function getStillAlpha(directorIp, details) {
+  const items = Object.entries(details)
+    .filter(([, d]) => d.alphaPending)
+    .map(([clip, d]) => ({ clip, source: d.source, codec: d.codec }));
+  const alpha = {};
+  let i = 0;
+  for (let calls = 0; i < items.length && calls < items.length; calls++) {
+    const res = await runScript(directorIp, stillAlphaScript, { items: items.slice(i, i + STILL_ALPHA_CHUNK_SIZE) });
+    if (!res || !(res.done > 0)) throw new Error('Reading still image headers failed');
+    Object.assign(alpha, res.alpha);
+    i += res.done;
+  }
+  return alpha;
 }
 
 /**
@@ -143,14 +172,16 @@ export async function getMappingList(directorIp) {
  * @returns {Promise<Array>} Filtered list of tracks.
  */
 export async function getTrackList(directorIp) {
-  const script = "return resourceManager.allResources(Track)";
-  const items = await executePython(directorIp, script);
-  
-  if (!Array.isArray(items)) return [];
+  // missing: the track's file is not found (Designer lists it as missing), same flag as clips
+  const script = 'return [{"track": t, "missing": bool(t.isInError)} for t in resourceManager.allResources(Track)]';
+  const rows = await executePython(directorIp, script);
 
-  return items
-    .filter(item => item.path)
-    .map(item => {
+  if (!Array.isArray(rows)) return [];
+
+  return rows
+    // Only user tracks: Designer keeps its own tracks under internal/ (e.g. internal/track/look/<uid>.apx)
+    .filter(row => row.track?.path && row.track.path.toLowerCase().startsWith('objects/'))
+    .map(({ track: item, missing }) => {
       const pathParts = item.path.split('/');
       let name = pathParts[pathParts.length - 1];
       if (name.toLowerCase().endsWith('.apx')) {
@@ -159,7 +190,8 @@ export async function getTrackList(directorIp) {
       return {
         uid: item.uid,
         path: item.path,
-        name: name
+        name: name,
+        missing: !!missing
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
@@ -295,19 +327,29 @@ export async function createLayerPlan(host, plan, onProgress) {
 }
 
 /**
+ * Why a track name cannot be used, or null. The name becomes the file objects/track/<name>.apx,
+ * so it must stay inside objects/track and be a valid Windows file name.
+ * @param {string} name - The trimmed track name.
+ * @returns {string|null}
+ */
+export function trackNameError(name) {
+  if (!name) return 'Name is required';
+  if (name.includes('..')) return 'Name cannot contain ..';
+  if (/[\\/:*?"<>|\u0000-\u001f]/.test(name)) return 'Name cannot contain \\ / : * ? " < > |';
+  return null;
+}
+
+/**
  * Creates a new Track resource in Disguise.
  * @param {string} host - The director or an editor of the session (the track syncs to all).
  * @param {string} trackName - The desired track name (must be unique).
  * @returns {Promise<{uid: string, path: string, name: string}>}
  */
 export async function createTrack(host, trackName) {
-  const script = `
-def run():
-    track = resourceManager.loadOrCreate("objects/track/${trackName}.apx", Track)
-    return track
-return run()
-`;
-  const result = await executePython(host, script);
+  const error = trackNameError(trackName);
+  if (error) throw new Error(error);
+  // The name goes to Python as JSON, never into the script source
+  const result = await runScript(host, trackCreateScript, { name: trackName });
   if (!result || !result.path) throw new Error('Failed to create track');
   const pathParts = result.path.split('/');
   let name = pathParts[pathParts.length - 1];

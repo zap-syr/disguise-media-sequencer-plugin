@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [1.2.3] - 2026-11-06
+
+### Fixed
+- **Create New Track** - the name is passed to Designer as data instead of being written into the script, so names with Cyrillic and other non-ASCII characters work. Names with `/`, `\`, `..` or characters Windows does not allow in file names are refused.
+- Clips, mappings and tracks whose path has four spaces in a row are found again.
+- Without `?director=` in the address the plugin talks to the machine that served it instead of `localhost`, so it works from a browser on another computer.
+- The track list no longer shows Designer's internal tracks (named like `0x2d828a5fd45804f6`).
+- Tracks whose file is missing in Designer are marked **MISSING** in the track list and can't be picked; a picked track that becomes missing after a Refresh is cleared.
+
+### Changed
+- **Offline fonts** - the Inter font ships with the plugin; nothing is loaded from the internet.
+- **Alpha of still images** is read in separate small calls after the media details, so a project with many PNG / EXR stills on slow storage no longer risks the Designer execute timeout. The alpha icons of stills appear a moment later.
+- README: tested Designer versions, and what Create does to the track length and to existing tags.
+- Removed unused files and the unused `@disguise-one/designer-pythonapi` dependency.
+
 ## [1.2.2] - 2026-11-05
 
 ### Added

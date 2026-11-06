@@ -681,7 +681,7 @@ async function handleCreateLayers(requestOptions) {
   height: 100vh;
   background-color: transparent;
   color: #d4d4d4;
-  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   overflow: hidden;
 }
 
