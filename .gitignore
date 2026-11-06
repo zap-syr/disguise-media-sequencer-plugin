@@ -27,3 +27,6 @@ examples/
 GEMINI.md
 .gemini/
 .claude/settings.local.json
+# Enables the owner's Claude Code plugin; kept local only
+.claude/settings.json
+.vite/
