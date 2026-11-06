@@ -10,6 +10,7 @@ import planPrepareScript from './python/plan_prepare.py?raw';
 import planLayersScript from './python/plan_layers.py?raw';
 import planMarkersScript from './python/plan_markers.py?raw';
 import sessionMachinesScript from './python/session_machines.py?raw';
+import trackCreateScript from './python/track_create.py?raw';
 
 /** d3net MachineRole of a Designer workstation joined to the session (MobileEditor). */
 export const EDITOR_ROLE = 5;
@@ -24,11 +25,12 @@ export const MARKER_CHUNK_SIZE = 300;
 /**
  * Turns `args` into a Python unicode string literal holding JSON, for `json.loads(__ARGS__)`.
  * JSON string escapes are valid in a Python u"" literal; non-ASCII is escaped so the
- * Python 2.7 source stays ASCII.
+ * Python 2.7 source stays ASCII. Spaces are escaped too: Designer turns every 4 spaces of an
+ * executed script into a tab, which would change a path with 4 spaces in a row.
  */
 function pythonJsonLiteral(args) {
   const literal = JSON.stringify(JSON.stringify(args))
-    .replace(/[\u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+    .replace(/[ \u007f-￿]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
   return 'u' + literal;
 }
 
@@ -295,19 +297,29 @@ export async function createLayerPlan(host, plan, onProgress) {
 }
 
 /**
+ * Why a track name cannot be used, or null. The name becomes the file objects/track/<name>.apx,
+ * so it must stay inside objects/track and be a valid Windows file name.
+ * @param {string} name - The trimmed track name.
+ * @returns {string|null}
+ */
+export function trackNameError(name) {
+  if (!name) return 'Name is required';
+  if (name.includes('..')) return 'Name cannot contain ..';
+  if (/[\\/:*?"<>|\u0000-\u001f]/.test(name)) return 'Name cannot contain \\ / : * ? " < > |';
+  return null;
+}
+
+/**
  * Creates a new Track resource in Disguise.
  * @param {string} host - The director or an editor of the session (the track syncs to all).
  * @param {string} trackName - The desired track name (must be unique).
  * @returns {Promise<{uid: string, path: string, name: string}>}
  */
 export async function createTrack(host, trackName) {
-  const script = `
-def run():
-    track = resourceManager.loadOrCreate("objects/track/${trackName}.apx", Track)
-    return track
-return run()
-`;
-  const result = await executePython(host, script);
+  const error = trackNameError(trackName);
+  if (error) throw new Error(error);
+  // The name goes to Python as JSON, never into the script source
+  const result = await runScript(host, trackCreateScript, { name: trackName });
   if (!result || !result.path) throw new Error('Failed to create track');
   const pathParts = result.path.split('/');
   let name = pathParts[pathParts.length - 1];

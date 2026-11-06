@@ -322,7 +322,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
-import { createTrack } from '../../services/disguiseService';
+import { createTrack, trackNameError } from '../../services/disguiseService';
 import { TIMECODE_RE } from '../../utils/timecode';
 import { describeMarkers } from '../../utils/planLayout';
 import { maskCueValue, isCueValueValid, maskMidiValue, isMidiValueValid } from '../../utils/tagInputs';
@@ -406,10 +406,10 @@ const isTimecodeIncrementValid = computed(() => !options.addTimecodeTag || TIMEC
 
 const newTrackNameError = computed(() => {
   const name = newTrackName.value.trim();
-  if (!name) return 'Name is required';
-  // The name goes into a Python string literal in createTrack()
-  if (/["\\]/.test(name)) return 'Name cannot contain " or \\';
-  if (props.tracks.some(t => t.name.toLowerCase() === name.toLowerCase())) return 'Name already exists';
+  const invalid = trackNameError(name);
+  if (invalid) return invalid;
+  const existing = props.tracks.find(t => t.name.toLowerCase() === name.toLowerCase());
+  if (existing) return existing.missing ? 'A missing track has this name' : 'Name already exists';
   return null;
 });
 
