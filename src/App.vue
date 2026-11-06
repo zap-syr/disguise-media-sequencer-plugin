@@ -8,9 +8,12 @@
 <script setup>
 import MediaSequencer from './components/MediaSequencer.vue'
 
-// Extract the director endpoint from the URL query parameters
+// The director endpoint: ?director= from Designer; without it, the host that served the page
+// (the plugin is served by the director). The Vite dev server falls back to a local Designer.
 const urlParams = new URLSearchParams(window.location.search)
-const directorEndpoint = urlParams.get('director') || 'localhost:80' // Fallback for development
+const directorEndpoint = urlParams.get('director')
+  || (!import.meta.env.DEV && window.location.host)
+  || 'localhost:80'
 </script>
 
 <style>
