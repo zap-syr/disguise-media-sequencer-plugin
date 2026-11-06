@@ -1,4 +1,4 @@
-# Disguise Media Sequencer Plugin
+# Media Sequencer for Disguise Designer
 
 This plugin offers an advanced interface for media browsing and automated layer generation within Disguise Designer. Browse and select project media, configure layer parameters, choose where the layers go on the timeline, and the plugin creates the video layers for you.
 
