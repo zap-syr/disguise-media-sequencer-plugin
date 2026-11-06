@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { getMediaList, getMediaDetails, getMappingList, getTrackList } from '../services/disguiseService';
+import { getMediaList, getMediaDetails, getStillAlpha, getMappingList, getTrackList } from '../services/disguiseService';
 
 /**
  * Media hierarchy, per-clip details, mappings and tracks loaded from Designer, with initial load and refresh.
@@ -29,9 +29,31 @@ export function useMediaLibrary(directorEndpoint, onError = () => {}) {
       getTrackList(directorEndpoint)
     ]);
     if (Array.isArray(media)) fullHierarchy.value = media;
-    if (details) mediaDetails.value = details;
+    if (details) {
+      mediaDetails.value = details;
+      loadStillAlpha(details); // not awaited: the alpha badges of stills arrive a bit later
+    }
     if (Array.isArray(mps)) mappings.value = mps;
     if (Array.isArray(trks)) tracks.value = trks;
+  }
+
+  // Alpha of stills is read in separate calls after the details. A Refresh started meanwhile
+  // makes the older result stale (detailsGeneration), so it never overwrites newer details.
+  let detailsGeneration = 0;
+  async function loadStillAlpha(details) {
+    const generation = ++detailsGeneration;
+    try {
+      const alpha = await getStillAlpha(directorEndpoint, details);
+      if (generation !== detailsGeneration) return;
+      const next = { ...mediaDetails.value };
+      for (const [clip, hasAlpha] of Object.entries(alpha)) {
+        if (next[clip]) next[clip] = { ...next[clip], hasAlpha, alphaPending: false };
+      }
+      mediaDetails.value = next;
+    } catch (err) {
+      console.error('Still image alpha unavailable:', err);
+      if (generation === detailsGeneration) onError(`Alpha of still images unavailable: ${err.message}`);
+    }
   }
 
   async function load() {

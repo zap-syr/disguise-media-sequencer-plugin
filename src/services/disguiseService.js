@@ -11,6 +11,7 @@ import planLayersScript from './python/plan_layers.py?raw';
 import planMarkersScript from './python/plan_markers.py?raw';
 import sessionMachinesScript from './python/session_machines.py?raw';
 import trackCreateScript from './python/track_create.py?raw';
+import stillAlphaScript from './python/still_alpha.py?raw';
 
 /** d3net MachineRole of a Designer workstation joined to the session (MobileEditor). */
 export const EDITOR_ROLE = 5;
@@ -21,6 +22,8 @@ const MACHINE_CHECK_TIMEOUT_MS = 2000;
 export const LAYER_CHUNK_SIZE = 100;
 /** Tags + splits per execute call: a 500-layer plan with TC, cue and MIDI tags places ~2000 markers. */
 export const MARKER_CHUNK_SIZE = 300;
+/** Still images per header-reading call (still_alpha.py also stops early on slow storage). */
+const STILL_ALPHA_CHUNK_SIZE = 50;
 
 /**
  * Turns `args` into a Python unicode string literal holding JSON, for `json.loads(__ARGS__)`.
@@ -107,11 +110,35 @@ export async function getMediaList(directorIp) {
  * Fetches per-clip metadata (kind, duration, resolution, alpha, audio...) keyed by VideoClip path.
  * @param {string} directorIp - The IP address and port.
  * @returns {Promise<Object<string, {kind: 'video'|'still'|'live', codec: string, nFrames: number,
- *   fps: number, duration: number|null, res: string, hasAlpha: boolean|null, hasAudio: boolean}>>}
+ *   fps: number, duration: number|null, res: string, hasAlpha: boolean|null, alphaPending: boolean,
+ *   hasAudio: boolean}>>} alphaPending: a still whose alpha comes later from getStillAlpha().
  */
 export async function getMediaDetails(directorIp) {
   const details = await executePython(directorIp, mediaDetailsScript);
   return details && typeof details === 'object' && !Array.isArray(details) ? details : {};
+}
+
+/**
+ * Alpha of the stills getMediaDetails() marked `alphaPending`, read from their file headers
+ * by still_alpha.py, STILL_ALPHA_CHUNK_SIZE per call. A call stops early on slow storage and
+ * reports how many it handled (at least one); the rest goes into the next call.
+ * @param {string} directorIp - The IP address and port.
+ * @param {Object} details - getMediaDetails() result.
+ * @returns {Promise<Object<string, boolean|null>>} hasAlpha keyed by clip path.
+ */
+export async function getStillAlpha(directorIp, details) {
+  const items = Object.entries(details)
+    .filter(([, d]) => d.alphaPending)
+    .map(([clip, d]) => ({ clip, source: d.source, codec: d.codec }));
+  const alpha = {};
+  let i = 0;
+  for (let calls = 0; i < items.length && calls < items.length; calls++) {
+    const res = await runScript(directorIp, stillAlphaScript, { items: items.slice(i, i + STILL_ALPHA_CHUNK_SIZE) });
+    if (!res || !(res.done > 0)) throw new Error('Reading still image headers failed');
+    Object.assign(alpha, res.alpha);
+    i += res.done;
+  }
+  return alpha;
 }
 
 /**

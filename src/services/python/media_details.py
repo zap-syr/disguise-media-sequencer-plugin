@@ -2,47 +2,15 @@
 # Imported by disguiseService.js (?raw) and runnable as a probe:
 #   node tools/designer-probes/run.mjs src/services/python/media_details
 # Verified against the media files on disk with tools/designer-probes/verify_media.mjs.
-# Alpha: videos use VideoAsset.hasAlpha; stills read their own file header, because
-# VideoAsset.hasAlpha is a default setting that is wrong for stills (see 09_alpha_resolved.py).
+# Alpha: videos use VideoAsset.hasAlpha. VideoAsset.hasAlpha is a default setting that is
+# wrong for stills (see 09_alpha_resolved.py): JPEG has none, other stills get
+# alphaPending and still_alpha.py reads their file header in separate calls, so many stills
+# on slow storage cannot push this call past the execute timeout.
 # missing: the clip is in error (its media was deleted or cannot be loaded), see 10_missing_media.py.
 import __builtin__
-import os.path
-import struct
 
-def still_alpha(path, codec):
-    kind = codec.split(":", 1)[1].upper() if ":" in codec else ""
-    if kind in ("JPEG", "JPG"):
-        return False
-    if not path or not os.path.exists(path):
-        return None
-    fh = open(path, "rb")
-    head = fh.read(64 * 1024)
-    fh.close()
-    if head[:8] == "\x89PNG\r\n\x1a\n":
-        if ord(head[25]) in (4, 6):
-            return True
-        pos = 8
-        while pos + 8 <= len(head):
-            length = struct.unpack(">I", head[pos:pos + 4])[0]
-            ctype = head[pos + 4:pos + 8]
-            if ctype == "tRNS":
-                return True
-            if ctype in ("IDAT", "IEND"):
-                break
-            pos += 12 + length
-        return False
-    if head[:4] == "\x76\x2f\x31\x01":
-        i = head.find("channels\x00chlist\x00")
-        if i < 0:
-            return None
-        p = i + len("channels\x00chlist\x00") + 4
-        names = []
-        while p < len(head) and head[p] != "\x00":
-            end = head.find("\x00", p)
-            names.append(head[p:end])
-            p = end + 1 + 16
-        return any(n == "A" or n.endswith(".A") for n in names)
-    return None
+def is_jpeg(codec):
+    return codec.split(":", 1)[1].upper() in ("JPEG", "JPG") if ":" in codec else False
 
 def run():
     out = {}
@@ -63,10 +31,12 @@ def run():
             src = str(f.fragments[0].proxies[0].path)
         except __builtin__.Exception:  # `Exception` is d3.Exception here and catches nothing
             pass
+        pending = False
         if live:
             alpha = None
         elif still:
-            alpha = still_alpha(src, codec)
+            alpha = False if is_jpeg(codec) else None
+            pending = alpha is None and bool(src) and not c.isInError
         else:
             alpha = bool(f.hasAlpha)
         size = c.fileFrameSize
@@ -79,6 +49,7 @@ def run():
             "transportDuration": str(c.transportDuration),
             "res": "%dx%d" % (int(size.x), int(size.y)),
             "hasAlpha": alpha,
+            "alphaPending": pending,
             "hasAudio": bool(c.hasAudio),
             "bitDepth": f.bitDepth,
             "source": src,
