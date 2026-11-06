@@ -19,6 +19,8 @@ There are two ways to work:
 
 ![Advanced mode, files list and plan](https://github.com/zap-syr/disguise-media-sequencer-plugin/blob/main/.github/aux-images/plugin-ui-3.png)
 
+Tested on Disguise Designer r34.0.3 and later.
+
 ## Download
 
 Download the latest release - [Media Sequencer](https://github.com/zap-syr/disguise-media-sequencer-plugin/releases/latest/download/Media.Sequencer.zip)
@@ -72,6 +74,8 @@ A clip whose media file was deleted in Designer is marked **MISSING**. It can't 
 ## Simple mode
 
 Select one or more files, configure the settings panel and click **Create**. A video layer is created for each selected file, one after another, in the order of the selection.
+
+In both modes, Create makes the track longer when the new layers go past its end, and a new tag replaces an existing tag of the same type at the same beat. Both can be undone in Designer.
 
 ### Mappings
 
